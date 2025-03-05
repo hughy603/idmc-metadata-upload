@@ -1,8 +1,4 @@
-import { screen, _fireEvent } from '@testing-library/react';
-import { screen, fireEvent } from '@testing-library/react';
-import { render } from '@testing-library/react';
-import { screen, _fireEvent } from '@testing-library/react';
-import { render, _RenderOptions } from '@testing-library/react'
+import { screen, _fireEvent, fireEvent, render, _RenderOptions } from '@testing-library/react';
 import React, { ReactElement } from 'react'
 
 // Define interface for wrapper provider props

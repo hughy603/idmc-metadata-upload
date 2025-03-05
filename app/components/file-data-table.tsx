@@ -1,6 +1,6 @@
+import { useEffect, useState } from 'react';
 'use client'
 
-import { useState, useEffect } from 'react'
 
 export interface FileDataRow {
   id: string
@@ -17,7 +17,7 @@ interface FileDataTableProps {
 export default function FileDataTable({
   data,
   onRowSubmit,
-}: FileDataTableProps) {
+}: FileDataTableProps): JSX.Element {
   const [tableData, setTableData] = useState<FileDataRow[]>([])
 
   useEffect(() => {
@@ -140,25 +140,25 @@ export default function FileDataTable({
               >
                 Status
               </th>
-              {headers.map(_header => (
+              {headers.map(header => (
                 <th
-                  key={_header}
+                  key={header}
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
                 >
-                  {_header}
+                  {header}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
-            {tableData.map(_row => (
+            {tableData.map(row => (
               <tr
-                key={_row.id}
+                key={row.id}
                 className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${
-                  _row.status === 'error'
+                  row.status === 'error'
                     ? 'bg-red-50 dark:bg-red-900/20'
-                    : _row.status === 'success'
+                    : row.status === 'success'
                       ? 'bg-green-50 dark:bg-green-900/20'
                       : ''
                 }`}
@@ -166,13 +166,13 @@ export default function FileDataTable({
                 <td className="whitespace-nowrap px-6 py-4 text-sm">
                   <div
                     className={`group relative flex items-center ${
-                      _row.status === 'error' ? 'cursor-help' : ''
+                      row.status === 'error' ? 'cursor-help' : ''
                     }`}
                   >
-                    {getStatusIcon(_row.status)}
+                    {getStatusIcon(row.status)}
 
                     {/* Show error icon with tooltip for errors */}
-                    {_row.status === 'error' && _row.error && (
+                    {row.status === 'error' && row.error && (
                       <div className="relative">
                         <span className="ml-2 text-red-500 dark:text-red-400">
                           <svg
@@ -194,7 +194,7 @@ export default function FileDataTable({
                         {/* Tooltip that appears on hover */}
                         <div className="absolute bottom-full left-0 z-10 mb-2 hidden group-hover:block">
                           <div className="max-w-xs rounded bg-gray-900 px-2 py-1 text-xs text-white">
-                            <p>{_row.error}</p>
+                            <p>{row.error}</p>
                             <div className="absolute left-3 top-full h-3 w-3 rotate-45 transform bg-gray-900"></div>
                           </div>
                         </div>
@@ -202,10 +202,10 @@ export default function FileDataTable({
                     )}
 
                     {/* Add retry button for error rows */}
-                    {_row.status === 'error' && onRowSubmit && (
+                    {row.status === 'error' && onRowSubmit && (
                       <button
                         type="button"
-                        onClick={() => onRowSubmit(_row)}
+                        onClick={() => onRowSubmit(row)}
                         className="ml-3 inline-flex items-center rounded border border-transparent bg-red-100 px-2 py-1 text-xs font-medium leading-4 text-red-700 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-red-900/40 dark:text-red-200 dark:hover:bg-red-900/60"
                       >
                         <svg
@@ -227,10 +227,10 @@ export default function FileDataTable({
                     )}
 
                     {/* Add process button for pending rows */}
-                    {_row.status === 'pending' && onRowSubmit && (
+                    {row.status === 'pending' && onRowSubmit && (
                       <button
                         type="button"
-                        onClick={() => onRowSubmit(_row)}
+                        onClick={() => onRowSubmit(row)}
                         className="ml-3 inline-flex items-center rounded border border-transparent bg-gray-100 px-2 py-1 text-xs font-medium leading-4 text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
                       >
                         Process
@@ -238,12 +238,12 @@ export default function FileDataTable({
                     )}
                   </div>
                 </td>
-                {headers.map(_header => (
+                {headers.map(header => (
                   <td
-                    key={`${_row.id}-${_header}`}
+                    key={`${row.id}-${header}`}
                     className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100"
                   >
-                    {String(_row.data[_header] || '')}
+                    {String(row.data[header] || '')}
                   </td>
                 ))}
               </tr>

@@ -1,11 +1,11 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 'use client'
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 
-import { InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-service'
+import type { InformaticaAuthCredentials } from '@/lib/utils/auth'
 
 // Map of regions to base URLs and API URLs
 export const REGION_URLS: Record<string, { baseUrl: string; apiUrl: string }> =
@@ -43,27 +43,24 @@ const authFormSchema = z.object({
 export type AuthFormValues = z.infer<typeof authFormSchema>
 
 interface AuthFormProps {
-  isLoading: boolean
-  error: string | null
+  isLoading?: boolean
+  error?: string | null
   onSubmit: (credentials: InformaticaAuthCredentials) => Promise<void>
-  onOAuthLogin: () => Promise<void>
+  onOAuthLogin?: () => Promise<void>
 }
 
 export default function AuthForm({
-  isLoading,
-  error,
+  isLoading = false,
+  error = null,
   onSubmit,
   onOAuthLogin,
-}: AuthFormProps) {
+}: AuthFormProps): JSX.Element {
   const [authMethod, setAuthMethod] = useState<'credentials' | 'oauth'>(
     'credentials'
   )
+  const [showPassword, setShowPassword] = useState(false)
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<AuthFormValues>({
+  const form = useForm<AuthFormValues>({
     resolver: zodResolver(authFormSchema),
     defaultValues: {
       username: '',
@@ -76,8 +73,6 @@ export default function AuthForm({
     const credentials: InformaticaAuthCredentials = {
       username: data.username,
       password: data.password,
-      baseUrl: REGION_URLS[data.region].baseUrl,
-      apiUrl: REGION_URLS[data.region].apiUrl,
     }
 
     await onSubmit(credentials)
@@ -116,7 +111,7 @@ export default function AuthForm({
         </div>
 
         {authMethod === 'credentials' ? (
-          <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
             <div className="mb-4">
               <label
                 htmlFor="username"
@@ -127,13 +122,13 @@ export default function AuthForm({
               <input
                 id="username"
                 type="text"
-                {...register('username')}
+                {...form.register('username')}
                 disabled={isLoading}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               />
-              {errors.username && (
+              {form.formState.errors.username && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.username.message}
+                  {form.formState.errors.username.message}
                 </p>
               )}
             </div>
@@ -147,14 +142,21 @@ export default function AuthForm({
               </label>
               <input
                 id="password"
-                type="password"
-                {...register('password')}
+                type={showPassword ? 'text' : 'password'}
+                {...form.register('password')}
                 disabled={isLoading}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               />
-              {errors.password && (
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="text-sm text-gray-500"
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+              {form.formState.errors.password && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.password.message}
+                  {form.formState.errors.password.message}
                 </p>
               )}
             </div>
@@ -168,7 +170,7 @@ export default function AuthForm({
               </label>
               <select
                 id="region"
-                {...register('region')}
+                {...form.register('region')}
                 disabled={isLoading}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
               >
@@ -178,9 +180,9 @@ export default function AuthForm({
                 <option value="canada">Canada</option>
                 <option value="uk">United Kingdom</option>
               </select>
-              {errors.region && (
+              {form.formState.errors.region && (
                 <p className="mt-1 text-sm text-red-600">
-                  {errors.region.message}
+                  {form.formState.errors.region.message}
                 </p>
               )}
             </div>

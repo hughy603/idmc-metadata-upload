@@ -1,7 +1,8 @@
 {
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit"
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
@@ -22,11 +23,12 @@
   "javascript.updateImportsOnFileMove.enabled": "always",
   "typescript.updateImportsOnFileMove.enabled": "always",
   "eslint.validate": [
-    "javascript",
-    "javascriptreact",
     "typescript",
-    "typescriptreact"
+    "typescriptreact",
+    "javascript",
+    "javascriptreact"
   ],
+  "eslint.format.enable": true,
   "eslint.options": {
     "overrideConfigFile": ".eslintrc.js"
   },
@@ -50,5 +52,30 @@
   "typescript.preferences.importModuleSpecifier": "non-relative",
   "files.associations": {
     "*.css": "tailwindcss"
+  },
+  "editor.rulers": [80],
+  "typescript.surveys.enabled": false,
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": "active",
+  "css.lint.unknownAtRules": "ignore",
+  "scss.lint.unknownAtRules": "ignore",
+  "workbench.colorCustomizations": {
+    "editorRuler.foreground": "#3a3a3a"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.classAttributes": ["class", "className", "ngClass", "class:list"],
+  "tailwindCSS.experimental.classRegex": [
+    ["cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]"]
+  ],
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.patterns": {
+    "*.ts": "${capture}.test.ts,${capture}.test.tsx,${capture}.spec.ts,${capture}.spec.tsx",
+    "*.tsx": "${capture}.test.ts,${capture}.test.tsx,${capture}.spec.ts,${capture}.spec.tsx,${capture}.css",
+    "package.json": "package-lock.json,yarn.lock,pnpm-lock.yaml,.npmrc,tsconfig.json,tsconfig.*.json,.prettierrc,.eslintrc.*,.eslintignore"
   }
 }

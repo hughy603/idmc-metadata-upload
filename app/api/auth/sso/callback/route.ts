@@ -1,11 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
+import { cookies } from 'next/headers';
+import { NextResponse , NextRequest } from 'next/server';
 
-import { authenticate } from '@/lib/services/auth-service'
-import {
-  InformaticaAuthCredentials,
-  INFORMATICA_REGIONS,
-} from '@/lib/utils/auth'
+
 
 /**
  * API route for handling OAuth callbacks from Informatica Cloud
@@ -13,7 +9,7 @@ import {
  * @param request The incoming request
  * @returns A response redirecting to the app with authentication info
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     // Get the authorization code from the query parameters
     const url = new URL(request.url)
@@ -46,7 +42,15 @@ export async function GET(request: NextRequest) {
     }
 
     // Extract region from state (encoded as region:randomString)
-    const [region] = state.split(':')
+    const [
+      _region,
+      _sessionId,
+      _redirectUrl,
+    ] = await Promise.all([
+      state.split(':')[0],
+      state.split(':')[1],
+      state.split(':')[2],
+    ])
 
     // Exchange the authorization code for an access token
     const tokenResponse = await fetch(

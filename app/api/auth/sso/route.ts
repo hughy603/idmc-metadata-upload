@@ -1,9 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { randomBytes } from 'crypto'
 
-import { cookies } from 'next/headers'
+import { randomBytes } from 'crypto';
 
-import { INFORMATICA_REGIONS } from '@/lib/services/auth-service'
+import { cookies } from 'next/headers';
+import { NextResponse , NextRequest } from 'next/server';
+
+import { INFORMATICA_REGIONS } from '@/lib/services/auth-service';
+
+
 
 /**
  * API route for initiating OAuth authentication with Informatica Cloud
@@ -11,7 +14,7 @@ import { INFORMATICA_REGIONS } from '@/lib/services/auth-service'
  * @param request The incoming request
  * @returns A response redirecting to Informatica's OAuth authorization endpoint
  */
-export async function GET(request: NextRequest) {
+export async function GET(request: NextRequest): Promise<Response> {
   try {
     // Get the region from the query parameters (default to US)
     const url = new URL(request.url)

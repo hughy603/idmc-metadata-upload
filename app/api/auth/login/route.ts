@@ -1,9 +1,18 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse , NextRequest } from 'next/server';
 
-import { authenticateWithInformatica, InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-service'
+import { authenticateWithInformatica } from '@/lib/services/informatica-mapping-service';
+
+import { InformaticaAuthCredentials } from '@/lib/types';
+
+interface InformaticaAuthCredentials {
+  username: string;
+  password: string;
+}
+
+
 
 // Define regions
-const INFORMATICA_REGIONS = {
+const _INFORMATICA_REGIONS = {
   US: {
     baseUrl: 'https://dm-us.informaticacloud.com',
     apiUrl: 'https://idmc-api.dm-us.informaticacloud.com',
@@ -24,7 +33,7 @@ const INFORMATICA_REGIONS = {
  * @param request The incoming request
  * @returns A response with the authentication token
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     // Get credentials from request body
     const body = await request.json()

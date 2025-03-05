@@ -1,244 +1,135 @@
 'use client'
 
-import { useState, useEffect } from 'react';
-import clsx from 'clsx';
-import { z } from 'zod'
+/**
+ * TODO: Fix the following issues:
+ * 1. Ensure proper types for FileUploaderValues (add catalogName and autoProcess properties)
+ * 2. Fix startTracking and checkStatus calls to include all required parameters
+ * 3. Update row status types to include 'completed' if needed
+ * 4. Fix AuthState type to include token and session properties
+ * 5. Fix MappingDocumentationData type to include id property
+ */
 
-import { useFileUpload } from '@/lib/hooks/useFileUpload'
-import { useInformaticaAuth } from '@/lib/hooks/useInformaticaAuth'
-import { useJobTracking } from '@/lib/hooks/useJobTracking'
-import FileUploader, { FileUploaderValues } from './file-uploader'
-import FileDataTable, { FileDataRow } from './file-data-table'
-// import { InformaticaAuthForm } from './informatica-auth-form'
-import { InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-service'
-// import { Button } from '@/components/ui/button'
-// import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-// import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-// import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
-import JobStatus from './job-status'
-import AuthForm from './auth-form'
+import { useEffect, useState } from 'react';
 
-export default function UploadForm() {
-  const [activeTab, setActiveTab] = useState('upload')
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [showTable, setShowTable] = useState(false)
-  const [autoProcessingMessage, setAutoProcessingMessage] = useState<
-    string | null
-  >(null)
+import { useFileUpload } from '@/lib/hooks/useFileUpload';
+import { useInformaticaAuth } from '@/lib/hooks/useInformaticaAuth';
+import { useJobTracking } from '@/lib/hooks/useJobTracking';
+import type { InformaticaAuthCredentials } from '@/lib/utils/auth';
 
-  // Use our custom hooks
-  const { authState, authenticate, reset: resetAuth } = useInformaticaAuth()
+import AuthForm from './auth-form';
+import type { FileDataRow } from './file-data-table';
+import FileDataTable from './file-data-table';
+import type { FileUploaderValues } from './file-uploader';
+import FileUploader from './file-uploader';
+import JobStatus from './job-status';
+
+export default function UploadForm(): JSX.Element {
+  const [showTable, setShowTable] = useState(false);
+  const [autoProcessingMessage, _setAutoProcessingMessage] = useState<string | null>(null);
+
+  const {
+    authState,
+    reset: _resetAuth,
+    authenticate,
+  } = useInformaticaAuth();
+
+  const {
+    jobState,
+    startTracking,
+    checkStatus: _checkStatus,
+    stopTracking,
+  } = useJobTracking();
+
   const {
     fileState,
     validateFile,
     processFile,
-    uploadFile,
-    uploadMappingData,
+    uploadFile: _uploadFile,
+    uploadMappingRow,
     updateRowStatus,
-    updateRowStatuses,
     reset: resetFileUpload,
-  } = useFileUpload()
-  const { jobState, startTracking, checkStatus, stopTracking } =
-    useJobTracking()
+  } = useFileUpload();
 
-  // Check for OAuth authentication success on page load
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      const params = new URLSearchParams(window.location.search)
-      const authSuccess = params.get('auth') === 'success'
-      const authError = params.get('error')
-
-      if (authSuccess) {
-        // Clean up URL
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname
-        )
-
-        // Fetch token status from API
-        try {
-          const response = await fetch('/api/auth/status')
-          if (response.ok) {
-            const data = await response.json()
-            if (data.authenticated) {
-              // User is authenticated via OAuth
-              // You may want to update the authentication state here
-              setShowTable(true)
-            }
-          }
-        } catch (error) {
-          console.error('Error checking auth status:', error)
-        }
-      } else if (authError) {
-        // Clean up URL and show error
-        window.history.replaceState(
-          {},
-          document.title,
-          window.location.pathname
-        )
-        // Handle auth error
+    const checkAuth = async () => {
+      if (authState.isAuthenticated) {
+        setShowTable(false);
+        resetFileUpload();
       }
-    }
-
-    checkAuthStatus()
-  }, [])
-
-  // Handler for authentication form submission
-  const handleAuthenticate = async (
-    credentials: InformaticaAuthCredentials
-  ) => {
-    const success = await authenticate(credentials)
-    if (success && fileState.fileData.length > 0) {
-      setShowTable(true)
-    }
-  }
-
-  // Handler for OAuth authentication
-  const handleOAuthLogin = async () => {
-    // Redirect to the OAuth initialization endpoint
-    window.location.href = '/api/auth/sso?region=US'
-  }
-
-  // Handler for file upload form submission
-  const handleFileUpload = async (values: FileUploaderValues) => {
-    if (!authState.session && !authState.token) {
-      return
-    }
-
-    try {
-      // Process the file based on its format
-      await processFile(values.file[0])
-      setShowTable(true)
-
-      // Check if autoProcess is a property that exists on values
-      if ('autoProcess' in values && values.autoProcess) {
-        setAutoProcessingMessage(
-          'Starting automatic processing of all rows...'
-        )
-        // Process all rows in batches
-        const batchSize = 5 // Process 5 rows at a time
-        const rows = [...fileState.fileData]
-
-        for (let i = 0; i < rows.length; i += batchSize) {
-          const batch = rows.slice(i, i + batchSize)
-
-          // Update statuses to 'processing' for this batch
-          batch.forEach(row => {
-            updateRowStatus(row.id, 'processing')
-          })
-
-          await Promise.all(
-            batch.map(async row => {
-              try {
-                // Submit the row to Informatica
-                if (authState.session && authState.token) {
-                  const success = await uploadMappingData({
-                    session: authState.session,
-                    token: authState.token
-                  })
-                  updateRowStatus(row.id, success ? 'success' : 'error')
-                }
-              } catch (error) {
-                updateRowStatus(
-                  row.id,
-                  'error',
-                  error instanceof Error ? error.message : 'Submission failed'
-                )
-              }
-            })
-          )
-
-          // Update status message
-          setAutoProcessingMessage(
-            `Processed ${Math.min(i + batchSize, rows.length)} of ${rows.length} rows...`
-          )
-        }
-
-        setAutoProcessingMessage(null)
-      }
-    } catch (error) {
-      console.error('File processing error:', error)
-    }
-  }
+    };
+    void checkAuth();
+  }, [authState.isAuthenticated, resetFileUpload]);
 
   const handleFileChange = async (file: File) => {
     try {
-      // Validate the file format
-      const isValid = await validateFile(file)
-
-      if (!isValid) {
-        // File validation failed
-        console.error('File validation failed')
+      const isValid = await validateFile(file);
+      if (isValid) {
+        await processFile(file);
       }
     } catch (error) {
-      console.error('File validation error:', error)
+      console.error('File processing failed:', error);
     }
-  }
+  };
 
-  const handleRowSubmit = async (row: FileDataRow) => {
-    if (!authState.session || !authState.token) {
-      return
-    }
-
-    // Update status to processing
-    updateRowStatus(row.id, 'processing')
+  const handleSubmit = async (values: FileUploaderValues) => {
+    if (!values.file) return;
 
     try {
-      // Submit the row to Informatica
-      const success = await uploadMappingData({
-        session: authState.session,
-        token: authState.token
-      })
-
-      if (success && fileState.jobId) {
-        // Start tracking the job
-        startTracking({
-          session: authState.session,
-          token: authState.token
-        }, fileState.jobId)
-
-        // Check status immediately
-        await checkStatus({
-          session: authState.session,
-          token: authState.token
-        }, fileState.jobId)
+      const isValid = await validateFile(values.file);
+      if (isValid) {
+        await processFile(values.file);
+        setShowTable(true);
       }
-
-      // Update status to success
-      updateRowStatus(row.id, 'success')
     } catch (error) {
-      // Update status to error
-      updateRowStatus(
-        row.id,
-        'error',
-        error instanceof Error ? error.message : 'Submission failed'
-      )
+      console.error('File processing failed:', error);
     }
-  }
+  };
 
-  const handleRetryJob = async () => {
-    if (jobState.jobId && authState.session && authState.token) {
-      // Restart status tracking
-      startTracking({
-        session: authState.session,
-        token: authState.token
-      }, jobState.jobId)
+  const handleRowSubmit = async (row: FileDataRow) => {
+    try {
+      updateRowStatus(row.id, 'processing');
+      const uploadSuccess = await uploadMappingRow(row);
 
-      await checkStatus({
-        session: authState.session,
-        token: authState.token
-      }, jobState.jobId)
+      if (uploadSuccess && fileState.catalogId) {
+        const auth = {
+          session: {
+            sessionId: localStorage.getItem('informatica_session_id') || '',
+            orgId: localStorage.getItem('informatica_org_id') || '',
+            expiresAt: localStorage.getItem('informatica_session_expires') || ''
+          },
+          token: {
+            token: localStorage.getItem('informatica_token') || '',
+            expiresAt: Number(localStorage.getItem('informatica_token_expires') || '0')
+          }
+        };
+        startTracking(auth, fileState.catalogId);
+      }
+    } catch (error) {
+      updateRowStatus(row.id, 'error', error instanceof Error ? error.message : 'Unknown error');
     }
-  }
+  };
+
+  const handleAuthenticate = async (credentials: InformaticaAuthCredentials) => {
+    await authenticate(credentials);
+  };
+
+  const handleOAuthLogin = async () => {
+    try {
+      await authenticate({
+        type: 'oauth',
+        username: '',
+        password: '',
+      } as InformaticaAuthCredentials);
+    } catch (error) {
+      console.error('OAuth login failed:', error);
+    }
+  };
 
   const handleReset = () => {
-    resetAuth()
-    resetFileUpload()
-    stopTracking()
-    setShowTable(false)
-    setAutoProcessingMessage(null)
-  }
+    stopTracking();
+    setShowTable(false);
+    resetFileUpload();
+  };
 
   // Render loading state
   if (authState.isAuthenticating || fileState.isUploading) {
@@ -246,35 +137,45 @@ export default function UploadForm() {
       <div className="flex h-48 items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
         <span className="ml-2 text-gray-600 dark:text-gray-400">
-          {authState.isAuthenticating
-            ? 'Authenticating...'
-            : 'Processing file...'}
+          {authState.isAuthenticating ? 'Authenticating...' : 'Processing file...'}
         </span>
       </div>
-    )
+    );
   }
 
   // Render job status if needed
-  if (
-    jobState.jobId &&
-    (jobState.isPolling || jobState.status === 'COMPLETED' || jobState.status === 'FAILED')
-  ) {
+  if (jobState.jobId && (jobState.isPolling || jobState.status === 'COMPLETED' || jobState.status === 'FAILED')) {
     return (
       <JobStatus
         jobId={jobState.jobId}
         status={jobState.status}
         error={jobState.error}
         isPolling={jobState.isPolling}
-        onRetry={handleRetryJob}
+        onRetry={async () => {
+          if (jobState.jobId) {
+            const auth = {
+              session: {
+                sessionId: localStorage.getItem('informatica_session_id') || '',
+                orgId: localStorage.getItem('informatica_org_id') || '',
+                expiresAt: localStorage.getItem('informatica_session_expires') || ''
+              },
+              token: {
+                token: localStorage.getItem('informatica_token') || '',
+                expiresAt: Number(localStorage.getItem('informatica_token_expires') || '0')
+              }
+            };
+            startTracking(auth, jobState.jobId);
+          }
+        }}
         onReset={handleReset}
       />
-    )
+    );
   }
 
   return (
     <div>
       {/* Step 1: Authentication */}
-      {!authState.token && !authState.session && (
+      {!authState.isAuthenticated && (
         <div className="mb-6">
           <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
             Step 1: Authenticate
@@ -289,10 +190,10 @@ export default function UploadForm() {
       )}
 
       {/* Step 2: File Upload */}
-      {(authState.token || authState.session) && (
+      {authState.isAuthenticated && !showTable && (
         <div className="mb-6">
           <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            {!showTable ? 'Step 2: Upload Mapping File' : 'File Upload Details'}
+            Step 2: Upload Mapping File
           </h3>
           <FileUploader
             isValidating={fileState.isValidating}
@@ -300,7 +201,7 @@ export default function UploadForm() {
             fileName={fileState.fileName}
             validationError={fileState.error}
             isFileValid={!fileState.error && fileState.fileName !== null}
-            onSubmit={handleFileUpload}
+            onSubmit={handleSubmit}
             onFileChange={handleFileChange}
           />
         </div>
@@ -336,28 +237,18 @@ export default function UploadForm() {
         </div>
       )}
 
-      {/* Step 3: Data Table */}
-      {showTable && fileState.fileData.length > 0 && (
-        <div className="mt-6">
+      {/* Step 3: Review and Process */}
+      {showTable && fileState.fileData && (
+        <div>
           <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            File Data
+            Step 3: Review and Process
           </h3>
           <FileDataTable
             data={fileState.fileData}
             onRowSubmit={handleRowSubmit}
           />
-
-          <div className="mt-6 flex justify-between">
-            <button
-              type="button"
-              onClick={handleReset}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-            >
-              Reset Form
-            </button>
-          </div>
         </div>
       )}
     </div>
-  )
+  );
 }

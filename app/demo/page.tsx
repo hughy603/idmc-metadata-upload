@@ -1,4 +1,4 @@
-export default function DemoPage() {
+export default function DemoPage(): JSX.Element {
   return (
     <div className="flex min-h-screen flex-col">
       <div className="container mx-auto px-4 py-8">

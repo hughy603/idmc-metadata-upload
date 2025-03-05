@@ -1,7 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
 
-import { refreshTokenIfNeeded } from '@/lib/services/auth-service'
-import { InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-service'
+import { authenticate } from '@/lib/services/token-service';
+
+interface InformaticaAuthCredentials {
+  username: string;
+  password: string;
+  baseUrl?: string;
+  apiUrl?: string;
+}
 
 /**
  * API route for refreshing an authentication token
@@ -9,7 +15,7 @@ import { InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-s
  * @param request The incoming request
  * @returns A response with the refreshed token
  */
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest): Promise<Response> {
   try {
     // Get credentials from request body
     const body = await request.json()
@@ -29,29 +35,25 @@ export async function POST(request: NextRequest) {
       apiUrl: body.apiUrl || 'https://idmc-api.dm-us.informaticacloud.com',
     }
 
-    // Refresh token if needed
-    const token = await refreshTokenIfNeeded(credentials)
+    // Authenticate with the provided credentials
+    const result = await authenticate(credentials)
 
-    if (!token) {
+    if (!result.success) {
       return NextResponse.json(
-        { error: 'Failed to refresh token' },
+        { error: result.error || 'Authentication failed' },
         { status: 401 }
       )
     }
 
-    // Return token and expiration
+    // Return success response
     return NextResponse.json({
-      accessToken: token.accessToken,
-      expiresAt: token.expiresAt,
+      success: true
     })
   } catch (error) {
-    console.error('Token refresh error:', error)
-
+    console.error('Error refreshing token:', error)
     return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : 'Token refresh failed',
-      },
-      { status: 401 }
+      { error: 'Internal server error' },
+      { status: 500 }
     )
   }
 }

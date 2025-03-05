@@ -1,12 +1,11 @@
+import * as XLSX from 'xlsx-js-style';
+
+import type { MappingDocumentationData } from '@/lib/services/informatica-mapping-service';
 /**
  * Utility functions for parsing mapping documentation files
  */
 
-import { useState } from 'react'
-import Papa from 'papaparse'
-import * as XLSX from 'xlsx-js-style'
 
-import { MappingDocumentationData } from '@/lib/services/informatica-mapping-service'
 
 /**
  * Parse an Excel or CSV file containing mapping documentation
@@ -18,9 +17,9 @@ import { MappingDocumentationData } from '@/lib/services/informatica-mapping-ser
  * - TargetSystem
  * - TargetTable
  * - TargetColumn
- * - TransformationLogic (_optional)
- * - BusinessTerm (_optional)
- * - Description (_optional)
+ * - TransformationLogic (optional)
+ * - BusinessTerm (optional)
+ * - Description (optional)
  *
  * @param file The Excel or CSV file to parse
  * @returns Promise resolving to an array of mapping data
@@ -35,66 +34,68 @@ export async function parseMappingFile(
       reader.onload = e => {
         try {
           if (!e.target || !e.target.result) {
-            throw new Error('Error reading file')
-          }
-
-          // Parse the file using XLSX
-          const workbook = XLSX.read(e.target.result, { type: 'binary' })
-
-          // Assume the first sheet contains the mapping data
-          const firstSheetName = workbook.SheetNames[0]
-          const worksheet = workbook.Sheets[firstSheetName]
-
-          // Convert to JSON
-          const jsonData = XLSX.utils.sheet_to_json(worksheet)
-
-          if (jsonData.length === 0) {
             throw new Error('No data found in file')
           }
 
-          // Transform to our expected format
-          const mappingData: MappingDocumentationData[] = jsonData.map(
-            (row: any, index: number) => {
-              // Validate required fields
-              const missingFields = []
+          // Parse the file using XLSX
+          try {
+            const workbook = XLSX.read(e.target.result, { type: 'binary' })
 
-              if (!row.SourceSystem) missingFields.push('SourceSystem')
-              if (!row.SourceTable) missingFields.push('SourceTable')
-              if (!row.SourceColumn) missingFields.push('SourceColumn')
-              if (!row.TargetSystem) missingFields.push('TargetSystem')
-              if (!row.TargetTable) missingFields.push('TargetTable')
-              if (!row.TargetColumn) missingFields.push('TargetColumn')
+            // Assume the first sheet contains the mapping data
+            const firstSheetName = workbook.SheetNames[0]
+            const worksheet = workbook.Sheets[firstSheetName]
 
-              if (missingFields.length > 0) {
-                throw new Error(
-                  `Invalid mapping data at row ${
-                    index + 1
-                  }. Missing required fields: ${missingFields.join(', ')}`
-                )
-              }
+            // Convert to JSON
+            const jsonData = XLSX.utils.sheet_to_json(worksheet)
 
-              return {
-                sourceSystem: row.SourceSystem,
-                sourceTable: row.SourceTable,
-                sourceColumn: row.SourceColumn,
-                targetSystem: row.TargetSystem,
-                targetTable: row.TargetTable,
-                targetColumn: row.TargetColumn,
-                transformationLogic: row.TransformationLogic || undefined,
-                businessTerm: row.BusinessTerm || undefined,
-                description: row.Description || undefined,
-              }
+            if (jsonData.length === 0) {
+              throw new Error('No data found in file')
             }
-          )
 
-          resolve(mappingData)
-        } catch (error) {
-          if (error instanceof Error) {
-            if (error.message.startsWith('Invalid')) {
+            // Transform to our expected format
+            const mappingData: MappingDocumentationData[] = jsonData.map(
+              (row: any, index: number) => {
+                // Validate required fields
+                const missingFields = []
+
+                if (!row.SourceSystem) missingFields.push('SourceSystem')
+                if (!row.SourceTable) missingFields.push('SourceTable')
+                if (!row.SourceColumn) missingFields.push('SourceColumn')
+                if (!row.TargetSystem) missingFields.push('TargetSystem')
+                if (!row.TargetTable) missingFields.push('TargetTable')
+                if (!row.TargetColumn) missingFields.push('TargetColumn')
+
+                if (missingFields.length > 0) {
+                  throw new Error(
+                    `Required fields missing in row ${index + 1}: ${missingFields.join(', ')}`
+                  )
+                }
+
+                return {
+                  sourceSystem: row.SourceSystem,
+                  sourceTable: row.SourceTable,
+                  sourceColumn: row.SourceColumn,
+                  targetSystem: row.TargetSystem,
+                  targetTable: row.TargetTable,
+                  targetColumn: row.TargetColumn,
+                  transformationLogic: row.TransformationLogic || undefined,
+                  businessTerm: row.BusinessTerm || undefined,
+                  description: row.Description || undefined,
+                }
+              }
+            )
+
+            resolve(mappingData)
+          } catch (error) {
+            if (error instanceof Error) {
               reject(new Error(`Error parsing file: ${error.message}`))
             } else {
-              reject(error)
+              reject(new Error('Error parsing file: Unknown error'))
             }
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            reject(error)
           } else {
             reject(new Error('Unknown error parsing file'))
           }
@@ -102,7 +103,7 @@ export async function parseMappingFile(
       }
 
       reader.onerror = error => {
-        reject(new Error('Error reading file'))
+        reject(new Error('No data found in file'))
       }
 
       // Read the file as binary
@@ -124,6 +125,17 @@ export async function validateMappingFile(file: File): Promise<{
   errors?: string[]
   mappingData?: MappingDocumentationData[]
 }> {
+  // Check file extension first
+  const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+  const allowedExtensions = ['.xlsx', '.csv'];
+
+  if (!allowedExtensions.includes(fileExtension)) {
+    return {
+      isValid: false,
+      errors: ['Invalid file format. Please upload an Excel (.xlsx) or CSV (.csv) file.'],
+    };
+  }
+
   try {
     const mappingData = await parseMappingFile(file)
 
@@ -134,29 +146,10 @@ export async function validateMappingFile(file: File): Promise<{
     }
   } catch (error) {
     if (error instanceof Error) {
-      // Make sure error messages align with test expectations
-      let errorMessage = error.message
-      if (errorMessage === 'Failed to read file') {
-        errorMessage = 'No data found in file'
-      } else if (errorMessage.includes('Missing required mapping fields')) {
-        // Extract the row data and determine which fields are missing
-        const rowMatch = error.message.match(/row: (.+)/)
-        if (rowMatch) {
-          try {
-            const rowData = JSON.parse(rowMatch[1])
-            const missingFields = []
-            if (!rowData.SourceSystem) missingFields.push('SourceSystem')
-            if (!rowData.SourceTable) missingFields.push('SourceTable')
-            if (!rowData.SourceColumn) missingFields.push('SourceColumn')
-            if (!rowData.TargetSystem) missingFields.push('TargetSystem')
-            if (!rowData.TargetTable) missingFields.push('TargetTable')
-            if (!rowData.TargetColumn) missingFields.push('TargetColumn')
-
-            errorMessage = `Required fields missing in row 1: ${missingFields.join(', ')}`
-          } catch (_e) {
-            // If JSON parsing fails, use the original message
-          }
-        }
+      // Extract the actual error message without the "Error parsing file:" prefix
+      let errorMessage = error.message;
+      if (errorMessage.startsWith('Error parsing file:')) {
+        errorMessage = errorMessage.substring('Error parsing file:'.length).trim();
       }
 
       return {
@@ -201,7 +194,7 @@ export function generateMappingTemplate(): Uint8Array {
       TargetSystem: 'TargetSystem1',
       TargetTable: 'CustomerDim',
       TargetColumn: 'FirstName',
-      TransformationLogic: 'TRIM(_FirstName)',
+      TransformationLogic: 'TRIM(FirstName)',
       BusinessTerm: 'Customer First Name',
       Description: '',
     },

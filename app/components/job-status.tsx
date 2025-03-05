@@ -1,7 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react';
-import clsx from 'clsx';
 
 interface JobStatusProps {
   jobId: string | null
@@ -19,7 +17,7 @@ export default function JobStatus({
   isPolling,
   onRetry,
   onReset,
-}: JobStatusProps) {
+}: JobStatusProps): JSX.Element {
   if (!jobId) {
     return null
   }

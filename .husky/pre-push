@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "Running pre-push checks..."
+
+# Run TypeScript type check
+echo "🔍 Running TypeScript type check..."
+npm run typecheck || { echo "❌ TypeScript check failed"; exit 1; }
+
+# Run tests with coverage
+echo "🧪 Running tests with coverage..."
+npm run test:coverage || { echo "❌ Tests failed"; exit 1; }
+
+# Check for duplicate code
+echo "👯 Checking for duplicate code..."
+npm run duplicate-check || { echo "⚠️ Duplicate code check found issues"; }
+
+# Check for accessibility issues
+echo "♿ Checking for accessibility issues..."
+npm run axe-lint || { echo "⚠️ Accessibility check found issues"; }
+
+echo "✅ All pre-push checks passed! Pushing..."

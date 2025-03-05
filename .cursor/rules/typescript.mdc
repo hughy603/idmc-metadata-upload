@@ -36,6 +36,7 @@ alwaysApply: false
 - Always handle error parameters in callbacks
 - Limit line length to 80 characters
 - Use trailing commas in multiline object/array literals
+- Put linting config in `eslint.config.js`
 
 # Naming Conventions
 

@@ -1,7 +1,9 @@
-import Papa from 'papaparse'
-import * as XLSX from 'xlsx-js-style'
+/* eslint-disable import/order */
+import type { FileDataRow } from '@/app/components/file-data-table';
 
-import { FileDataRow } from '@/app/components/file-data-table'
+import Papa from 'papaparse';
+import * as XLSX from 'xlsx-js-style';
+/* eslint-enable import/order */
 
 /**
  * Parse Excel or CSV file and return structured data
@@ -80,7 +82,7 @@ async function parseCsvFile(file: File): Promise<FileDataRow[]> {
               row =>
                 row !== null &&
                 typeof row === 'object' &&
-                Object.keys(row as object).length > 0
+                Object.keys(row).length > 0
             ) // Filter out empty rows
             .map((row, index) => ({
               id: `row-${index}`,

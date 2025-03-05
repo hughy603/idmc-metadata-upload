@@ -1,14 +1,14 @@
+import { useState } from 'react';
+
+import { useMockAuth } from '@/lib/providers/mock-auth-provider';
 'use client'
 
-import { useState, useEffect } from 'react';
-import clsx from 'clsx';
-import { useMockAuth } from '@/lib/providers/mock-auth-provider'
 
 /**
  * Development-only component for enabling mock authentication
  * This component only appears in development mode
  */
-export default function DevMockAuth() {
+export default function DevMockAuth(): JSX.Element {
   const { isMockAuthEnabled, enableMockAuth, disableMockAuth } = useMockAuth()
   const [username, setUsername] = useState('test.user@example.com')
   const [password, setPassword] = useState('password123')
@@ -28,7 +28,7 @@ export default function DevMockAuth() {
     return (
       <div className="fixed bottom-4 right-4 z-50">
         <button
-          onClick={() => setIsOpen(true)}
+          onClick={(error) => setIsOpen(true)}
           className="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-purple-700"
         >
           Enable Mock Auth
@@ -60,7 +60,7 @@ export default function DevMockAuth() {
           Development Mock Auth
         </h3>
         <button
-          onClick={() => setIsOpen(false)}
+          onClick={(e) => setIsOpen(false)}
           className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-700"
         >
           <svg
@@ -115,7 +115,7 @@ export default function DevMockAuth() {
 
         <div className="flex justify-end space-x-2">
           <button
-            onClick={() => setIsOpen(false)}
+            onClick={(e) => setIsOpen(false)}
             className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           >
             Cancel

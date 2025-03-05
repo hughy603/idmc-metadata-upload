@@ -1,22 +1,22 @@
 import {
-  authenticateWithInformatica,
-  _checkImportJobStatus,
-  _importMappingDocumentation,
-  _uploadMappingFile,
-} from '@/lib/services/informatica-mapping-service'
-
-import {
   mockAuthResponse,
-  _mockFailedAuthResponse,
-  _mockFailedJobResponse,
-  _mockFailedJobStatusResponse,
-  _mockJobResponse,
-  _mockJobStatusResponse,
-  _mockRunningJobStatusResponse,
-} from '../../mocks/handlers'
+  mockFailedAuthResponse,
+  mockJobResponse,
+  mockFailedJobResponse,
+  mockJobStatusResponse,
+  mockRunningJobStatusResponse,
+  mockFailedJobStatusResponse
+} from '../../mocks/handlers';
+import {
+  authenticateWithInformatica,
+  checkImportJobStatus,
+  importMappingDocumentation,
+  uploadMappingFile
+} from '@/lib/services/informatica-mapping-service';
 
 // Mock fetch globally
-const mockFetch = global.fetch as jest.Mock
+global.fetch = jest.fn();
+const mockFetch = global.fetch as jest.Mock;
 
 // Helper to create proper Response objects for mocking
 const createMockResponse = (
@@ -27,42 +27,42 @@ const createMockResponse = (
 ) => {
   return {
     ok,
-    _status,
-    _statusText,
-    json: jest.fn().mockResolvedValue(_data),
-    text: jest.fn().mockResolvedValue(JSON.stringify(_data)),
-  }
-}
+    status,
+    statusText,
+    json: jest.fn().mockResolvedValue(data),
+    text: jest.fn().mockResolvedValue(JSON.stringify(data)),
+  };
+};
 
 describe('Informatica Mapping Service', () => {
   beforeEach(() => {
-    mockFetch.mockClear()
-  })
+    mockFetch.mockClear();
+  });
 
   describe('authenticateWithInformatica', () => {
     it('should authenticate successfully', async () => {
       // Mock successful login response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, {
-          sessionId: 'mock-session-id',
-          orgId: 'mock-org-id',
+        createMockResponse(true, {
+          sessionId: mockAuthResponse.sessionId,
+          orgId: mockAuthResponse.orgId,
         })
-      )
+      );
 
       // Mock successful token response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, { token: 'mock-token' })
-      )
+        createMockResponse(true, { token: mockAuthResponse.token })
+      );
 
       const result = await authenticateWithInformatica({
         username: 'testuser',
         password: 'testpass',
         baseUrl: 'https://test-base-url.com',
         apiUrl: 'https://test-api-url.com/api',
-      })
+      });
 
-      expect(_mockFetch).toHaveBeenCalledTimes(2)
-      expect(_mockFetch).toHaveBeenNthCalledWith(
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(mockFetch).toHaveBeenNthCalledWith(
         1,
         'https://test-base-url.com/identity-service/api/v1/Login',
         expect.objectContaining({
@@ -75,31 +75,31 @@ describe('Informatica Mapping Service', () => {
             password: 'testpass',
           }),
         })
-      )
+      );
 
-      expect(_result).toEqual({
+      expect(result).toEqual({
         session: {
-          sessionId: 'mock-session-id',
-          orgId: 'mock-org-id',
+          sessionId: mockAuthResponse.sessionId,
+          orgId: mockAuthResponse.orgId,
           apiUrl: 'https://test-api-url.com/api',
         },
         token: {
-          token: 'mock-token',
-          expiresAt: expect.any(_Number),
+          token: mockAuthResponse.token,
+          expiresAt: expect.any(Number),
         },
-      })
-    })
+      });
+    });
 
     it('should handle authentication failure', async () => {
       // Mock failed authentication response
       mockFetch.mockResolvedValueOnce(
         createMockResponse(
           false,
-          { error: 'Invalid credentials' },
+          mockFailedAuthResponse,
           401,
           'Unauthorized'
         )
-      )
+      );
 
       await expect(
         authenticateWithInformatica({
@@ -108,11 +108,11 @@ describe('Informatica Mapping Service', () => {
           baseUrl: 'https://test-base-url.com',
           apiUrl: 'https://test-api-url.com/api',
         })
-      ).rejects.toThrow('Login failed: {"error":"Invalid credentials"}')
-    })
+      ).rejects.toThrow(`Login failed: ${JSON.stringify(mockFailedAuthResponse)}`);
+    });
 
     it('should handle network errors', async () => {
-      mockFetch.mockRejectedValueOnce(new Error('Network error'))
+      mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(
         authenticateWithInformatica({
@@ -121,21 +121,21 @@ describe('Informatica Mapping Service', () => {
           baseUrl: 'https://test-base-url.com',
           apiUrl: 'https://test-api-url.com/api',
         })
-      ).rejects.toThrow('Network error')
-    })
-  })
+      ).rejects.toThrow('Network error');
+    });
+  });
 
   describe('importMappingDocumentation', () => {
     const mockSessionInfo = {
-      sessionId: 'mock-session-id',
-      orgId: 'mock-org-id',
+      sessionId: mockAuthResponse.sessionId,
+      orgId: mockAuthResponse.orgId,
       apiUrl: 'https://test-api-url.com',
-    }
+    };
 
     const mockAuthToken = {
-      token: 'mock-token',
+      token: mockAuthResponse.token,
       expiresAt: Date.now() + 3600000,
-    }
+    };
 
     const mockMappingData = [
       {
@@ -149,203 +149,208 @@ describe('Informatica Mapping Service', () => {
         businessTerm: 'CustomerID',
         description: 'Test description',
       },
-    ]
+    ];
 
     it('should import mapping documentation successfully', async () => {
       // Mock successful import response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, { jobId: 'mock-job-id' })
-      )
+        createMockResponse(true, mockJobResponse)
+      );
 
       const result = await importMappingDocumentation(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        _mockMappingData
-      )
+        mockMappingData
+      );
 
-      expect(_mockFetch).toHaveBeenCalledTimes(1)
-      expect(_result).toEqual({
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
         success: true,
-        jobId: 'mock-job-id',
-      })
-    })
+        jobId: mockJobResponse.jobId,
+      });
+    });
 
     it('should handle import failure', async () => {
       // Mock failed import response
       mockFetch.mockResolvedValueOnce(
         createMockResponse(
           false,
-          { error: 'Invalid data format' },
+          mockFailedJobResponse,
           400,
           'Bad Request'
         )
-      )
+      );
 
       const result = await importMappingDocumentation(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        _mockMappingData
-      )
+        mockMappingData
+      );
 
-      expect(_result).toEqual({
+      expect(result).toEqual({
         success: false,
         error:
-          'Failed to import mapping documentation: {"error":"Invalid data format"}',
-      })
-    })
-  })
+          `Failed to import mapping documentation: ${JSON.stringify(mockFailedJobResponse)}`,
+      });
+    });
+  });
 
   describe('uploadMappingFile', () => {
     const mockSessionInfo = {
-      sessionId: 'mock-session-id',
-      orgId: 'mock-org-id',
+      sessionId: mockAuthResponse.sessionId,
+      orgId: mockAuthResponse.orgId,
       apiUrl: 'https://test-api-url.com',
-    }
+    };
 
     const mockAuthToken = {
-      token: 'mock-token',
+      token: mockAuthResponse.token,
       expiresAt: Date.now() + 3600000,
-    }
+    };
 
     const mockFile = new File(['test file content'], 'test-mapping.xlsx', {
       type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    })
+    });
 
     it('should upload mapping file successfully', async () => {
       // Mock successful upload response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, { jobId: 'mock-job-id' })
-      )
+        createMockResponse(true, mockJobResponse)
+      );
 
       const result = await uploadMappingFile(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        _mockFile
-      )
+        mockFile
+      );
 
-      expect(_mockFetch).toHaveBeenCalledTimes(1)
-      expect(_result).toEqual({
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
         success: true,
-        jobId: 'mock-job-id',
-      })
-    })
+        jobId: mockJobResponse.jobId,
+      });
+    });
 
     it('should handle upload failure', async () => {
       // Mock failed upload response
       mockFetch.mockResolvedValueOnce(
         createMockResponse(
           false,
-          { error: 'Invalid file format' },
+          mockFailedJobResponse,
           400,
           'Bad Request'
         )
-      )
+      );
 
       const result = await uploadMappingFile(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        _mockFile
-      )
+        mockFile
+      );
 
-      expect(_result).toEqual({
+      expect(result).toEqual({
         success: false,
-        error: 'Failed to upload mapping file: {"error":"Invalid file format"}',
-      })
-    })
-  })
+        error: `Failed to upload mapping file: ${JSON.stringify(mockFailedJobResponse)}`,
+      });
+    });
+  });
 
   describe('checkImportJobStatus', () => {
     const mockSessionInfo = {
-      sessionId: 'mock-session-id',
-      orgId: 'mock-org-id',
+      sessionId: mockAuthResponse.sessionId,
+      orgId: mockAuthResponse.orgId,
       apiUrl: 'https://test-api-url.com',
-    }
+    };
 
     const mockAuthToken = {
-      token: 'mock-token',
+      token: mockAuthResponse.token,
       expiresAt: Date.now() + 3600000,
-    }
+    };
 
-    it('should check job status successfully - COMPLETED', async () => {
+    it('should check job status successfully - completed', async () => {
       // Mock successful job status response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, { status: 'COMPLETED' })
-      )
+        createMockResponse(true, mockJobStatusResponse)
+      );
 
       const result = await checkImportJobStatus(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        'test-job-id'
-      )
+        'mock-job-id'
+      );
 
-      expect(_mockFetch).toHaveBeenCalledTimes(1)
-      expect(_result).toEqual({
-        status: 'COMPLETED',
-        details: { status: 'COMPLETED' },
-      })
-    })
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        success: true,
+        status: mockJobStatusResponse.status,
+        isComplete: true,
+      });
+    });
 
-    it('should check job status successfully - RUNNING', async () => {
-      // Mock running job status
+    it('should check job status successfully - running', async () => {
+      // Mock running job status response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, { status: 'RUNNING' })
-      )
+        createMockResponse(true, mockRunningJobStatusResponse)
+      );
 
       const result = await checkImportJobStatus(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        'test-job-id'
-      )
+        'mock-job-id'
+      );
 
-      expect(_result).toEqual({
-        status: 'RUNNING',
-        details: { status: 'RUNNING' },
-      })
-    })
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        success: true,
+        status: mockRunningJobStatusResponse.status,
+        isComplete: false,
+      });
+    });
 
-    it('should check job status successfully - FAILED', async () => {
-      // Mock failed job status
+    it('should check job status successfully - failed', async () => {
+      // Mock failed job status response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_true, {
-          status: 'FAILED',
-          error: 'Import job failed',
-        })
-      )
+        createMockResponse(true, mockFailedJobStatusResponse)
+      );
 
       const result = await checkImportJobStatus(
         {
           session: mockSessionInfo,
           token: mockAuthToken,
         },
-        'test-job-id'
-      )
+        'mock-job-id'
+      );
 
-      expect(_result).toEqual({
-        status: 'FAILED',
-        details: {
-          error: 'Import job failed',
-          status: 'FAILED',
-        },
-      })
-    })
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        success: true,
+        status: mockFailedJobStatusResponse.status,
+        isComplete: true,
+        error: mockFailedJobStatusResponse.error,
+      });
+    });
 
-    it('should handle status check failure', async () => {
+    it('should handle job status check failure', async () => {
       // Mock failed job status check
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(_false, { error: 'Job not found' }, 404, 'Not Found')
-      )
+        createMockResponse(
+          false,
+          { error: 'Job not found' },
+          404,
+          'Not Found'
+        )
+      );
 
       await expect(
         checkImportJobStatus(
@@ -353,9 +358,9 @@ describe('Informatica Mapping Service', () => {
             session: mockSessionInfo,
             token: mockAuthToken,
           },
-          'nonexistent-job'
+          'invalid-job-id'
         )
-      ).rejects.toThrow('Failed to check job status: {"error":"Job not found"}')
-    })
-  })
-})
+      ).rejects.toThrow('Failed to check job status: {"error":"Job not found"}');
+    });
+  });
+});

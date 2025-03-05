@@ -1,96 +1,150 @@
+import { getApiBaseUrl } from '@/lib/utils/auth';
+
+import { authService } from './auth-service';
 /**
- * API client for making authenticated requests to Informatica Cloud
+ * A simplified API client for Informatica Cloud API
  */
 
-import { getApiBaseUrl } from '@/lib/utils/auth'
-import { InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-service'
 
-import { getCurrentAuth, authenticate } from './auth-service'
+// Informatica API response interface
+export interface ApiResponse<T> {
+  success: boolean
+  data?: T
+  error?: string
+  statusCode?: number
+}
 
-// Types for API requests
-export interface ApiRequestOptions {
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
-  headers?: Record<string, string>
+// API request options
+interface ApiRequestOptions {
+  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
   body?: any
-  credentials?: InformaticaAuthCredentials
+  headers?: Record<string, string>
+  requiresAuth?: boolean
 }
 
 /**
- * Makes an authenticated request to the Informatica Cloud API
+ * Makes an API request to the Informatica Cloud API
  *
- * @param endpoint The API endpoint to call (without the base URL)
+ * @param endpoint The API endpoint to call (without base URL)
  * @param options Request options
- * @returns The API response
+ * @returns A typed API response
  */
 export async function apiRequest<T = any>(
   endpoint: string,
   options: ApiRequestOptions = {}
-): Promise<T> {
-  const auth = getCurrentAuth()
-  const credentials = options.credentials
+): Promise<ApiResponse<T>> {
+  try {
+    const {
+      method = 'GET',
+      body,
+      headers = {},
+      requiresAuth = true
+    } = options
 
-  // Check if we have valid auth or credentials to authenticate
-  if (!auth && !credentials) {
-    throw new Error('No authentication available. Please provide credentials.')
-  }
+    // Get the base URL for the current region
+    const authStatus = authService.getAuthStatus()
+    const baseUrl = getApiBaseUrl(authStatus.region as any)
 
-  // Get token from current auth or authenticate with provided credentials
-  const token =
-    auth?.token ||
-    (credentials ? (await authenticate(credentials)).accessToken : null)
+    // Prepare URL
+    const url = new URL(endpoint, baseUrl).toString()
 
-  if (!token) {
-    throw new Error('Failed to get authentication token')
-  }
-
-  // Get the base API URL
-  const baseUrl = getApiBaseUrl(auth?.region || 'US')
-
-  // Prepare request headers
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    Authorization: `Bearer ${typeof token === 'string' ? token : token.accessToken}`,
-    ...options.headers,
-  }
-
-  // Add the org ID if available
-  if (auth?.session?.orgId) {
-    headers['X-INFA-ORG-ID'] = auth.session.orgId
-  }
-
-  // Add the session ID if available (required for some endpoints)
-  if (auth?.session?.sessionId) {
-    headers['IDS-SESSION-ID'] = auth.session.sessionId
-  }
-
-  // Prepare request options
-  const requestOptions: RequestInit = {
-    method: options.method || 'GET',
-    headers,
-    body: options.body ? JSON.stringify(options.body) : undefined,
-  }
-
-  // Make the request
-  const response = await fetch(`${baseUrl}${endpoint}`, requestOptions)
-
-  // Handle error responses
-  if (!response.ok) {
-    let errorMessage = `API request failed: ${response.status} ${response.statusText}`
-
-    try {
-      const errorData = await response.json()
-      errorMessage = `API request failed: ${errorData.error || errorMessage}`
-    } catch (_e) {
-      // If we can't parse the error response, just use the status message
+    // Prepare headers with authentication token if required
+    const requestHeaders: Record<string, string> = {
+      ...headers,
+      'Content-Type': headers['Content-Type'] || 'application/json',
+      'Accept': 'application/json'
     }
 
-    throw new Error(errorMessage)
-  }
+    // Add authentication if required
+    if (requiresAuth) {
+      const token = await authService.getAccessToken()
+      if (!token) {
+        return {
+          success: false,
+          error: 'Not authenticated',
+          statusCode: 401
+        }
+      }
 
-  // Parse and return response
-  if (response.headers.get('Content-Type')?.includes('application/json')) {
-    return response.json()
-  }
+      requestHeaders['Authorization'] = `Bearer ${token}`
+    }
 
-  return response.text() as unknown as T
+    // Prepare request options
+    const requestOptions: RequestInit = {
+      method,
+      headers: requestHeaders,
+      credentials: 'include'
+    }
+
+    // Add body if provided
+    if (body) {
+      if (body instanceof FormData) {
+        // If FormData, remove Content-Type header to let browser set it with boundary
+        delete requestHeaders['Content-Type']
+        requestOptions.body = body
+      } else {
+        requestOptions.body = JSON.stringify(body)
+      }
+    }
+
+    // Make the request
+    const response = await fetch(url, requestOptions)
+
+    // Parse response based on content type
+    const contentType = response.headers.get('content-type') || ''
+    let data: any
+
+    if (contentType.includes('application/json')) {
+      data = await response.json()
+    } else if (contentType.includes('text/')) {
+      data = await response.text()
+    } else {
+      // For binary responses or other types
+      data = await response.blob()
+    }
+
+    // Return success or error based on status code
+    if (response.ok) {
+      return {
+        success: true,
+        data,
+        statusCode: response.status
+      }
+    } else {
+      return {
+        success: false,
+        error: data.error || response.statusText,
+        statusCode: response.status,
+        data
+      }
+    }
+  } catch (error) {
+    // Handle network or other errors
+    const errorMessage = error instanceof Error ? error.message : 'Unknown API error'
+    return {
+      success: false,
+      error: errorMessage,
+      statusCode: 0
+    }
+  }
+}
+
+/**
+ * Convenience methods for common HTTP verbs
+ */
+export const api = {
+  get: <T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method' | 'body'>): Promise<ApiResponse<T>> =>
+    apiRequest<T>(endpoint, { ...options, method: 'GET' }),
+
+  post: <T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method'>): Promise<ApiResponse<T>> =>
+    apiRequest<T>(endpoint, { ...options, method: 'POST', body }),
+
+  put: <T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method'>): Promise<ApiResponse<T>> =>
+    apiRequest<T>(endpoint, { ...options, method: 'PUT', body }),
+
+  patch: <T>(endpoint: string, body?: any, options?: Omit<ApiRequestOptions, 'method'>): Promise<ApiResponse<T>> =>
+    apiRequest<T>(endpoint, { ...options, method: 'PATCH', body }),
+
+  delete: <T>(endpoint: string, options?: Omit<ApiRequestOptions, 'method'>): Promise<ApiResponse<T>> =>
+    apiRequest<T>(endpoint, { ...options, method: 'DELETE' })
 }

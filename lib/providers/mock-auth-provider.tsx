@@ -1,7 +1,7 @@
+import type { ReactNode } from 'react';
+import { createContext, useContext, useState } from 'react';
 'use client'
 
-import { createContext, useContext, useState } from 'react';
-import { ReactNode } from 'react';
 
 type MockAuthContextType = {
   isMockAuthEnabled: boolean;
@@ -17,9 +17,9 @@ const MockAuthContext = createContext<MockAuthContextType>({
   getMockCredentials: () => null
 });
 
-export const useMockAuth = () => useContext(MockAuthContext);
+export const useMockAuth = (): MockAuthContextType => useContext(MockAuthContext);
 
-export function MockAuthProvider({ children }: { children: ReactNode }) {
+export function MockAuthProvider({ children }: { children: ReactNode }): JSX.Element {
   const [mockEnabled, setMockEnabled] = useState(false);
   const [mockCredentials, setMockCredentials] = useState<{ username: string; password: string } | null>(null);
 

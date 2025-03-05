@@ -1,7 +1,7 @@
 import Header from './components/header'
 import UploadForm from './components/upload-form'
 
-export default function Home() {
+export default function Home(): JSX.Element {
   return (
     <div className="container mx-auto px-4 py-8">
       <Header />

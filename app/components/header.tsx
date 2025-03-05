@@ -1,9 +1,8 @@
+import { useEffect, useState } from 'react';
 'use client'
 
-import { useState, useEffect } from 'react';
-import clsx from 'clsx';
 
-export default function Header() {
+export default function Header(): JSX.Element {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   // Check for user's preferred color scheme on initial load

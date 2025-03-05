@@ -1,15 +1,16 @@
+import type { LucideIcon } from 'lucide-react';
+
+import { cn } from '@/lib/utils';
 'use client'
 
-import { LucideIcon } from 'lucide-react'
 
-import { cn } from '@/lib/utils'
 
 interface IconProps {
   icon: LucideIcon
   className?: string
 }
 
-export function Icon({ icon: LucideIcon, className }: IconProps) {
+export function Icon({ icon: LucideIcon, className }: IconProps): JSX.Element {
   return <LucideIcon className={cn('', className)} />
 }
 

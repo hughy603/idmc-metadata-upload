@@ -1,8 +1,8 @@
+import { InformaticaAuthCredentials } from '@/lib/utils/auth';
 /**
  * Client-side service for managing authentication tokens
  */
 
-import { InformaticaAuthCredentials } from '@/lib/utils/auth'
 
 // Token storage keys
 const TOKEN_KEY = 'informatica_token'

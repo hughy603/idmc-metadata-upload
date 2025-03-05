@@ -1,6 +1,9 @@
-import './globals.css'
 import type { Metadata } from 'next'
+import { Inter as _Inter } from 'next/font/google'
+
 import { MockAuthProvider } from '@/lib/providers/mock-auth-provider'
+import './globals.css'
+
 import DevMockAuth from './components/dev-mock-auth'
 
 export const metadata: Metadata = {
@@ -13,7 +16,7 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
-}) {
+}): JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
