@@ -27,17 +27,40 @@ export async function parseMappingFile(
 ): Promise<MappingDocumentationData[]> {
   return new Promise((resolve, reject) => {
     try {
+      // Validate File instance first
+      if (!(file instanceof File)) {
+        console.error('Invalid file object received:', file);
+        reject(new Error('Input not instance of File'));
+        return;
+      }
+
+      console.log('Parsing file:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: new Date(file.lastModified).toISOString()
+      });
+
       const reader = new FileReader();
 
       reader.onload = e => {
         try {
           if (!e.target || !e.target.result) {
-            throw new Error('No data found in file');
+            reject(new Error('No data found in file'));
+            return;
           }
 
           // Parse the file using XLSX
           try {
-            const workbook = XLSX.read(e.target.result, { type: 'binary' });
+            // For safety, check if we have ArrayBuffer or string
+            let data = e.target.result;
+
+            const workbook = XLSX.read(data, {
+              type: 'binary',
+              cellDates: true,
+              cellNF: false,
+              cellText: false
+            });
 
             // Assume the first sheet contains the mapping data
             const firstSheetName = workbook.SheetNames[0];
@@ -45,6 +68,7 @@ export async function parseMappingFile(
 
             // Convert to JSON
             const jsonData = XLSX.utils.sheet_to_json(worksheet);
+            console.log(`Parsed ${jsonData.length} rows from file`);
 
             if (jsonData.length === 0) {
               throw new Error('No data found in file');
@@ -85,6 +109,7 @@ export async function parseMappingFile(
 
             resolve(mappingData);
           } catch (error) {
+            console.error('XLSX parsing error:', error);
             if (error instanceof Error) {
               reject(new Error(`Error parsing file: ${error.message}`));
             } else {
@@ -92,6 +117,7 @@ export async function parseMappingFile(
             }
           }
         } catch (error) {
+          console.error('Reader error:', error);
           if (error instanceof Error) {
             reject(error);
           } else {
@@ -101,12 +127,14 @@ export async function parseMappingFile(
       };
 
       reader.onerror = () => {
-        reject(new Error('No data found in file'));
+        console.error('FileReader error event triggered');
+        reject(new Error('Error reading file'));
       };
 
-      // Read the file as binary
+      // Read the file as binary string
       reader.readAsBinaryString(file);
     } catch (error) {
+      console.error('Top-level parsing error:', error);
       reject(error);
     }
   });

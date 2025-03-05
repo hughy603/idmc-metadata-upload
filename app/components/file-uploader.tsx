@@ -46,7 +46,32 @@ export default function FileUploader({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      await onFileChange(file);
+      console.log('File selected:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        isFile: file instanceof File
+      });
+
+      // Ensure we're working with a valid File instance by creating a fresh copy
+      // This avoids issues with file references being modified or file objects becoming invalid
+      try {
+        const fileBlob = await file.slice(0, file.size).arrayBuffer();
+        const newFile = new File([fileBlob], file.name, { type: file.type });
+
+        console.log('Created new file instance:', {
+          name: newFile.name,
+          size: newFile.size,
+          type: newFile.type,
+          isFile: newFile instanceof File
+        });
+
+        await onFileChange(newFile);
+      } catch (error) {
+        console.error('Error creating file instance:', error);
+        // If the copy fails, try with the original file
+        await onFileChange(file);
+      }
     }
   };
 

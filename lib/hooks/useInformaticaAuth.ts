@@ -16,6 +16,8 @@ export interface AuthState {
   isAuthenticated: boolean;
   error: string | null;
   region: string;
+  session?: any;
+  token?: any;
 }
 
 export interface UseInformaticaAuthReturn {
@@ -52,12 +54,28 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
     if (isMockMode() && isMockAuthEnabled && getMockCredentials()) {
       const mockCredentials = getMockCredentials();
       if (mockCredentials) {
-        // Create a fake session and token for the mock auth
+        // Create a mock session and token for mock auth
+        const mockSession = {
+          sessionId: 'mock-session-' + Math.random().toString(36).substring(2),
+          orgId: 'mock-org-' + Math.random().toString(36).substring(2),
+        };
+
+        const mockToken = {
+          token: 'mock-token-' + Math.random().toString(36).substring(2),
+          expiresAt: Date.now() + 3600000, // 1 hour expiry
+        };
+
+        // Store mock session and token
+        localStorage.setItem('informaticaSession', JSON.stringify(mockSession));
+        localStorage.setItem('informaticaToken', JSON.stringify(mockToken));
+
         setAuthState({
           isAuthenticating: false,
           isAuthenticated: true,
           error: null,
           region: 'US',
+          session: mockSession,
+          token: mockToken,
         });
       }
     }

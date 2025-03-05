@@ -14,54 +14,52 @@ interface ParsedMappingResult {
 // Import and augment the parseMappingFile function
 import { parseMappingFile as originalParseMappingFile } from '@/lib/utils/mapping-file-parser';
 
+// Constants for file processing
+const CHUNK_SIZE = 500; // Number of rows to process at once
+const CHUNK_PROCESSING_DELAY = 10; // Milliseconds between chunk processing
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB max file size
+
 // Wrapper function to return both parsed data and mapping data
 async function parseMappingFile(file: File): Promise<ParsedMappingResult> {
-  const mappingData = await originalParseMappingFile(file);
-
-  // Create a reader for raw data parsing
-  return new Promise((resolve, reject) => {
-    try {
-      const reader = new FileReader();
-
-      reader.onload = e => {
-        try {
-          if (!e.target || !e.target.result) {
-            reject(new Error('No data found in file'));
-            return;
-          }
-
-          // We'll use a simplified approach to extract raw data
-          // This would be expanded in a real implementation to match the actual parser
-          const rawData = mappingData.map(item => ({
-            sourceSystem: item.sourceSystem,
-            sourceTable: item.sourceTable,
-            sourceColumn: item.sourceColumn,
-            targetSystem: item.targetSystem,
-            targetTable: item.targetTable,
-            targetColumn: item.targetColumn,
-            transformationLogic: item.transformationLogic || '',
-            businessTerm: item.businessTerm || '',
-            description: item.description || '',
-          }));
-
-          resolve({
-            mappingData,
-            parsedData: rawData
-          });
-        } catch (error) {
-          reject(error);
-        }
-      };
-
-      reader.onerror = () => {
-        reject(new Error('Error reading file'));
-      };
-
-      reader.readAsBinaryString(file);
-    } catch (error) {
-      reject(error);
+  try {
+    // Ensure we're working with a valid File object
+    if (!(file instanceof File)) {
+      console.error('parseMappingFile wrapper received invalid file:', file);
+      throw new Error('Input not instance of File');
     }
-  });
+
+    console.log('parseMappingFile wrapper processing file:', {
+      name: file.name,
+      size: file.size,
+      type: file.type
+    });
+
+    // Only read the file once through the original parser
+    const mappingData = await originalParseMappingFile(file);
+
+    // Transform the mapping data to the raw format without reading the file again
+    const rawData = mappingData.map(item => ({
+      sourceSystem: item.sourceSystem,
+      sourceTable: item.sourceTable,
+      sourceColumn: item.sourceColumn,
+      targetSystem: item.targetSystem,
+      targetTable: item.targetTable,
+      targetColumn: item.targetColumn,
+      transformationLogic: item.transformationLogic || '',
+      businessTerm: item.businessTerm || '',
+      description: item.description || '',
+    }));
+
+    console.log(`Successfully processed ${rawData.length} rows of data`);
+
+    return {
+      mappingData,
+      parsedData: rawData
+    };
+  } catch (error) {
+    console.error('Error in parseMappingFile wrapper:', error);
+    throw error;
+  }
 }
 
 export interface FileUploadState {
@@ -122,10 +120,6 @@ export interface UseFileUploadReturn {
   reset: () => void;
 }
 
-// Configuration for chunked processing
-const CHUNK_SIZE = 1000; // Number of rows to process in a single chunk
-const CHUNK_PROCESSING_DELAY = 10; // Delay between chunks in milliseconds
-
 /**
  * Custom hook for managing file uploads and processing
  */
@@ -152,11 +146,17 @@ export function useFileUpload(): UseFileUploadReturn {
       ...prev,
       isValidating: true,
       fileName: file.name,
+      validationResults: { isValid: false },
       uploadStatus: 'validating',
       error: null,
     }));
 
     try {
+      // Ensure we're working with a valid File object
+      if (!(file instanceof File)) {
+        throw new Error('Input not instance of File');
+      }
+
       // Check file type
       const fileType = file.name.split('.').pop()?.toLowerCase();
       const isValidType = ['csv', 'xlsx', 'xls'].includes(fileType || '');
@@ -176,8 +176,7 @@ export function useFileUpload(): UseFileUploadReturn {
       }
 
       // Check file size
-      const maxSizeInBytes = 100 * 1024 * 1024; // 100MB max size
-      if (file.size > maxSizeInBytes) {
+      if (file.size > MAX_FILE_SIZE) {
         setFileState(prev => ({
           ...prev,
           isValidating: false,
@@ -202,22 +201,19 @@ export function useFileUpload(): UseFileUploadReturn {
       return true;
     } catch (error) {
       console.error('Error validating file:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'An unknown error occurred during validation.';
+
       setFileState(prev => ({
         ...prev,
         isValidating: false,
         validationResults: {
           isValid: false,
-          errors: [
-            error instanceof Error
-              ? error.message
-              : 'An unknown error occurred during validation.',
-          ],
+          errors: [errorMessage],
         },
         uploadStatus: 'error',
-        error:
-          error instanceof Error
-            ? error.message
-            : 'An unknown error occurred during validation.',
+        error: errorMessage,
       }));
       return false;
     }
@@ -232,6 +228,7 @@ export function useFileUpload(): UseFileUploadReturn {
       isProcessing: true,
       uploadStatus: 'processing',
       error: null,
+      fileData: [], // Clear previous file data
       processProgress: {
         total: 0,
         processed: 0,
@@ -240,8 +237,23 @@ export function useFileUpload(): UseFileUploadReturn {
     }));
 
     try {
+      // Ensure we're working with a valid File object
+      if (!(file instanceof File)) {
+        console.error('processFile received invalid file:', file);
+        throw new Error('Input not instance of File');
+      }
+
+      // Store the file name
+      setFileState(prev => ({
+        ...prev,
+        fileName: file.name,
+      }));
+
+      console.log('Starting file processing for:', file.name);
+
       // Parse file to get row data
       const { parsedData, mappingData } = await parseMappingFile(file);
+      console.log(`Processing ${parsedData.length} rows of data`);
 
       // Initialize process tracking
       setFileState(prev => ({
@@ -255,9 +267,11 @@ export function useFileUpload(): UseFileUploadReturn {
 
       // Process in chunks for large files
       if (parsedData.length > CHUNK_SIZE) {
+        console.log(`Large file detected, processing in chunks of ${CHUNK_SIZE}`);
         await processInChunks(parsedData, mappingData);
       } else {
         // For smaller files, process all at once
+        console.log('Small file, processing all at once');
         const formattedRows = formatFileData(parsedData);
         setFileState(prev => ({
           ...prev,
@@ -272,16 +286,21 @@ export function useFileUpload(): UseFileUploadReturn {
           },
         }));
       }
+
+      console.log('File processing completed successfully');
     } catch (error) {
       console.error('Error processing file:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during processing.';
+
       setFileState(prev => ({
         ...prev,
         isProcessing: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : 'An unknown error occurred during processing.',
+        error: errorMessage,
         uploadStatus: 'error',
+        validationResults: {
+          isValid: false,
+          errors: [errorMessage]
+        }
       }));
     }
   };
@@ -293,52 +312,72 @@ export function useFileUpload(): UseFileUploadReturn {
     parsedData: Record<string, string | number>[],
     mappingData: MappingDocumentationData[]
   ): Promise<void> => {
-    let formattedRows: FileDataRow[] = [];
-    const totalChunks = Math.ceil(parsedData.length / CHUNK_SIZE);
+    try {
+      let formattedRows: FileDataRow[] = [];
+      const totalChunks = Math.ceil(parsedData.length / CHUNK_SIZE);
 
-    for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
-      // Extract chunk
-      const startIndex = chunkIndex * CHUNK_SIZE;
-      const endIndex = Math.min(startIndex + CHUNK_SIZE, parsedData.length);
-      const chunk = parsedData.slice(startIndex, endIndex);
+      console.log(`Starting chunk processing: ${totalChunks} chunks total`);
 
-      // Process chunk
-      const chunkFormattedRows = formatFileData(chunk);
-      formattedRows = [...formattedRows, ...chunkFormattedRows];
+      for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+        // Extract chunk
+        const startIndex = chunkIndex * CHUNK_SIZE;
+        const endIndex = Math.min(startIndex + CHUNK_SIZE, parsedData.length);
+        const chunk = parsedData.slice(startIndex, endIndex);
 
-      // Update progress
-      const processed = endIndex;
-      const percentage = Math.round((processed / parsedData.length) * 100);
+        console.log(`Processing chunk ${chunkIndex + 1}/${totalChunks}: rows ${startIndex}-${endIndex}`);
+
+        // Process chunk
+        const chunkFormattedRows = formatFileData(chunk);
+        formattedRows = [...formattedRows, ...chunkFormattedRows];
+
+        // Update progress
+        const processed = endIndex;
+        const percentage = Math.round((processed / parsedData.length) * 100);
+
+        setFileState(prev => ({
+          ...prev,
+          fileData: formattedRows,
+          processProgress: {
+            total: parsedData.length,
+            processed,
+            percentage,
+          },
+        }));
+
+        // Small delay to allow UI to update and prevent freezing
+        if (chunkIndex < totalChunks - 1) {
+          await new Promise(resolve => setTimeout(resolve, CHUNK_PROCESSING_DELAY));
+        }
+      }
+
+      // Processing complete
+      console.log(`Chunk processing complete: ${formattedRows.length} total rows processed`);
 
       setFileState(prev => ({
         ...prev,
+        isProcessing: false,
         fileData: formattedRows,
+        mappingData,
+        uploadStatus: 'validated',
         processProgress: {
           total: parsedData.length,
-          processed,
-          percentage,
+          processed: parsedData.length,
+          percentage: 100,
         },
       }));
+    } catch (error) {
+      console.error('Error in chunk processing:', error);
+      const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred during chunk processing';
 
-      // Small delay to allow UI to update and prevent freezing
-      if (chunkIndex < totalChunks - 1) {
-        await new Promise(resolve => setTimeout(resolve, CHUNK_PROCESSING_DELAY));
-      }
+      setFileState(prev => ({
+        ...prev,
+        isProcessing: false,
+        error: errorMessage,
+        uploadStatus: 'error',
+      }));
+
+      throw error; // Re-throw to be caught by the caller
     }
-
-    // Processing complete
-    setFileState(prev => ({
-      ...prev,
-      isProcessing: false,
-      fileData: formattedRows,
-      mappingData,
-      uploadStatus: 'validated',
-      processProgress: {
-        total: parsedData.length,
-        processed: parsedData.length,
-        percentage: 100,
-      },
-    }));
   };
 
   /**
@@ -375,6 +414,11 @@ export function useFileUpload(): UseFileUploadReturn {
     }));
 
     try {
+      // Ensure we're working with a valid File object
+      if (!(file instanceof File)) {
+        throw new Error('Input not instance of File');
+      }
+
       // Upload the file and create a catalog
       const result = await mappingService.uploadFile(file, catalogName, description);
 
@@ -392,14 +436,19 @@ export function useFileUpload(): UseFileUploadReturn {
       return true;
     } catch (error) {
       console.error('Error uploading file:', error);
+      const errorMessage = error instanceof Error
+        ? error.message
+        : 'An unknown error occurred during upload.';
+
       setFileState(prev => ({
         ...prev,
         isUploading: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : 'An unknown error occurred during upload.',
+        error: errorMessage,
         uploadStatus: 'error',
+        validationResults: {
+          ...prev.validationResults,
+          errors: [...(prev.validationResults.errors || []), errorMessage]
+        }
       }));
       return false;
     }
@@ -449,115 +498,121 @@ export function useFileUpload(): UseFileUploadReturn {
   };
 
   /**
-   * Uploads a single mapping row
+   * Upload a single mapping row
    */
   const uploadMappingRow = async (row: FileDataRow): Promise<boolean> => {
-    if (!fileState.catalogId) {
-      throw new Error('No catalog ID available for row upload');
-    }
-
-    // Update row status to processing
-    updateRowStatus(row.id, 'processing');
-
     try {
-      const result = await mappingService.uploadMappingRow(
-        row,
-        fileState.catalogId
-      );
+      if (!fileState.catalogId) {
+        throw new Error('No catalog ID available');
+      }
 
-      if (result.success) {
-        updateRowStatus(row.id, 'success');
-        return true;
-      } else {
-        updateRowStatus(row.id, 'error', result.error);
+      updateRowStatus(row.id, 'processing');
+
+      // Call the mapping service to upload the row
+      const result = await mappingService.uploadMappingRow(row, fileState.catalogId);
+
+      if (!result.success) {
+        updateRowStatus(row.id, 'error', result.error || 'Failed to upload mapping');
         return false;
       }
+
+      // Don't mark as success until we confirm with Thoughtspot
+      // Keep as processing until job tracking confirms success
+      return true;
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : 'Unknown error during row upload';
-      updateRowStatus(row.id, 'error', errorMessage);
+      console.error('Error uploading mapping row:', error);
+      updateRowStatus(
+        row.id,
+        'error',
+        error instanceof Error ? error.message : 'Failed to upload mapping'
+      );
       return false;
     }
   };
 
   /**
-   * Uploads multiple mapping rows with rate limiting
+   * Upload multiple mapping rows as a batch
    */
   const uploadMappingBatch = async (rows: FileDataRow[]): Promise<void> => {
-    if (!fileState.catalogId || rows.length === 0) {
-      return;
-    }
+    if (rows.length === 0) return;
 
-    // Initialize batch progress tracking
-    const batchProgress = {
-      total: rows.length,
-      completed: 0,
-      success: 0,
-      failed: 0,
-    };
-
-    // Update state to show batch progress
     setFileState(prev => ({
       ...prev,
-      batchProgress,
+      isUploading: true,
+      batchProgress: {
+        total: rows.length,
+        completed: 0,
+        success: 0,
+        failed: 0,
+      },
     }));
 
-    // Update all selected rows to processing status
-    rows.forEach(row => {
-      updateRowStatus(row.id, 'processing');
-    });
+    try {
+      // Process rows in chunks to avoid overwhelming the API
+      const chunks = [];
+      for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
+        chunks.push(rows.slice(i, i + CHUNK_SIZE));
+      }
 
-    // Process each row
-    for (const row of rows) {
-      try {
-        // Enqueue the API call to be processed with rate limiting
-        const result = await apiRateLimiter.enqueue(() =>
-          mappingService.uploadMappingRow(row, fileState.catalogId!)
+      let completedCount = 0;
+      let successCount = 0;
+      let failedCount = 0;
+
+      // Process each chunk
+      for (const chunk of chunks) {
+        // Mark rows as processing
+        chunk.forEach(row => {
+          updateRowStatus(row.id, 'processing');
+        });
+
+        // Process the chunk
+        const results = await Promise.all(
+          chunk.map(row => uploadMappingRow(row))
         );
 
-        // Update progress and row status
-        batchProgress.completed++;
+        // Update counts
+        results.forEach((success, index) => {
+          completedCount++;
+          if (success) {
+            successCount++;
+          } else {
+            failedCount++;
+          }
+        });
 
-        if (result.success) {
-          batchProgress.success++;
-          updateRowStatus(row.id, 'success');
-        } else {
-          batchProgress.failed++;
-          updateRowStatus(row.id, 'error', result.error);
+        // Update batch progress
+        setFileState(prev => ({
+          ...prev,
+          batchProgress: {
+            total: rows.length,
+            completed: completedCount,
+            success: successCount,
+            failed: failedCount,
+          },
+        }));
+
+        // Add a small delay between chunks to avoid rate limiting
+        if (chunks.length > 1) {
+          await new Promise(resolve => setTimeout(resolve, CHUNK_PROCESSING_DELAY));
         }
-
-        // Update batch progress in state
-        setFileState(prev => ({
-          ...prev,
-          batchProgress: { ...batchProgress },
-        }));
-      } catch (error) {
-        // Handle error and update progress
-        batchProgress.completed++;
-        batchProgress.failed++;
-        const errorMessage =
-          error instanceof Error
-            ? error.message
-            : 'Unknown error during row upload';
-        updateRowStatus(row.id, 'error', errorMessage);
-
-        // Update batch progress in state
-        setFileState(prev => ({
-          ...prev,
-          batchProgress: { ...batchProgress },
-        }));
       }
-    }
+    } catch (error) {
+      console.error('Batch processing error:', error);
+      const errorMessage =
+        error instanceof Error ? error.message : 'Batch processing failed';
 
-    // Clear batch progress when done
-    setTimeout(() => {
-      setFileState(prev => {
-        const { batchProgress: _, ...rest } = prev;
-        return rest;
+      // Mark all remaining rows as error
+      rows.forEach(row => {
+        if (row.status === 'processing') {
+          updateRowStatus(row.id, 'error', errorMessage);
+        }
       });
-    }, 3000);
+    } finally {
+      setFileState(prev => ({
+        ...prev,
+        isUploading: false,
+      }));
+    }
   };
 
   /**

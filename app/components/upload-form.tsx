@@ -83,6 +83,35 @@ export default function UploadForm(): JSX.Element {
   const { jobState, startTracking, stopTracking } = useJobTracking();
 
   /**
+   * Handle file selection
+   */
+  const handleFileChange = async (file: File): Promise<void> => {
+    try {
+      console.log('File selected in upload form:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        isFile: file instanceof File
+      });
+
+      // Immediately show file data panel when a file is selected
+      setShowFileData(true);
+
+      // Validate the file
+      const isValid = await validateFile(file);
+
+      if (isValid) {
+        // Process the file to extract data
+        await processFile(file);
+      }
+    } catch (error) {
+      console.error('Error handling file change:', error);
+      // Let the user know something went wrong through the UI
+      // We'll use the fileState error mechanisms that already exist
+    }
+  };
+
+  /**
    * Handle form submission with file upload
    */
   const handleSubmit = async (
@@ -217,9 +246,7 @@ export default function UploadForm(): JSX.Element {
                   fileName={fileState.fileName}
                   validationError={fileState.error}
                   isFileValid={fileState.validationResults.isValid}
-                  onFileChange={async (file: File) => {
-                    await validateFile(file);
-                  }}
+                  onFileChange={handleFileChange}
                   onSubmit={handleSubmit}
                 />
 
@@ -362,11 +389,19 @@ export default function UploadForm(): JSX.Element {
                 )}
 
                 {/* Display file data table if available */}
-                {showFileData && fileState.fileData.length > 0 && (
+                {showFileData ? (
                   <div className="mt-8">
-                    <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-                      File Data
-                    </h3>
+                    <div className="mb-4 flex items-center justify-between">
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                        File Data
+                      </h3>
+                      <button
+                        onClick={() => setShowFileData(false)}
+                        className="rounded-md bg-gray-200 px-2 py-1 text-xs text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                      >
+                        Hide Data
+                      </button>
+                    </div>
 
                     {/* Show progress indicator when processing large files */}
                     {fileState.isProcessing && fileState.processProgress && (
@@ -383,12 +418,42 @@ export default function UploadForm(): JSX.Element {
                       </div>
                     )}
 
-                    <FileDataTable
-                      data={fileState.fileData}
-                      onRowSubmit={handleRowSubmit}
-                      onBatchSubmit={handleBatchSubmit}
-                      initialPageSize={25}
-                    />
+                    {fileState.fileData.length > 0 ? (
+                      <FileDataTable
+                        data={fileState.fileData}
+                        onRowSubmit={handleRowSubmit}
+                        onBatchSubmit={handleBatchSubmit}
+                        initialPageSize={25}
+                      />
+                    ) : (
+                      <div className="rounded-md bg-yellow-50 p-4 dark:bg-yellow-900/30">
+                        <div className="flex">
+                          <div className="ml-3">
+                            <h3 className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                              No Data Available
+                            </h3>
+                            <div className="mt-2 text-sm text-yellow-700 dark:text-yellow-300">
+                              {fileState.isProcessing ? (
+                                <p>File data is still being processed. Please wait...</p>
+                              ) : fileState.error ? (
+                                <p>Error processing file: {fileState.error}</p>
+                              ) : (
+                                <p>No data was found in the file or the file could not be processed correctly.</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="mt-4">
+                    <button
+                      onClick={() => setShowFileData(true)}
+                      className="rounded-md bg-gray-200 px-3 py-1 text-sm text-gray-700 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+                    >
+                      Show File Data
+                    </button>
                   </div>
                 )}
               </div>

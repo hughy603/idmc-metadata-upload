@@ -32,6 +32,48 @@ interface FileDataTableProps {
   initialPageSize?: number;
 }
 
+const StatusBadge = ({ status, error, onRetry }: { status: string; error?: string | undefined; onRetry?: (() => void | Promise<void>) | undefined }) => {
+  const getStatusColor = () => {
+    switch (status) {
+      case 'success':
+        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'error':
+        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'processing':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-1">
+      <div className="flex items-center gap-2">
+        <span
+          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor()}`}
+        >
+          {status.charAt(0).toUpperCase() + status.slice(1)}
+        </span>
+        {(status === 'error' || status === 'pending') && onRetry && (
+          <button
+            onClick={onRetry}
+            className={`rounded px-2 py-1 text-xs text-white ${
+              status === 'error'
+                ? 'bg-red-500 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-600'
+                : 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-600'
+            }`}
+          >
+            {status === 'error' ? 'Retry' : 'Process'}
+          </button>
+        )}
+      </div>
+      {error && (
+        <span className="text-xs text-red-600 dark:text-red-400">{error}</span>
+      )}
+    </div>
+  );
+};
+
 /**
  * Table component that displays file data and provides batch processing capabilities
  */
@@ -57,7 +99,87 @@ export default function FileDataTable({
     setTotalPages(Math.max(1, Math.ceil(data.length / pageSize)));
     // Reset to first page when data changes
     setCurrentPage(1);
+
+    // Automatically submit all rows when data is loaded
+    if (data.length > 0 && onBatchSubmit) {
+      const pendingRows = data.filter(row => row.status === 'pending');
+      if (pendingRows.length > 0) {
+        handleBatchProcess(pendingRows);
+      }
+    }
   }, [data, pageSize]);
+
+  // Update local table data when a row's status changes
+  const updateRowStatus = (rowId: string, updates: Partial<FileDataRow>): void => {
+    setTableData(currentData =>
+      currentData.map(row =>
+        row.id === rowId ? { ...row, ...updates } : row
+      )
+    );
+  };
+
+  /**
+   * Handle submission of a single row
+   */
+  const handleRowSubmit = async (row: FileDataRow): Promise<void> => {
+    if (!onRowSubmit || row.status !== 'pending') return;
+
+    updateRowStatus(row.id, { status: 'processing' });
+    try {
+      await onRowSubmit(row);
+      updateRowStatus(row.id, { status: 'success' });
+    } catch (error) {
+      console.error('Row processing failed:', error);
+      updateRowStatus(row.id, {
+        status: 'error',
+        error: error instanceof Error ? error.message : 'Processing failed'
+      });
+    }
+  };
+
+  /**
+   * Handle batch processing of selected rows
+   */
+  const handleBatchProcess = async (rowsToProcess?: FileDataRow[]): Promise<void> => {
+    if (!onBatchSubmit) return;
+
+    const rows = rowsToProcess || tableData.filter(
+      row => selectedRows.has(row.id) && row.status === 'pending'
+    );
+
+    if (rows.length === 0) {
+      console.warn('No pending rows selected for processing');
+      return;
+    }
+
+    setIsBatchProcessing(true);
+    try {
+      // Mark all rows as processing
+      rows.forEach(row => {
+        updateRowStatus(row.id, { status: 'processing' });
+      });
+
+      await onBatchSubmit(rows);
+
+      // Mark all rows as success
+      rows.forEach(row => {
+        updateRowStatus(row.id, { status: 'success' });
+      });
+    } catch (error) {
+      console.error('Batch processing failed:', error);
+      // Mark all rows as error
+      rows.forEach(row => {
+        updateRowStatus(row.id, {
+          status: 'error',
+          error: error instanceof Error ? error.message : 'Batch processing failed'
+        });
+      });
+    } finally {
+      setIsBatchProcessing(false);
+      setSelectedRows(new Set());
+      setSelectAll(false);
+    }
+  };
 
   // Show a message when there's no data to display
   if (!tableData.length) {
@@ -72,31 +194,6 @@ export default function FileDataTable({
 
   // Extract column headers from the first row
   const headers = Object.keys(tableData[0].data);
-
-  /**
-   * Handle batch processing of selected rows
-   */
-  const handleBatchProcess = async (): Promise<void> => {
-    if (!onBatchSubmit || selectedRows.size === 0) return;
-
-    const rowsToProcess = tableData.filter(
-      row => selectedRows.has(row.id) && row.status === 'pending'
-    );
-
-    if (rowsToProcess.length === 0) {
-      console.warn('No pending rows selected for processing');
-      return;
-    }
-
-    setIsBatchProcessing(true);
-    try {
-      await onBatchSubmit(rowsToProcess);
-    } catch (error) {
-      console.error('Batch processing failed:', error);
-    } finally {
-      setIsBatchProcessing(false);
-    }
-  };
 
   /**
    * Toggle select all rows
@@ -265,69 +362,55 @@ export default function FileDataTable({
   };
 
   return (
-    <div className="mt-4 overflow-x-auto rounded-lg shadow">
-      {/* Batch processing controls */}
-      <div className="mb-4 flex flex-col justify-between space-y-2 sm:flex-row sm:items-center sm:space-y-0">
+    <div className="mt-4 overflow-hidden rounded-lg bg-white shadow dark:bg-gray-800">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-gray-50 px-6 py-4 dark:border-gray-700 dark:bg-gray-900">
         <div className="flex items-center">
           <input
             type="checkbox"
-            id="select-all-checkbox"
             checked={selectAll}
             onChange={toggleSelectAll}
-            className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400"
+            disabled={isBatchProcessing}
+            className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700"
           />
-          <label
-            htmlFor="select-all-checkbox"
-            className="text-sm text-gray-700 dark:text-gray-300"
-          >
-            Select All Pending
-          </label>
+          <span className="ml-2 text-sm text-gray-700 dark:text-gray-300">
+            {selectedRows.size} selected
+          </span>
         </div>
-        <button
-          onClick={handleBatchProcess}
-          disabled={
-            selectedRows.size === 0 ||
-            isBatchProcessing ||
-            !tableData.some(
-              row => selectedRows.has(row.id) && row.status === 'pending'
-            )
-          }
-          className="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-blue-800 dark:hover:bg-blue-700"
-        >
-          {isBatchProcessing ? 'Processing...' : 'Process Selected'}
-        </button>
+        <div className="flex items-center space-x-4">
+          <div className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="font-medium">{tableData.filter(row => row.status === 'success').length}</span> processed,{' '}
+            <span className="font-medium">{tableData.filter(row => row.status === 'error').length}</span> failed,{' '}
+            <span className="font-medium">{tableData.filter(row => row.status === 'pending').length}</span> pending
+          </div>
+          <button
+            onClick={() => handleBatchProcess()}
+            disabled={
+              selectedRows.size === 0 ||
+              isBatchProcessing ||
+              !Array.from(selectedRows).some(
+                id => tableData.find(row => row.id === id)?.status === 'pending'
+              )
+            }
+            className="rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:opacity-50 dark:bg-blue-700 dark:hover:bg-blue-600"
+          >
+            {isBatchProcessing ? 'Processing...' : 'Process Selected'}
+          </button>
+        </div>
       </div>
 
-      {/* Status summary */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        <span className="rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-          Pending: {tableData.filter(row => row.status === 'pending').length}
-        </span>
-        <span className="rounded-md bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
-          Processing: {tableData.filter(row => row.status === 'processing').length}
-        </span>
-        <span className="rounded-md bg-green-50 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-300">
-          Success: {tableData.filter(row => row.status === 'success').length}
-        </span>
-        <span className="rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 dark:bg-red-900/30 dark:text-red-300">
-          Error: {tableData.filter(row => row.status === 'error').length}
-        </span>
-      </div>
-
-      {/* Table */}
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-100 dark:bg-gray-800">
+          <thead className="bg-gray-50 dark:bg-gray-900">
             <tr>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                className="w-12 px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
-                Select
+                <span className="sr-only">Select</span>
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
               >
                 Status
               </th>
@@ -335,93 +418,52 @@ export default function FileDataTable({
                 <th
                   key={header}
                   scope="col"
-                  className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
                 >
                   {header}
                 </th>
               ))}
-              <th
-                scope="col"
-                className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
-              >
-                Actions
-              </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-900">
+          <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-gray-800">
             {paginatedData.map(row => (
               <tr
                 key={row.id}
-                className={
-                  row.status === 'error'
-                    ? 'bg-red-50 dark:bg-red-900/20'
-                    : row.status === 'success'
-                      ? 'bg-green-50 dark:bg-green-900/20'
-                      : row.status === 'processing'
-                        ? 'bg-yellow-50 dark:bg-yellow-900/20'
-                        : ''
-                }
+                className={row.status === 'processing' ? 'animate-pulse bg-blue-50 dark:bg-blue-900/20' : ''}
               >
-                <td className="whitespace-nowrap px-3 py-4 text-sm">
+                <td className="whitespace-nowrap px-6 py-4">
                   <input
                     type="checkbox"
-                    disabled={row.status !== 'pending' || isBatchProcessing}
                     checked={selectedRows.has(row.id)}
                     onChange={() => toggleRowSelection(row.id)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-400"
+                    disabled={isBatchProcessing || row.status !== 'pending'}
+                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700"
                   />
                 </td>
-                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                  <span
-                    className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                      row.status === 'success'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                        : row.status === 'processing'
-                        ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                        : row.status === 'error'
-                        ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                        : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                    }`}
-                  >
-                    {row.status.charAt(0).toUpperCase() + row.status.slice(1)}
-                  </span>
-                  {row.error && (
-                    <span className="ml-2 text-xs text-red-500 dark:text-red-400">
-                      {row.error}
-                    </span>
-                  )}
+                <td className="whitespace-nowrap px-6 py-4 text-sm">
+                  <StatusBadge
+                    status={row.status}
+                    error={row.error}
+                    onRetry={
+                      (row.status === 'error' || row.status === 'pending')
+                        ? () => handleRowSubmit(row)
+                        : undefined
+                    }
+                  />
                 </td>
                 {headers.map(header => (
                   <td
-                    key={`${row.id}-${header}`}
-                    className="whitespace-nowrap px-3 py-4 text-sm text-gray-900 dark:text-gray-100"
+                    key={header}
+                    className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-300"
                   >
-                    {String(row.data[header] || '')}
+                    {row.data[header]}
                   </td>
                 ))}
-                <td className="whitespace-nowrap px-3 py-4 text-sm">
-                  {row.status === 'pending' && (
-                    <button
-                      onClick={() => onRowSubmit?.(row)}
-                      disabled={isBatchProcessing}
-                      className="rounded bg-blue-500 px-2 py-1 text-xs text-white hover:bg-blue-600 disabled:opacity-50 dark:bg-blue-700 dark:hover:bg-blue-600"
-                    >
-                      Process
-                    </button>
-                  )}
-                  {row.status === 'success' && row.jobId && (
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      Job ID: {row.jobId}
-                    </span>
-                  )}
-                </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
-      {/* Pagination controls */}
       {renderPaginationControls()}
     </div>
   );

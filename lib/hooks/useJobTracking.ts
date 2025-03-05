@@ -1,76 +1,40 @@
 import { useEffect, useState } from 'react';
 
-// Define interfaces locally since they're not properly exported
-interface SessionInfo {
-  sessionId: string;
-  orgId: string;
-  expiresAt: string;
-}
+import { mappingService } from '@/lib/services/informatica-mapping-service';
+import type { AuthResult } from '@/lib/services/informatica-mapping-service';
 
-interface AuthTokenInfo {
-  token: string;
-  expiresAt: number;
-}
+const POLLING_INTERVAL = 5000; // 5 seconds
 
-// Mock implementation since the actual function doesn't exist
-const checkImportJobStatus = async (
-  _auth: { session: SessionInfo; token: AuthTokenInfo },
-  _jobId: string
-): Promise<{ status: string; details: any }> => {
-  // In a real implementation, this would call the API
-  return {
-    status: 'COMPLETED',
-    details: { progress: 100 },
-  };
-};
-
-export interface JobTrackingState {
+export interface JobState {
   jobId: string | null;
-  status: string | null;
+  status: 'PENDING' | 'RUNNING' | 'COMPLETED' | 'FAILED' | 'QUEUED' | null;
   error: string | null;
   isPolling: boolean;
-  details: any;
 }
 
 export interface UseJobTrackingReturn {
-  jobState: JobTrackingState;
-  startTracking: (
-    auth: { session: SessionInfo; token: AuthTokenInfo },
-    jobId: string
-  ) => void;
+  jobState: JobState;
+  startTracking: (auth: AuthResult, jobId: string) => void;
   stopTracking: () => void;
-  checkStatus: (
-    auth: { session: SessionInfo; token: AuthTokenInfo },
-    jobId: string
-  ) => Promise<boolean>;
 }
 
+/**
+ * Custom hook for tracking job status
+ */
 export function useJobTracking(): UseJobTrackingReturn {
-  const [jobState, setJobState] = useState<JobTrackingState>({
+  const [jobState, setJobState] = useState<JobState>({
     jobId: null,
     status: null,
     error: null,
     isPolling: false,
-    details: null,
   });
 
+  // Polling interval reference
   const [pollingInterval, setPollingInterval] = useState<NodeJS.Timeout | null>(
     null
   );
 
-  // Define stopTracking function before it's used
-  const stopTracking = () => {
-    if (pollingInterval) {
-      clearInterval(pollingInterval);
-      setPollingInterval(null);
-    }
-    setJobState(prev => ({
-      ...prev,
-      isPolling: false,
-    }));
-  };
-
-  // Cleanup on unmount
+  // Clean up polling on unmount
   useEffect(() => {
     return () => {
       if (pollingInterval) {
@@ -79,38 +43,11 @@ export function useJobTracking(): UseJobTrackingReturn {
     };
   }, [pollingInterval]);
 
-  const checkStatus = async (
-    auth: { session: SessionInfo; token: AuthTokenInfo },
-    jobId: string
-  ): Promise<boolean> => {
-    try {
-      const result = await checkImportJobStatus(auth, jobId);
-
-      setJobState(prev => ({
-        ...prev,
-        status: result.status,
-        details: result.details || null,
-        error: null,
-      }));
-
-      // Return true if job is complete (success or failure)
-      return ['COMPLETED', 'FAILED', 'ABORTED'].includes(result.status);
-    } catch (error) {
-      setJobState(prev => ({
-        ...prev,
-        error:
-          error instanceof Error ? error.message : 'Error checking job status',
-      }));
-
-      return false;
-    }
-  };
-
-  const startTracking = (
-    auth: { session: SessionInfo; token: AuthTokenInfo },
-    jobId: string
-  ) => {
-    // Clear any existing interval
+  /**
+   * Start tracking a job
+   */
+  const startTracking = async (auth: AuthResult, jobId: string): Promise<void> => {
+    // Clear any existing polling
     if (pollingInterval) {
       clearInterval(pollingInterval);
     }
@@ -120,25 +57,75 @@ export function useJobTracking(): UseJobTrackingReturn {
       status: 'PENDING',
       error: null,
       isPolling: true,
-      details: null,
     });
 
-    // Start polling
-    const interval = setInterval(async () => {
-      const isComplete = await checkStatus(auth, jobId);
+    // Function to check job status
+    const checkStatus = async () => {
+      try {
+        const status = await mappingService.getJobStatus(jobId);
 
-      if (isComplete) {
+        // Map the API status to our internal status
+        let mappedStatus: JobState['status'];
+        switch (status.status) {
+          case 'QUEUED':
+            mappedStatus = 'PENDING';
+            break;
+          case 'RUNNING':
+          case 'COMPLETED':
+          case 'FAILED':
+            mappedStatus = status.status;
+            break;
+          default:
+            mappedStatus = 'FAILED';
+            break;
+        }
+
+        setJobState(prev => ({
+          ...prev,
+          status: mappedStatus,
+          error: status.error || null,
+        }));
+
+        // If job is complete or failed, stop polling
+        if (status.status === 'COMPLETED' || status.status === 'FAILED') {
+          stopTracking();
+        }
+      } catch (error) {
+        console.error('Error checking job status:', error);
+        setJobState(prev => ({
+          ...prev,
+          error: error instanceof Error ? error.message : 'Failed to check job status',
+        }));
         stopTracking();
       }
-    }, 3000); // Poll every 3 seconds
+    };
 
+    // Start polling
+    const interval = setInterval(checkStatus, POLLING_INTERVAL);
     setPollingInterval(interval);
+
+    // Do an immediate check
+    await checkStatus();
+  };
+
+  /**
+   * Stop tracking the current job
+   */
+  const stopTracking = (): void => {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      setPollingInterval(null);
+    }
+
+    setJobState(prev => ({
+      ...prev,
+      isPolling: false,
+    }));
   };
 
   return {
     jobState,
     startTracking,
     stopTracking,
-    checkStatus,
   };
 }

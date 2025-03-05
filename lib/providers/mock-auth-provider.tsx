@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 
 type MockAuthContextType = {
   isMockAuthEnabled: boolean;
@@ -30,6 +30,21 @@ export function MockAuthProvider({
     username: string;
     password: string;
   } | null>(null);
+
+  // Initialize mock auth state from localStorage on mount
+  useEffect(() => {
+    const storedMockEnabled = localStorage.getItem('mockAuthEnabled') === 'true';
+    const storedUsername = localStorage.getItem('mockUsername');
+    const storedPassword = localStorage.getItem('mockPassword');
+
+    if (storedMockEnabled && storedUsername && storedPassword) {
+      setMockEnabled(true);
+      setMockCredentials({
+        username: storedUsername,
+        password: storedPassword,
+      });
+    }
+  }, []);
 
   // Enable mock authentication with provided credentials
   const enableMockAuth = (credentials: {
