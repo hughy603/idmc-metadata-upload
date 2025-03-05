@@ -114,17 +114,27 @@ jest.mock('@/app/components/file-uploader', () => ({
 
 jest.mock('@/app/components/file-data-table', () => ({
   __esModule: true,
-  default: jest.fn(({ data, onRowSubmit }: {
-    data: Array<any>;
-    onRowSubmit: (row: any) => void;
-  }) => (
-    <div data-testid="mock-data-table">
-      <span>Data table with {data?.length || 0} rows</span>
-      {data && data.length > 0 && (
-        <button data-testid="submit-row-button" onClick={() => onRowSubmit(data[0])}>Submit Row</button>
-      )}
-    </div>
-  )),
+  default: jest.fn(
+    ({
+      data,
+      onRowSubmit,
+    }: {
+      data: Array<any>;
+      onRowSubmit: (row: any) => void;
+    }) => (
+      <div data-testid="mock-data-table">
+        <span>Data table with {data?.length || 0} rows</span>
+        {data && data.length > 0 && (
+          <button
+            data-testid="submit-row-button"
+            onClick={() => onRowSubmit(data[0])}
+          >
+            Submit Row
+          </button>
+        )}
+      </div>
+    )
+  ),
 }));
 
 jest.mock('@/app/components/job-status', () => ({

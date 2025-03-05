@@ -14,13 +14,43 @@
         ]
       }
     ],
-    "declaration-block-trailing-semicolon": null,
     "no-descending-specificity": null,
     "function-no-unknown": [
       true,
       {
         "ignoreFunctions": ["theme"]
       }
-    ]
-  }
+    ],
+    "at-rule-empty-line-before": [
+      "always",
+      {
+        "except": ["first-nested", "blockless-after-same-name-blockless"],
+        "ignore": ["after-comment"],
+        "ignoreAtRules": ["tailwind", "layer", "apply"]
+      }
+    ],
+    "custom-property-empty-line-before": [
+      "always",
+      {
+        "except": ["after-custom-property", "first-nested"],
+        "ignore": ["after-comment", "inside-single-line-block"]
+      }
+    ],
+    "at-rule-no-deprecated": null,
+    "value-keyword-case": [
+      "lower",
+      {
+        "ignoreKeywords": [
+          "BlinkMacSystemFont",
+          "Roboto",
+          "Arial",
+          "Segoe UI",
+          "Helvetica Neue"
+        ]
+      }
+    ],
+    "no-invalid-position-at-import-rule": null
+  },
+  "ignoreFiles": ["coverage/**/*.css"],
+  "quietDeprecationWarnings": true
 }

@@ -39,5 +39,5 @@ export default function DemoPage(): JSX.Element {
         </div>
       </div>
     </div>
-  )
+  );
 }

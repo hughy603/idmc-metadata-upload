@@ -2,10 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-'use client'
+('use client');
 
-
-import type { InformaticaAuthCredentials } from '@/lib/utils/auth'
+import type { InformaticaAuthCredentials } from '@/lib/utils/auth';
 
 // Map of regions to base URLs and API URLs
 export const REGION_URLS: Record<string, { baseUrl: string; apiUrl: string }> =
@@ -30,7 +29,7 @@ export const REGION_URLS: Record<string, { baseUrl: string; apiUrl: string }> =
       baseUrl: 'https://dm-uk.informaticacloud.com',
       apiUrl: 'https://idmc-api.dm-uk.informaticacloud.com',
     },
-  }
+  };
 
 const authFormSchema = z.object({
   username: z.string().min(1, { message: 'Username is required' }),
@@ -38,15 +37,15 @@ const authFormSchema = z.object({
   region: z.enum(['us', 'emea', 'apj', 'canada', 'uk'], {
     message: 'Please select a valid region',
   }),
-})
+});
 
-export type AuthFormValues = z.infer<typeof authFormSchema>
+export type AuthFormValues = z.infer<typeof authFormSchema>;
 
 interface AuthFormProps {
-  isLoading?: boolean
-  error?: string | null
-  onSubmit: (credentials: InformaticaAuthCredentials) => Promise<void>
-  onOAuthLogin?: () => Promise<void>
+  isLoading?: boolean;
+  error?: string | null;
+  onSubmit: (credentials: InformaticaAuthCredentials) => Promise<void>;
+  onOAuthLogin?: () => Promise<void>;
 }
 
 export default function AuthForm({
@@ -57,8 +56,8 @@ export default function AuthForm({
 }: AuthFormProps): JSX.Element {
   const [authMethod, setAuthMethod] = useState<'credentials' | 'oauth'>(
     'credentials'
-  )
-  const [showPassword, setShowPassword] = useState(false)
+  );
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(authFormSchema),
@@ -67,16 +66,16 @@ export default function AuthForm({
       password: '',
       region: 'us',
     },
-  })
+  });
 
   const handleFormSubmit = async (data: AuthFormValues) => {
     const credentials: InformaticaAuthCredentials = {
       username: data.username,
       password: data.password,
-    }
+    };
 
-    await onSubmit(credentials)
-  }
+    await onSubmit(credentials);
+  };
 
   return (
     <div className="space-y-6">
@@ -111,7 +110,10 @@ export default function AuthForm({
         </div>
 
         {authMethod === 'credentials' ? (
-          <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleFormSubmit)}
+            className="space-y-4"
+          >
             <div className="mb-4">
               <label
                 htmlFor="username"
@@ -217,5 +219,5 @@ export default function AuthForm({
         </div>
       )}
     </div>
-  )
+  );
 }

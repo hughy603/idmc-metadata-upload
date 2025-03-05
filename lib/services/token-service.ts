@@ -3,14 +3,13 @@ import { InformaticaAuthCredentials } from '@/lib/utils/auth';
  * Client-side service for managing authentication tokens
  */
 
-
 // Token storage keys
-const TOKEN_KEY = 'informatica_token'
-const TOKEN_EXPIRY_KEY = 'informatica_token_expiry'
-const REGION_KEY = 'informatica_region'
+const TOKEN_KEY = 'informatica_token';
+const TOKEN_EXPIRY_KEY = 'informatica_token_expiry';
+const REGION_KEY = 'informatica_region';
 
 // Credentials storage in memory only, never persisted
-let credentials: InformaticaAuthCredentials | null = null
+let credentials: InformaticaAuthCredentials | null = null;
 
 /**
  * Get the stored token if available and not expired
@@ -19,26 +18,26 @@ let credentials: InformaticaAuthCredentials | null = null
  */
 export function getStoredToken(): string | null {
   if (typeof window === 'undefined') {
-    return null
+    return null;
   }
 
-  const token = localStorage.getItem(TOKEN_KEY)
-  const expiryStr = localStorage.getItem(TOKEN_EXPIRY_KEY)
+  const token = localStorage.getItem(TOKEN_KEY);
+  const expiryStr = localStorage.getItem(TOKEN_EXPIRY_KEY);
 
   if (!token || !expiryStr) {
-    return null
+    return null;
   }
 
-  const expiry = Number(expiryStr)
+  const expiry = Number(expiryStr);
 
   // Check if token is expired or will expire in the next 5 minutes
   if (Date.now() + 5 * 60 * 1000 >= expiry) {
     // Clear the expired token
-    clearStoredToken()
-    return null
+    clearStoredToken();
+    return null;
   }
 
-  return token
+  return token;
 }
 
 /**
@@ -54,14 +53,14 @@ export function storeToken(
   region?: string
 ): void {
   if (typeof window === 'undefined') {
-    return
+    return;
   }
 
-  localStorage.setItem(TOKEN_KEY, token)
-  localStorage.setItem(TOKEN_EXPIRY_KEY, expiresAt.toString())
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(TOKEN_EXPIRY_KEY, expiresAt.toString());
 
   if (region) {
-    localStorage.setItem(REGION_KEY, region)
+    localStorage.setItem(REGION_KEY, region);
   }
 }
 
@@ -70,13 +69,13 @@ export function storeToken(
  */
 export function clearStoredToken(): void {
   if (typeof window === 'undefined') {
-    return
+    return;
   }
 
-  localStorage.removeItem(TOKEN_KEY)
-  localStorage.removeItem(TOKEN_EXPIRY_KEY)
-  localStorage.removeItem(REGION_KEY)
-  credentials = null
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_EXPIRY_KEY);
+  localStorage.removeItem(REGION_KEY);
+  credentials = null;
 }
 
 /**
@@ -85,7 +84,7 @@ export function clearStoredToken(): void {
  * @param creds The credentials to store
  */
 export function storeCredentials(creds: InformaticaAuthCredentials): void {
-  credentials = creds
+  credentials = creds;
 }
 
 /**
@@ -94,7 +93,7 @@ export function storeCredentials(creds: InformaticaAuthCredentials): void {
  * @returns The stored credentials or null
  */
 export function getStoredCredentials(): InformaticaAuthCredentials | null {
-  return credentials
+  return credentials;
 }
 
 /**
@@ -104,10 +103,10 @@ export function getStoredCredentials(): InformaticaAuthCredentials | null {
  */
 export function getStoredRegion(): string | null {
   if (typeof window === 'undefined') {
-    return null
+    return null;
   }
 
-  return localStorage.getItem(REGION_KEY)
+  return localStorage.getItem(REGION_KEY);
 }
 
 /**
@@ -116,7 +115,7 @@ export function getStoredRegion(): string | null {
  * @returns True if authenticated
  */
 export function isAuthenticated(): boolean {
-  return getStoredToken() !== null
+  return getStoredToken() !== null;
 }
 
 /**
@@ -136,26 +135,26 @@ export async function authenticate(
 
     // Store the region if provided
     if (region) {
-      localStorage.setItem(REGION_KEY, region)
+      localStorage.setItem(REGION_KEY, region);
     }
 
     // Store the credentials for potential token refresh
-    storeCredentials(credentials)
+    storeCredentials(credentials);
 
     // Generate a mock token that expires in 1 hour
-    const expiresAt = Date.now() + 60 * 60 * 1000
-    const token = 'mock-token-' + Math.random().toString(36).substring(2)
+    const expiresAt = Date.now() + 60 * 60 * 1000;
+    const token = 'mock-token-' + Math.random().toString(36).substring(2);
 
     // Store the token
-    storeToken(token, expiresAt)
+    storeToken(token, expiresAt);
 
-    return { success: true }
+    return { success: true };
   } catch (error) {
-    console.error('Authentication error:', error)
+    console.error('Authentication error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
-    }
+    };
   }
 }
 
@@ -165,31 +164,31 @@ export async function authenticate(
  * @returns The refresh result
  */
 export async function refreshTokenIfNeeded(): Promise<{
-  success: boolean
-  error?: string
+  success: boolean;
+  error?: string;
 }> {
   // Check if we have a token and if it's expired
-  const token = getStoredToken()
+  const token = getStoredToken();
 
   if (token) {
     // Token exists and is not expired (getStoredToken handles expiry check)
-    return { success: true }
+    return { success: true };
   }
 
   // Try to refresh the token using stored credentials
-  const storedCredentials = getStoredCredentials()
+  const storedCredentials = getStoredCredentials();
 
   if (!storedCredentials) {
-    return { success: false, error: 'No stored credentials found' }
+    return { success: false, error: 'No stored credentials found' };
   }
 
   // Attempt to authenticate with stored credentials
-  return authenticate(storedCredentials)
+  return authenticate(storedCredentials);
 }
 
 /**
  * Logout and clear authentication
  */
 export function logout(): void {
-  clearStoredToken()
+  clearStoredToken();
 }

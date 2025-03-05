@@ -30,7 +30,7 @@ The solution includes:
 Authentication is required before any operations with Informatica Cloud's API.
 
 ```typescript
-import { authenticateWithInformatica } from '@/lib/services/informatica-mapping-service'
+import { authenticateWithInformatica } from '@/lib/services/informatica-mapping-service';
 
 // Authentication
 async function authenticate() {
@@ -39,10 +39,10 @@ async function authenticate() {
     password: 'your-password',
     baseUrl: 'https://dm-us.informaticacloud.com', // US region
     apiUrl: 'https://na1.dm-us.informaticacloud.com/ma/api',
-  })
+  });
 
   // Store the session info for later use
-  return sessionInfo
+  return sessionInfo;
 }
 ```
 
@@ -66,7 +66,7 @@ Submit mapping data programmatically:
 import {
   authenticateWithInformatica,
   importMappingDocumentation,
-} from '@/lib/services/informatica-mapping-service'
+} from '@/lib/services/informatica-mapping-service';
 
 async function submitMapping() {
   // First authenticate
@@ -75,7 +75,7 @@ async function submitMapping() {
     password: 'your-password',
     baseUrl: 'https://dm-us.informaticacloud.com',
     apiUrl: 'https://na1.dm-us.informaticacloud.com/ma/api',
-  })
+  });
 
   // Prepare mapping data
   const mappingData = [
@@ -91,17 +91,17 @@ async function submitMapping() {
       description: 'Primary customer identifier',
     },
     // Add more mapping entries as needed
-  ]
+  ];
 
   // Submit the mapping documentation
   const result = await importMappingDocumentation({
     mappingData: mappingData,
     sessionInfo: sessionInfo,
     description: 'Monthly ETL mapping documentation',
-  })
+  });
 
-  console.log(`Job ID: ${result.jobId}`)
-  return result
+  console.log(`Job ID: ${result.jobId}`);
+  return result;
 }
 ```
 
@@ -113,16 +113,16 @@ Upload an Excel or CSV file containing mapping documentation:
 import {
   authenticateWithInformatica,
   uploadMappingFile,
-} from '@/lib/services/informatica-mapping-service'
-import { validateMappingFile } from '@/lib/utils/mapping-file-parser'
+} from '@/lib/services/informatica-mapping-service';
+import { validateMappingFile } from '@/lib/utils/mapping-file-parser';
 
 async function uploadMappingFromFile(file: File) {
   // First validate the file
-  const validationResult = await validateMappingFile(file)
+  const validationResult = await validateMappingFile(file);
 
   if (!validationResult.isValid) {
-    console.error('Validation errors:', validationResult.errors)
-    return
+    console.error('Validation errors:', validationResult.errors);
+    return;
   }
 
   // Authenticate
@@ -131,17 +131,17 @@ async function uploadMappingFromFile(file: File) {
     password: 'your-password',
     baseUrl: 'https://dm-us.informaticacloud.com',
     apiUrl: 'https://na1.dm-us.informaticacloud.com/ma/api',
-  })
+  });
 
   // Upload the file
   const result = await uploadMappingFile({
     file: file,
     sessionInfo: sessionInfo,
     description: 'Mapping upload from file',
-  })
+  });
 
-  console.log(`Job ID: ${result.jobId}`)
-  return result
+  console.log(`Job ID: ${result.jobId}`);
+  return result;
 }
 ```
 
@@ -150,30 +150,30 @@ async function uploadMappingFromFile(file: File) {
 After submitting a mapping job, you can monitor its status:
 
 ```typescript
-import { checkImportJobStatus } from '@/lib/services/informatica-mapping-service'
+import { checkImportJobStatus } from '@/lib/services/informatica-mapping-service';
 
 async function monitorJobStatus(jobId: string, sessionInfo: AuthTokenInfo) {
-  let status = 'RUNNING'
-  let attempts = 0
-  const maxAttempts = 30 // Maximum attempts to check status
+  let status = 'RUNNING';
+  let attempts = 0;
+  const maxAttempts = 30; // Maximum attempts to check status
 
   while (status === 'RUNNING' && attempts < maxAttempts) {
     const statusResult = await checkImportJobStatus({
       jobId,
       sessionInfo,
-    })
+    });
 
-    status = statusResult.status
-    console.log(`Job ${jobId} status: ${status}`)
+    status = statusResult.status;
+    console.log(`Job ${jobId} status: ${status}`);
 
     if (status === 'RUNNING') {
       // Wait 2 seconds before checking again
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      attempts++
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      attempts++;
     }
   }
 
-  return status
+  return status;
 }
 ```
 
@@ -186,46 +186,46 @@ import {
   parseMappingFile,
   validateMappingFile,
   generateMappingTemplate,
-} from '@/lib/utils/mapping-file-parser'
+} from '@/lib/utils/mapping-file-parser';
 
 // Parse a mapping file
 async function parseFile(file: File) {
   try {
-    const mappingData = await parseMappingFile(file)
-    console.log('Parsed mapping data:', mappingData)
-    return mappingData
+    const mappingData = await parseMappingFile(file);
+    console.log('Parsed mapping data:', mappingData);
+    return mappingData;
   } catch (error) {
-    console.error('Error parsing file:', error)
+    console.error('Error parsing file:', error);
   }
 }
 
 // Validate a mapping file
 async function validateFile(file: File) {
-  const result = await validateMappingFile(file)
+  const result = await validateMappingFile(file);
 
   if (result.isValid) {
-    console.log('File is valid. Mapping data:', result.mappingData)
+    console.log('File is valid. Mapping data:', result.mappingData);
   } else {
-    console.error('Validation errors:', result.errors)
+    console.error('Validation errors:', result.errors);
   }
 
-  return result
+  return result;
 }
 
 // Generate a template file
 function downloadTemplate() {
-  const template = generateMappingTemplate()
+  const template = generateMappingTemplate();
   const blob = new Blob([template], {
     type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-  })
-  const url = URL.createObjectURL(blob)
+  });
+  const url = URL.createObjectURL(blob);
 
-  const a = document.createElement('a')
-  a.href = url
-  a.download = 'mapping_template.xlsx'
-  document.body.appendChild(a)
-  a.click()
-  document.body.removeChild(a)
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'mapping_template.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 ```
 
@@ -253,52 +253,52 @@ The solution includes a React component for integrating with your UI:
 
 ```tsx
 // In your React component
-import { useState } from 'react'
+import { useState } from 'react';
 import {
   authenticateWithInformatica,
   uploadMappingFile,
-} from '@/lib/services/informatica-mapping-service'
-import { validateMappingFile } from '@/lib/utils/mapping-file-parser'
-import FileDataTable from '@/app/components/file-data-table'
+} from '@/lib/services/informatica-mapping-service';
+import { validateMappingFile } from '@/lib/utils/mapping-file-parser';
+import FileDataTable from '@/app/components/file-data-table';
 
 function MappingUploadComponent() {
-  const [file, setFile] = useState<File | null>(null)
-  const [isValidating, setIsValidating] = useState(false)
-  const [validationResult, setValidationResult] = useState<any>(null)
+  const [file, setFile] = useState<File | null>(null);
+  const [isValidating, setIsValidating] = useState(false);
+  const [validationResult, setValidationResult] = useState<any>(null);
   // ... more state variables
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (!selectedFile) return
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
-    setFile(selectedFile)
-    await validateFile(selectedFile)
-  }
+    setFile(selectedFile);
+    await validateFile(selectedFile);
+  };
 
   const validateFile = async (fileToValidate: File) => {
-    setIsValidating(true)
+    setIsValidating(true);
     try {
-      const result = await validateMappingFile(fileToValidate)
-      setValidationResult(result)
+      const result = await validateMappingFile(fileToValidate);
+      setValidationResult(result);
     } catch (error) {
-      console.error('Validation error:', error)
+      console.error('Validation error:', error);
     } finally {
-      setIsValidating(false)
+      setIsValidating(false);
     }
-  }
+  };
 
   const handleSubmit = async (credentials: {
-    username: string
-    password: string
-    region: string
+    username: string;
+    password: string;
+    region: string;
   }) => {
     // Process based on your UI flow
     // 1. Authenticate
     // 2. Upload the file
     // 3. Check job status
-  }
+  };
 
-  return <div>{/* Your UI components here */}</div>
+  return <div>{/* Your UI components here */}</div>;
 }
 ```
 

@@ -5,8 +5,6 @@ import type { MappingDocumentationData } from '@/lib/services/informatica-mappin
  * Utility functions for parsing mapping documentation files
  */
 
-
-
 /**
  * Parse an Excel or CSV file containing mapping documentation
  *
@@ -29,46 +27,46 @@ export async function parseMappingFile(
 ): Promise<MappingDocumentationData[]> {
   return new Promise((resolve, reject) => {
     try {
-      const reader = new FileReader()
+      const reader = new FileReader();
 
       reader.onload = e => {
         try {
           if (!e.target || !e.target.result) {
-            throw new Error('No data found in file')
+            throw new Error('No data found in file');
           }
 
           // Parse the file using XLSX
           try {
-            const workbook = XLSX.read(e.target.result, { type: 'binary' })
+            const workbook = XLSX.read(e.target.result, { type: 'binary' });
 
             // Assume the first sheet contains the mapping data
-            const firstSheetName = workbook.SheetNames[0]
-            const worksheet = workbook.Sheets[firstSheetName]
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
 
             // Convert to JSON
-            const jsonData = XLSX.utils.sheet_to_json(worksheet)
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
             if (jsonData.length === 0) {
-              throw new Error('No data found in file')
+              throw new Error('No data found in file');
             }
 
             // Transform to our expected format
             const mappingData: MappingDocumentationData[] = jsonData.map(
               (row: any, index: number) => {
                 // Validate required fields
-                const missingFields = []
+                const missingFields = [];
 
-                if (!row.SourceSystem) missingFields.push('SourceSystem')
-                if (!row.SourceTable) missingFields.push('SourceTable')
-                if (!row.SourceColumn) missingFields.push('SourceColumn')
-                if (!row.TargetSystem) missingFields.push('TargetSystem')
-                if (!row.TargetTable) missingFields.push('TargetTable')
-                if (!row.TargetColumn) missingFields.push('TargetColumn')
+                if (!row.SourceSystem) missingFields.push('SourceSystem');
+                if (!row.SourceTable) missingFields.push('SourceTable');
+                if (!row.SourceColumn) missingFields.push('SourceColumn');
+                if (!row.TargetSystem) missingFields.push('TargetSystem');
+                if (!row.TargetTable) missingFields.push('TargetTable');
+                if (!row.TargetColumn) missingFields.push('TargetColumn');
 
                 if (missingFields.length > 0) {
                   throw new Error(
                     `Required fields missing in row ${index + 1}: ${missingFields.join(', ')}`
-                  )
+                  );
                 }
 
                 return {
@@ -81,37 +79,37 @@ export async function parseMappingFile(
                   transformationLogic: row.TransformationLogic || undefined,
                   businessTerm: row.BusinessTerm || undefined,
                   description: row.Description || undefined,
-                }
+                };
               }
-            )
+            );
 
-            resolve(mappingData)
+            resolve(mappingData);
           } catch (error) {
             if (error instanceof Error) {
-              reject(new Error(`Error parsing file: ${error.message}`))
+              reject(new Error(`Error parsing file: ${error.message}`));
             } else {
-              reject(new Error('Error parsing file: Unknown error'))
+              reject(new Error('Error parsing file: Unknown error'));
             }
           }
         } catch (error) {
           if (error instanceof Error) {
-            reject(error)
+            reject(error);
           } else {
-            reject(new Error('Unknown error parsing file'))
+            reject(new Error('Unknown error parsing file'));
           }
         }
-      }
+      };
 
       reader.onerror = error => {
-        reject(new Error('No data found in file'))
-      }
+        reject(new Error('No data found in file'));
+      };
 
       // Read the file as binary
-      reader.readAsBinaryString(file)
+      reader.readAsBinaryString(file);
     } catch (error) {
-      reject(error)
+      reject(error);
     }
-  })
+  });
 }
 
 /**
@@ -121,47 +119,53 @@ export async function parseMappingFile(
  * @returns Promise resolving to validation result
  */
 export async function validateMappingFile(file: File): Promise<{
-  isValid: boolean
-  errors?: string[]
-  mappingData?: MappingDocumentationData[]
+  isValid: boolean;
+  errors?: string[];
+  mappingData?: MappingDocumentationData[];
 }> {
   // Check file extension first
-  const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+  const fileExtension = file.name
+    .substring(file.name.lastIndexOf('.'))
+    .toLowerCase();
   const allowedExtensions = ['.xlsx', '.csv'];
 
   if (!allowedExtensions.includes(fileExtension)) {
     return {
       isValid: false,
-      errors: ['Invalid file format. Please upload an Excel (.xlsx) or CSV (.csv) file.'],
+      errors: [
+        'Invalid file format. Please upload an Excel (.xlsx) or CSV (.csv) file.',
+      ],
     };
   }
 
   try {
-    const mappingData = await parseMappingFile(file)
+    const mappingData = await parseMappingFile(file);
 
     // If we got here, the file is valid
     return {
       isValid: true,
-      mappingData
-    }
+      mappingData,
+    };
   } catch (error) {
     if (error instanceof Error) {
       // Extract the actual error message without the "Error parsing file:" prefix
       let errorMessage = error.message;
       if (errorMessage.startsWith('Error parsing file:')) {
-        errorMessage = errorMessage.substring('Error parsing file:'.length).trim();
+        errorMessage = errorMessage
+          .substring('Error parsing file:'.length)
+          .trim();
       }
 
       return {
         isValid: false,
         errors: [errorMessage],
-      }
+      };
     }
 
     return {
       isValid: false,
       errors: ['Unknown error parsing file'],
-    }
+    };
   }
 }
 
@@ -172,7 +176,7 @@ export async function validateMappingFile(file: File): Promise<{
  */
 export function generateMappingTemplate(): Uint8Array {
   // Create a new workbook
-  const workbook = XLSX.utils.book_new()
+  const workbook = XLSX.utils.book_new();
 
   // Sample data with column headers
   const sampleData = [
@@ -198,16 +202,16 @@ export function generateMappingTemplate(): Uint8Array {
       BusinessTerm: 'Customer First Name',
       Description: '',
     },
-  ]
+  ];
 
   // Create a worksheet from the sample data
-  const worksheet = XLSX.utils.json_to_sheet(sampleData)
+  const worksheet = XLSX.utils.json_to_sheet(sampleData);
 
   // Add the worksheet to the workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Mapping Documentation')
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Mapping Documentation');
 
   // Generate Excel file
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' })
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
 
-  return new Uint8Array(excelBuffer)
+  return new Uint8Array(excelBuffer);
 }

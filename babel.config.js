@@ -19,7 +19,7 @@ const config = {
       ],
     },
   },
-}
+};
 
 // Use CommonJS export for Jest compatibility
-module.exports = config
+module.exports = config;

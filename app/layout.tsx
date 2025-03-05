@@ -1,21 +1,21 @@
-import type { Metadata } from 'next'
-import { Inter as _Inter } from 'next/font/google'
+import type { Metadata } from 'next';
+import { Inter as _Inter } from 'next/font/google';
 
-import { MockAuthProvider } from '@/lib/providers/mock-auth-provider'
-import './globals.css'
+import { MockAuthProvider } from '@/lib/providers/mock-auth-provider';
+import './globals.css';
 
-import DevMockAuth from './components/dev-mock-auth'
+import DevMockAuth from './components/dev-mock-auth';
 
 export const metadata: Metadata = {
   title: 'IDMC Metadata Upload',
   description:
     "User Interface for validating & submitting data mapping documentation containing source to target lineage & business terms to Informatica Cloud's Data Catalog.",
-}
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }): JSX.Element {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -35,5 +35,5 @@ export default function RootLayout({
         </MockAuthProvider>
       </body>
     </html>
-  )
+  );
 }

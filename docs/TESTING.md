@@ -103,7 +103,7 @@ jest.mock('@/lib/services/informatica-mapping-service', () => ({
     baseUrl: 'https://mock-base-url.com',
     apiUrl: 'https://mock-api-url.com/api',
   }),
-}))
+}));
 ```
 
 ### File Mocks
@@ -121,7 +121,7 @@ jest.mock('xlsx', () => ({
     book_append_sheet: jest.fn(),
   },
   write: jest.fn().mockReturnValue(new Uint8Array([1, 2, 3])),
-}))
+}));
 ```
 
 ### Component Mocks
@@ -150,19 +150,19 @@ describe('authenticateWithInformatica', () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({ token: 'mock-token' }),
-    })
+    });
 
     const result = await authenticateWithInformatica({
       username: 'testuser',
       password: 'testpass',
       baseUrl: 'https://test-url.com',
       apiUrl: 'https://test-api-url.com',
-    })
+    });
 
-    expect(mockFetch).toHaveBeenCalledTimes(1)
-    expect(result.token).toBe('mock-token')
-  })
-})
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(result.token).toBe('mock-token');
+  });
+});
 ```
 
 ### Testing Components

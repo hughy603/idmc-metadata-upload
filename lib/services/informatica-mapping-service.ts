@@ -50,41 +50,41 @@ export interface MappingDocumentationData {
  * Metadata catalog information
  */
 export interface MetadataCatalog {
-  id: string
-  name: string
-  description?: string
-  createdAt: string
-  status: 'ACTIVE' | 'PROCESSING' | 'ERROR'
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  status: 'ACTIVE' | 'PROCESSING' | 'ERROR';
 }
 
 /**
  * Response from mapping validation
  */
 export interface ValidationResponse {
-  isValid: boolean
-  mappingData?: MappingDocumentationData[]
-  errors?: string[]
+  isValid: boolean;
+  mappingData?: MappingDocumentationData[];
+  errors?: string[];
 }
 
 /**
  * Upload response
  */
 export interface UploadResponse {
-  success: boolean
-  catalogId?: string
-  error?: string
+  success: boolean;
+  catalogId?: string;
+  error?: string;
 }
 
 /**
  * Job status response
  */
 export interface JobStatus {
-  id: string
-  status: 'COMPLETED' | 'RUNNING' | 'FAILED' | 'QUEUED'
-  progress: number
-  startedAt: string
-  completedAt?: string
-  error?: string
+  id: string;
+  status: 'COMPLETED' | 'RUNNING' | 'FAILED' | 'QUEUED';
+  progress: number;
+  startedAt: string;
+  completedAt?: string;
+  error?: string;
 }
 
 /**
@@ -165,13 +165,17 @@ export async function authenticateWithInformatica(credentials: {
 export async function importMappingDocumentation(
   auth: AuthResult,
   mappingData: MappingDocumentationData[]
-): Promise<{ success: boolean; jobId?: string | undefined; error?: string | undefined }> {
+): Promise<{
+  success: boolean;
+  jobId?: string | undefined;
+  error?: string | undefined;
+}> {
   try {
     const response = await fetch(`${auth.session.apiUrl}/mappings/import`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${auth.token.token}`,
+        Authorization: `Bearer ${auth.token.token}`,
         'IDS-SESSION-ID': auth.session.sessionId,
       },
       body: JSON.stringify({ mappings: mappingData }),
@@ -191,7 +195,8 @@ export async function importMappingDocumentation(
       jobId: data.jobId,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     return {
       success: false,
       error: `Failed to import mapping documentation: ${errorMessage}`,
@@ -205,7 +210,11 @@ export async function importMappingDocumentation(
 export async function uploadMappingFile(
   auth: AuthResult,
   file: File
-): Promise<{ success: boolean; jobId?: string | undefined; error?: string | undefined }> {
+): Promise<{
+  success: boolean;
+  jobId?: string | undefined;
+  error?: string | undefined;
+}> {
   try {
     const formData = new FormData();
     formData.append('file', file);
@@ -213,7 +222,7 @@ export async function uploadMappingFile(
     const response = await fetch(`${auth.session.apiUrl}/mappings/upload`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${auth.token.token}`,
+        Authorization: `Bearer ${auth.token.token}`,
         'IDS-SESSION-ID': auth.session.sessionId,
       },
       body: formData,
@@ -233,7 +242,8 @@ export async function uploadMappingFile(
       jobId: data.jobId,
     };
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     return {
       success: false,
       error: `Failed to upload mapping file: ${errorMessage}`,
@@ -247,12 +257,17 @@ export async function uploadMappingFile(
 export async function checkImportJobStatus(
   auth: AuthResult,
   jobId: string
-): Promise<{ success: boolean; status: string; isComplete: boolean; error?: string | undefined }> {
+): Promise<{
+  success: boolean;
+  status: string;
+  isComplete: boolean;
+  error?: string | undefined;
+}> {
   try {
     const response = await fetch(`${auth.session.apiUrl}/jobs/${jobId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${auth.token.token}`,
+        Authorization: `Bearer ${auth.token.token}`,
         'IDS-SESSION-ID': auth.session.sessionId,
       },
     });
@@ -272,7 +287,9 @@ export async function checkImportJobStatus(
       ...(data.error && { error: data.error }),
     };
   } catch (error) {
-    throw error instanceof Error ? error : new Error('Failed to check job status');
+    throw error instanceof Error
+      ? error
+      : new Error('Failed to check job status');
   }
 }
 
@@ -287,12 +304,16 @@ export class MappingService {
     try {
       // Validate file extension
       const allowedExtensions = ['.xlsx', '.csv', '.json'];
-      const fileExtension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      const fileExtension = file.name
+        .substring(file.name.lastIndexOf('.'))
+        .toLowerCase();
 
       if (!allowedExtensions.includes(fileExtension)) {
         return {
           isValid: false,
-          errors: [`Invalid file format. Please upload one of the following: ${allowedExtensions.join(', ')}`]
+          errors: [
+            `Invalid file format. Please upload one of the following: ${allowedExtensions.join(', ')}`,
+          ],
         };
       }
 
@@ -303,19 +324,22 @@ export class MappingService {
       if (!mappingData || mappingData.length === 0) {
         return {
           isValid: false,
-          errors: ['No valid mapping data found in file']
+          errors: ['No valid mapping data found in file'],
         };
       }
 
       return {
         isValid: true,
-        mappingData
+        mappingData,
       };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error during validation';
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error during validation';
       return {
         isValid: false,
-        errors: [errorMessage]
+        errors: [errorMessage],
       };
     }
   }
@@ -330,38 +354,39 @@ export class MappingService {
   ): Promise<UploadResponse> {
     try {
       // Create form data for file upload
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('catalogName', catalogName)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('catalogName', catalogName);
 
       if (description) {
-        formData.append('description', description)
+        formData.append('description', description);
       }
 
       // Make API request to upload the file
-      const response = await api.post<{id: string}>('/catalogs', formData, {
+      const response = await api.post<{ id: string }>('/catalogs', formData, {
         headers: {
           // Let the browser set the content type with boundary
-        }
-      })
+        },
+      });
 
       if (response.success && response.data) {
         return {
           success: true,
-          catalogId: response.data.id
-        }
+          catalogId: response.data.id,
+        };
       } else {
         return {
           success: false,
-          error: response.error || 'Failed to upload file'
-        }
+          error: response.error || 'Failed to upload file',
+        };
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error during upload'
+      const errorMessage =
+        error instanceof Error ? error.message : 'Unknown error during upload';
       return {
         success: false,
-        error: errorMessage
-      }
+        error: errorMessage,
+      };
     }
   }
 
@@ -371,7 +396,7 @@ export class MappingService {
   async uploadMappingRow(
     row: FileDataRow,
     catalogId: string
-  ): Promise<{success: boolean; error?: string}> {
+  ): Promise<{ success: boolean; error?: string }> {
     try {
       // Extract mapping data from the row.data object
       const mapping: MappingDocumentationData = {
@@ -381,46 +406,58 @@ export class MappingService {
         targetSystem: String(row.data.targetSystem || ''),
         targetTable: String(row.data.targetTable || ''),
         targetColumn: String(row.data.targetColumn || ''),
-        transformationLogic: row.data.transformationLogic ? String(row.data.transformationLogic) : undefined,
-        businessTerm: row.data.businessTerm ? String(row.data.businessTerm) : undefined,
-        description: row.data.description ? String(row.data.description) : undefined
-      }
+        transformationLogic: row.data.transformationLogic
+          ? String(row.data.transformationLogic)
+          : undefined,
+        businessTerm: row.data.businessTerm
+          ? String(row.data.businessTerm)
+          : undefined,
+        description: row.data.description
+          ? String(row.data.description)
+          : undefined,
+      };
 
       // Validate required fields
-      const missingFields = []
-      if (!mapping.sourceSystem) missingFields.push('Source System')
-      if (!mapping.sourceTable) missingFields.push('Source Table')
-      if (!mapping.sourceColumn) missingFields.push('Source Column')
-      if (!mapping.targetSystem) missingFields.push('Target System')
-      if (!mapping.targetTable) missingFields.push('Target Table')
-      if (!mapping.targetColumn) missingFields.push('Target Column')
+      const missingFields = [];
+      if (!mapping.sourceSystem) missingFields.push('Source System');
+      if (!mapping.sourceTable) missingFields.push('Source Table');
+      if (!mapping.sourceColumn) missingFields.push('Source Column');
+      if (!mapping.targetSystem) missingFields.push('Target System');
+      if (!mapping.targetTable) missingFields.push('Target Table');
+      if (!mapping.targetColumn) missingFields.push('Target Column');
 
       if (missingFields.length > 0) {
         return {
           success: false,
-          error: `Missing required fields: ${missingFields.join(', ')}`
-        }
+          error: `Missing required fields: ${missingFields.join(', ')}`,
+        };
       }
 
       // Prepare the payload for the API
       const payload = {
         catalogId,
-        mapping
-      }
+        mapping,
+      };
 
       // Make the API request
-      const response = await api.post(`/catalogs/${catalogId}/mappings`, payload)
+      const response = await api.post(
+        `/catalogs/${catalogId}/mappings`,
+        payload
+      );
 
       return {
         success: response.success,
-        error: response.error
-      }
+        error: response.error,
+      };
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error uploading mapping'
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error uploading mapping';
       return {
         success: false,
-        error: errorMessage
-      }
+        error: errorMessage,
+      };
     }
   }
 
@@ -429,16 +466,19 @@ export class MappingService {
    */
   async getJobStatus(jobId: string): Promise<JobStatus> {
     try {
-      const response = await api.get<JobStatus>(`/jobs/${jobId}`)
+      const response = await api.get<JobStatus>(`/jobs/${jobId}`);
 
       if (response.success && response.data) {
-        return response.data
+        return response.data;
       } else {
-        throw new Error(response.error || 'Failed to get job status')
+        throw new Error(response.error || 'Failed to get job status');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error getting job status'
-      throw new Error(errorMessage)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error getting job status';
+      throw new Error(errorMessage);
     }
   }
 
@@ -447,39 +487,47 @@ export class MappingService {
    */
   async getCatalog(catalogId: string): Promise<MetadataCatalog> {
     try {
-      const response = await api.get<MetadataCatalog>(`/catalogs/${catalogId}`)
+      const response = await api.get<MetadataCatalog>(`/catalogs/${catalogId}`);
 
       if (response.success && response.data) {
-        return response.data
+        return response.data;
       } else {
-        throw new Error(response.error || 'Failed to get catalog information')
+        throw new Error(response.error || 'Failed to get catalog information');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error getting catalog'
-      throw new Error(errorMessage)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error getting catalog';
+      throw new Error(errorMessage);
     }
   }
 
   /**
    * Process a catalog (starts the mapping job)
    */
-  async processCatalog(catalogId: string): Promise<{jobId: string}> {
+  async processCatalog(catalogId: string): Promise<{ jobId: string }> {
     try {
-      const response = await api.post<{jobId: string}>(`/catalogs/${catalogId}/process`)
+      const response = await api.post<{ jobId: string }>(
+        `/catalogs/${catalogId}/process`
+      );
 
       if (response.success && response.data) {
         return {
-          jobId: response.data.jobId
-        }
+          jobId: response.data.jobId,
+        };
       } else {
-        throw new Error(response.error || 'Failed to process catalog')
+        throw new Error(response.error || 'Failed to process catalog');
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error processing catalog'
-      throw new Error(errorMessage)
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'Unknown error processing catalog';
+      throw new Error(errorMessage);
     }
   }
 }
 
 // Export a singleton instance
-export const mappingService = new MappingService()
+export const mappingService = new MappingService();

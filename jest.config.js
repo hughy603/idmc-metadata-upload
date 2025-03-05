@@ -23,7 +23,7 @@ const customJestConfig = {
     '^@styles/(.*)$': '<rootDir>/app/styles/$1',
     '^@public/(.*)$': '<rootDir>/public/$1',
     '^@services/(.*)$': '<rootDir>/lib/services/$1',
-    '^@tests/(.*)$': '<rootDir>/__tests__/$1'
+    '^@tests/(.*)$': '<rootDir>/__tests__/$1',
   },
   collectCoverage: true,
   collectCoverageFrom: [

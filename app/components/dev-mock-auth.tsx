@@ -1,40 +1,39 @@
 import { useState } from 'react';
 
 import { useMockAuth } from '@/lib/providers/mock-auth-provider';
-'use client'
-
+('use client');
 
 /**
  * Development-only component for enabling mock authentication
  * This component only appears in development mode
  */
 export default function DevMockAuth(): JSX.Element {
-  const { isMockAuthEnabled, enableMockAuth, disableMockAuth } = useMockAuth()
-  const [username, setUsername] = useState('test.user@example.com')
-  const [password, setPassword] = useState('password123')
-  const [isOpen, setIsOpen] = useState(false)
+  const { isMockAuthEnabled, enableMockAuth, disableMockAuth } = useMockAuth();
+  const [username, setUsername] = useState('test.user@example.com');
+  const [password, setPassword] = useState('password123');
+  const [isOpen, setIsOpen] = useState(false);
 
   // Only render in development mode
   if (process.env.NODE_ENV !== 'development') {
-    return null
+    return null;
   }
 
   const handleEnableMock = () => {
-    enableMockAuth({ username, password })
-    setIsOpen(false)
-  }
+    enableMockAuth({ username, password });
+    setIsOpen(false);
+  };
 
   if (!isOpen && !isMockAuthEnabled) {
     return (
       <div className="fixed bottom-4 right-4 z-50">
         <button
-          onClick={(error) => setIsOpen(true)}
+          onClick={error => setIsOpen(true)}
           className="rounded-md bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-md hover:bg-purple-700"
         >
           Enable Mock Auth
         </button>
       </div>
-    )
+    );
   }
 
   if (!isOpen && isMockAuthEnabled) {
@@ -50,7 +49,7 @@ export default function DevMockAuth(): JSX.Element {
           Disable
         </button>
       </div>
-    )
+    );
   }
 
   return (
@@ -60,7 +59,7 @@ export default function DevMockAuth(): JSX.Element {
           Development Mock Auth
         </h3>
         <button
-          onClick={(e) => setIsOpen(false)}
+          onClick={e => setIsOpen(false)}
           className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-500 dark:hover:bg-gray-700"
         >
           <svg
@@ -92,7 +91,7 @@ export default function DevMockAuth(): JSX.Element {
             id="mock-username"
             type="text"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={e => setUsername(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </div>
@@ -108,14 +107,14 @@ export default function DevMockAuth(): JSX.Element {
             id="mock-password"
             type="text"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={e => setPassword(e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           />
         </div>
 
         <div className="flex justify-end space-x-2">
           <button
-            onClick={(e) => setIsOpen(false)}
+            onClick={e => setIsOpen(false)}
             className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           >
             Cancel
@@ -129,5 +128,5 @@ export default function DevMockAuth(): JSX.Element {
         </div>
       </div>
     </div>
-  )
+  );
 }

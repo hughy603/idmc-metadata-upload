@@ -1,13 +1,12 @@
-'use client'
-
+'use client';
 
 interface JobStatusProps {
-  jobId: string | null
-  status: string | null
-  error: string | null
-  isPolling: boolean
-  onRetry: () => Promise<void>
-  onReset: () => void
+  jobId: string | null;
+  status: string | null;
+  error: string | null;
+  isPolling: boolean;
+  onRetry: () => Promise<void>;
+  onReset: () => void;
 }
 
 export default function JobStatus({
@@ -19,7 +18,7 @@ export default function JobStatus({
   onReset,
 }: JobStatusProps): JSX.Element {
   if (!jobId) {
-    return null
+    return null;
   }
 
   const getStatusBadge = () => {
@@ -28,7 +27,7 @@ export default function JobStatus({
         <div className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-800 dark:text-red-100">
           Error
         </div>
-      )
+      );
     }
 
     switch (status) {
@@ -39,36 +38,36 @@ export default function JobStatus({
           <div className="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
             Pending
           </div>
-        )
+        );
       case 'RUNNING':
       case 'IMPORTING':
         return (
           <div className="inline-flex items-center rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:bg-blue-800 dark:text-blue-100">
             Running
           </div>
-        )
+        );
       case 'COMPLETED':
       case 'SUCCESS':
         return (
           <div className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-100">
             Completed
           </div>
-        )
+        );
       case 'FAILED':
       case 'ABORTED':
         return (
           <div className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:bg-red-800 dark:text-red-100">
             Failed
           </div>
-        )
+        );
       default:
         return (
           <div className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-300">
             {status || 'Unknown'}
           </div>
-        )
+        );
     }
-  }
+  };
 
   return (
     <div className="mt-6 rounded-md bg-white p-4 shadow dark:bg-gray-800">
@@ -159,5 +158,5 @@ export default function JobStatus({
         </div>
       </div>
     </div>
-  )
+  );
 }

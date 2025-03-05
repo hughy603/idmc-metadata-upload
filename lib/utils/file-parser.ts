@@ -9,16 +9,16 @@ import * as XLSX from 'xlsx-js-style';
  * Parse Excel or CSV file and return structured data
  */
 export async function parseFile(file: File): Promise<FileDataRow[]> {
-  const fileExtension = file.name.split('.').pop()?.toLowerCase() || ''
+  const fileExtension = file.name.split('.').pop()?.toLowerCase() || '';
 
   if (fileExtension === 'xlsx' || fileExtension === 'xls') {
-    return parseExcelFile(file)
+    return parseExcelFile(file);
   } else if (fileExtension === 'csv') {
-    return parseCsvFile(file)
+    return parseCsvFile(file);
   } else {
     throw new Error(
       'Unsupported file format. Please upload an Excel or CSV file.'
-    )
+    );
   }
 }
 
@@ -27,45 +27,45 @@ export async function parseFile(file: File): Promise<FileDataRow[]> {
  */
 async function parseExcelFile(file: File): Promise<FileDataRow[]> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader()
+    const reader = new FileReader();
 
     reader.onload = e => {
       try {
         if (!e.target?.result) {
-          reject(new Error('Failed to read file'))
-          return
+          reject(new Error('Failed to read file'));
+          return;
         }
 
-        const data = new Uint8Array(e.target.result as ArrayBuffer)
-        const workbook = XLSX.read(data, { type: 'array' })
+        const data = new Uint8Array(e.target.result as ArrayBuffer);
+        const workbook = XLSX.read(data, { type: 'array' });
 
         // Assume the first sheet is the one we want
-        const firstSheetName = workbook.SheetNames[0]
-        const worksheet = workbook.Sheets[firstSheetName]
+        const firstSheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[firstSheetName];
 
         // Convert to JSON
         const jsonData =
-          XLSX.utils.sheet_to_json<Record<string, string | number>>(worksheet)
+          XLSX.utils.sheet_to_json<Record<string, string | number>>(worksheet);
 
         // Convert to FileDataRow format
         const rows = jsonData.map((row, index) => ({
           id: `row-${index}`,
           data: row,
           status: 'pending' as const,
-        }))
+        }));
 
-        resolve(rows)
+        resolve(rows);
       } catch (error) {
-        reject(error)
+        reject(error);
       }
-    }
+    };
 
     reader.onerror = () => {
-      reject(new Error('Error reading the file'))
-    }
+      reject(new Error('Error reading the file'));
+    };
 
-    reader.readAsArrayBuffer(file)
-  })
+    reader.readAsArrayBuffer(file);
+  });
 }
 
 /**
@@ -88,16 +88,16 @@ async function parseCsvFile(file: File): Promise<FileDataRow[]> {
               id: `row-${index}`,
               data: row as Record<string, string | number>,
               status: 'pending' as const,
-            }))
+            }));
 
-          resolve(rows)
+          resolve(rows);
         } catch (error) {
-          reject(error)
+          reject(error);
         }
       },
       error: error => {
-        reject(error)
+        reject(error);
       },
-    })
-  })
+    });
+  });
 }

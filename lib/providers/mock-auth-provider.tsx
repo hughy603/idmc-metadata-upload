@@ -1,30 +1,40 @@
 import type { ReactNode } from 'react';
 import { createContext, useContext, useState } from 'react';
-'use client'
-
+('use client');
 
 type MockAuthContextType = {
   isMockAuthEnabled: boolean;
   enableMockAuth: (credentials: { username: string; password: string }) => void;
   disableMockAuth: () => void;
   getMockCredentials: () => { username: string; password: string } | null;
-}
+};
 
 const MockAuthContext = createContext<MockAuthContextType>({
   isMockAuthEnabled: false,
   enableMockAuth: () => {},
   disableMockAuth: () => {},
-  getMockCredentials: () => null
+  getMockCredentials: () => null,
 });
 
-export const useMockAuth = (): MockAuthContextType => useContext(MockAuthContext);
+export const useMockAuth = (): MockAuthContextType =>
+  useContext(MockAuthContext);
 
-export function MockAuthProvider({ children }: { children: ReactNode }): JSX.Element {
+export function MockAuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}): JSX.Element {
   const [mockEnabled, setMockEnabled] = useState(false);
-  const [mockCredentials, setMockCredentials] = useState<{ username: string; password: string } | null>(null);
+  const [mockCredentials, setMockCredentials] = useState<{
+    username: string;
+    password: string;
+  } | null>(null);
 
   // Enable mock authentication with provided credentials
-  const enableMockAuth = (credentials: { username: string; password: string }) => {
+  const enableMockAuth = (credentials: {
+    username: string;
+    password: string;
+  }) => {
     setMockCredentials(credentials);
     setMockEnabled(true);
     localStorage.setItem('mockAuthEnabled', 'true');
@@ -52,7 +62,7 @@ export function MockAuthProvider({ children }: { children: ReactNode }): JSX.Ele
         isMockAuthEnabled: mockEnabled,
         enableMockAuth,
         disableMockAuth,
-        getMockCredentials
+        getMockCredentials,
       }}
     >
       {children}

@@ -3,23 +3,28 @@
 <!-- toc -->
 
 ## Introduction
+
 This project handles metadata uploads for IDMC.
 
 ## Features
+
 - Feature 1
 - Feature 2
 
 ## Installation
+
 ```bash
 npm install
 ```
 
 ## Usage
+
 ```bash
 npm run dev
 ```
 
 ## Contributing
+
 Please read the [contributing guide](CONTRIBUTING.md).
 
 ## Overview
@@ -208,6 +213,7 @@ npm run fix:naming
 ```
 
 This script:
+
 - Removes unnecessary underscore prefixes from variables that are actually used
 - Updates test files to use consistent naming
 - Runs ESLint to apply naming convention rules

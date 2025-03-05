@@ -1,7 +1,11 @@
 import { useEffect, useState } from 'react';
 
 import { useMockAuth } from '@/lib/providers/mock-auth-provider';
-import { login as authLogin, authService, getAuthStatus } from '@/lib/services/auth-service';
+import {
+  login as authLogin,
+  authService,
+  getAuthStatus,
+} from '@/lib/services/auth-service';
 import type { InformaticaAuthCredentials } from '@/lib/utils/auth';
 
 // Define a function to check if we're in mock mode
@@ -29,7 +33,7 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
     isAuthenticating: false,
     isAuthenticated: false,
     error: null,
-    region: 'US'
+    region: 'US',
   });
   const { isMockAuthEnabled, getMockCredentials } = useMockAuth();
 
@@ -39,7 +43,7 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
     setAuthState(prev => ({
       ...prev,
       isAuthenticated: status.isAuthenticated,
-      region: status.region
+      region: status.region,
     }));
   }, []);
 
@@ -53,7 +57,7 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
           isAuthenticating: false,
           isAuthenticated: true,
           error: null,
-          region: 'US'
+          region: 'US',
         });
       }
     }
@@ -68,7 +72,7 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
     setAuthState(prev => ({
       ...prev,
       isAuthenticating: true,
-      error: null
+      error: null,
     }));
 
     try {
@@ -80,14 +84,14 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
           isAuthenticating: false,
           isAuthenticated: true,
           error: null,
-          region: status.region
+          region: status.region,
         });
       } else {
         setAuthState({
           isAuthenticating: false,
           isAuthenticated: false,
           error: 'Authentication failed',
-          region: 'US'
+          region: 'US',
         });
       }
 
@@ -97,7 +101,7 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
         isAuthenticating: false,
         isAuthenticated: false,
         error: error instanceof Error ? error.message : 'Authentication failed',
-        region: 'US'
+        region: 'US',
       });
 
       return false;
@@ -113,7 +117,7 @@ export function useInformaticaAuth(): UseInformaticaAuthReturn {
       isAuthenticating: false,
       isAuthenticated: false,
       error: null,
-      region: 'US'
+      region: 'US',
     });
   };
 

@@ -4,18 +4,18 @@
 
 // Types for authentication
 export interface InformaticaAuthCredentials {
-  username: string
-  password: string
+  username: string;
+  password: string;
 }
 
 export interface InformaticaSession {
-  sessionId: string
-  orgId: string
+  sessionId: string;
+  orgId: string;
 }
 
 export interface InformaticaToken {
-  accessToken: string
-  expiresAt: number // Timestamp when token expires
+  accessToken: string;
+  expiresAt: number; // Timestamp when token expires
 }
 
 // Configuration for different Informatica Cloud regions
@@ -25,7 +25,7 @@ export const INFORMATICA_REGIONS = {
   APJ: 'https://dm-ap.informaticacloud.com',
   CANADA: 'https://dm-na.informaticacloud.com',
   UK: 'https://dm-uk.informaticacloud.com',
-}
+};
 
 export const API_REGIONS = {
   US: 'https://idmc-api.dm-us.informaticacloud.com/',
@@ -33,10 +33,10 @@ export const API_REGIONS = {
   APJ: 'https://idmc-api.dm-ap.informaticacloud.com/',
   CANADA: 'https://idmc-api.dm-na.informaticacloud.com/',
   UK: 'https://idmc-api.dm-uk.informaticacloud.com/',
-}
+};
 
 // Default region
-export const DEFAULT_REGION = 'US'
+export const DEFAULT_REGION = 'US';
 
 /**
  * Get the base URL for authentication based on the specified region
@@ -44,7 +44,7 @@ export const DEFAULT_REGION = 'US'
 export function getAuthBaseUrl(
   region: keyof typeof INFORMATICA_REGIONS = DEFAULT_REGION
 ): string {
-  return INFORMATICA_REGIONS[region]
+  return INFORMATICA_REGIONS[region];
 }
 
 /**
@@ -53,7 +53,7 @@ export function getAuthBaseUrl(
 export function getApiBaseUrl(
   region: keyof typeof API_REGIONS = DEFAULT_REGION
 ): string {
-  return API_REGIONS[region]
+  return API_REGIONS[region];
 }
 
 /**
@@ -67,8 +67,8 @@ export async function getInformaticaSession(
   credentials: InformaticaAuthCredentials,
   region: keyof typeof INFORMATICA_REGIONS = DEFAULT_REGION
 ): Promise<InformaticaSession> {
-  const baseUrl = getAuthBaseUrl(region)
-  const loginUrl = `${baseUrl}/identity-service/api/v1/Login`
+  const baseUrl = getAuthBaseUrl(region);
+  const loginUrl = `${baseUrl}/identity-service/api/v1/Login`;
 
   const response = await fetch(loginUrl, {
     method: 'POST',
@@ -79,23 +79,23 @@ export async function getInformaticaSession(
       username: credentials.username,
       password: credentials.password,
     }),
-  })
+  });
 
   if (!response.ok) {
     const errorData = await response
       .json()
-      .catch(() => ({ error: 'Unknown error' }))
+      .catch(() => ({ error: 'Unknown error' }));
     throw new Error(
       `Authentication failed: ${errorData.error || response.statusText}`
-    )
+    );
   }
 
-  const data = await response.json()
+  const data = await response.json();
 
   return {
     sessionId: data.sessionId,
     orgId: data.orgId,
-  }
+  };
 }
 
 /**
@@ -109,8 +109,8 @@ export async function generateJwtToken(
   session: InformaticaSession,
   region: keyof typeof INFORMATICA_REGIONS = DEFAULT_REGION
 ): Promise<InformaticaToken> {
-  const baseUrl = getAuthBaseUrl(region)
-  const tokenUrl = `${baseUrl}/identity-service/api/v1/jwt/Token?client_id=idmc_api&nonce=1234`
+  const baseUrl = getAuthBaseUrl(region);
+  const tokenUrl = `${baseUrl}/identity-service/api/v1/jwt/Token?client_id=idmc_api&nonce=1234`;
 
   const response = await fetch(tokenUrl, {
     method: 'POST',
@@ -118,26 +118,26 @@ export async function generateJwtToken(
       cookie: `USER_SESSION=${session.sessionId}`,
       'IDS-SESSION-ID': session.sessionId,
     },
-  })
+  });
 
   if (!response.ok) {
     const errorData = await response
       .json()
-      .catch(() => ({ error: 'Unknown error' }))
+      .catch(() => ({ error: 'Unknown error' }));
     throw new Error(
       `Token generation failed: ${errorData.error || response.statusText}`
-    )
+    );
   }
 
-  const data = await response.json()
+  const data = await response.json();
 
   // Token expires after 30 minutes (1800 seconds)
-  const expiresAt = Date.now() + 1800 * 1000
+  const expiresAt = Date.now() + 1800 * 1000;
 
   return {
     accessToken: data.token,
     expiresAt,
-  }
+  };
 }
 
 /**
@@ -148,6 +148,6 @@ export async function generateJwtToken(
  */
 export function isTokenExpired(token: InformaticaToken): boolean {
   // Consider token expired if less than 5 minutes remaining
-  const expirationBuffer = 5 * 60 * 1000 // 5 minutes in milliseconds
-  return Date.now() + expirationBuffer >= token.expiresAt
+  const expirationBuffer = 5 * 60 * 1000; // 5 minutes in milliseconds
+  return Date.now() + expirationBuffer >= token.expiresAt;
 }

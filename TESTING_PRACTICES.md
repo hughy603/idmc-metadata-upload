@@ -43,7 +43,9 @@ describe('Button', () => {
     render(<Button>Click me</Button>);
 
     // Act & Assert
-    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /click me/i })
+    ).toBeInTheDocument();
   });
 
   it('calls the onClick handler when clicked', () => {
@@ -127,7 +129,7 @@ describe('TodoList Integration', () => {
 
     // Act
     fireEvent.change(screen.getByLabelText(/add todo/i), {
-      target: { value: 'Buy milk' }
+      target: { value: 'Buy milk' },
     });
     fireEvent.click(screen.getByRole('button', { name: /add/i }));
 
@@ -152,7 +154,7 @@ const server = setupServer(
     return res(
       ctx.json([
         { id: 1, text: 'Buy milk', completed: false },
-        { id: 2, text: 'Write tests', completed: true }
+        { id: 2, text: 'Write tests', completed: true },
       ])
     );
   })
@@ -169,7 +171,7 @@ Mock child components when testing parent components:
 
 ```tsx
 jest.mock('../components/TodoItem', () => ({
-  TodoItem: ({ text }) => <div data-testid="mocked-todo-item">{text}</div>
+  TodoItem: ({ text }) => <div data-testid="mocked-todo-item">{text}</div>,
 }));
 ```
 

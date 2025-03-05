@@ -1,29 +1,28 @@
 import { useEffect, useState } from 'react';
-'use client'
-
+('use client');
 
 export default function Header(): JSX.Element {
-  const [isDarkMode, setIsDarkMode] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Check for user's preferred color scheme on initial load
   useEffect(() => {
     const isDark =
       document.documentElement.classList.contains('dark') ||
-      window.matchMedia('(prefers-color-scheme: dark)').matches
-    setIsDarkMode(isDark)
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    setIsDarkMode(isDark);
     if (isDark) {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add('dark');
     }
-  }, [])
+  }, []);
 
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode)
+    setIsDarkMode(!isDarkMode);
     if (isDarkMode) {
-      document.documentElement.classList.remove('dark')
+      document.documentElement.classList.remove('dark');
     } else {
-      document.documentElement.classList.add('dark')
+      document.documentElement.classList.add('dark');
     }
-  }
+  };
 
   return (
     <header className="flex items-center justify-between py-4">
@@ -78,5 +77,5 @@ export default function Header(): JSX.Element {
         </button>
       </div>
     </header>
-  )
+  );
 }

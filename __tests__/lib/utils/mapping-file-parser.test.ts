@@ -1,4 +1,8 @@
-import { parseMappingFile, validateMappingFile, generateMappingTemplate } from '@/lib/utils/mapping-file-parser';
+import {
+  parseMappingFile,
+  validateMappingFile,
+  generateMappingTemplate,
+} from '@/lib/utils/mapping-file-parser';
 import * as XLSX from 'xlsx-js-style';
 
 // Mock xlsx

@@ -4,23 +4,22 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
-
-'use client'
+('use client');
 
 export const fileUploaderSchema = z.object({
   file: z.instanceof(File).optional(),
 });
 
-export type FileUploaderValues = z.infer<typeof fileUploaderSchema>
+export type FileUploaderValues = z.infer<typeof fileUploaderSchema>;
 
 interface FileUploaderProps {
-  isValidating: boolean
-  isUploading: boolean
-  fileName: string | null
-  validationError: string | null
-  isFileValid: boolean
-  onFileChange: (file: File) => Promise<void>
-  onSubmit: (values: FileUploaderValues) => Promise<void>
+  isValidating: boolean;
+  isUploading: boolean;
+  fileName: string | null;
+  validationError: string | null;
+  isFileValid: boolean;
+  onFileChange: (file: File) => Promise<void>;
+  onSubmit: (values: FileUploaderValues) => Promise<void>;
 }
 
 export default function FileUploader({
@@ -32,23 +31,23 @@ export default function FileUploader({
   onFileChange,
   onSubmit,
 }: FileUploaderProps): JSX.Element {
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FileUploaderValues>({
     resolver: zodResolver(fileUploaderSchema),
-  })
+  });
 
-  const { ref: fileRegisterRef, ...fileRegisterRest } = register('file')
+  const { ref: fileRegisterRef, ...fileRegisterRest } = register('file');
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      await onFileChange(file)
+      await onFileChange(file);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -66,10 +65,10 @@ export default function FileUploader({
                 className="sr-only"
                 disabled={isValidating || isUploading}
                 {...fileRegisterRest}
-                ref={(element) => {
-                  fileRegisterRef(element)
+                ref={element => {
+                  fileRegisterRef(element);
                   if (element) {
-                    fileInputRef.current = element
+                    fileInputRef.current = element;
                   }
                 }}
                 onChange={handleFileChange}
@@ -100,7 +99,9 @@ export default function FileUploader({
 
       {errors.file && (
         <div className="mt-4">
-          <p className="text-sm text-red-500">{errors.file.message?.toString()}</p>
+          <p className="text-sm text-red-500">
+            {errors.file.message?.toString()}
+          </p>
         </div>
       )}
 
@@ -118,5 +119,5 @@ export default function FileUploader({
         </button>
       </div>
     </form>
-  )
+  );
 }

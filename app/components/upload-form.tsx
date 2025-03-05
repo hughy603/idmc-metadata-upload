@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 /**
  * TODO: Fix the following issues:
@@ -14,6 +14,7 @@ import { useEffect, useState } from 'react';
 import { useFileUpload } from '@/lib/hooks/useFileUpload';
 import { useInformaticaAuth } from '@/lib/hooks/useInformaticaAuth';
 import { useJobTracking } from '@/lib/hooks/useJobTracking';
+import { apiRateLimiter } from '@/lib/services/api-rate-limiter';
 import type { InformaticaAuthCredentials } from '@/lib/utils/auth';
 
 import AuthForm from './auth-form';
@@ -23,232 +24,386 @@ import type { FileUploaderValues } from './file-uploader';
 import FileUploader from './file-uploader';
 import JobStatus from './job-status';
 
+/**
+ * Interface for FileUploaderValues with added properties
+ */
+interface ExtendedFileUploaderValues extends FileUploaderValues {
+  /** Name of the catalog to upload to */
+  catalogName?: string;
+  /** Whether to automatically process the file after upload */
+  autoProcess?: boolean;
+}
+
+/**
+ * Interface for auth information from local storage
+ */
+interface StoredAuthInfo {
+  session: {
+    sessionId: string;
+    orgId: string;
+    expiresAt: string;
+  };
+  token: {
+    token: string;
+    expiresAt: number;
+  };
+}
+
+/**
+ * Main form component for file upload and processing
+ */
 export default function UploadForm(): JSX.Element {
-  const [showTable, setShowTable] = useState(false);
-  const [autoProcessingMessage, _setAutoProcessingMessage] = useState<string | null>(null);
+  const [showFileData, setShowFileData] = useState(false);
+  const [autoProcess, _setAutoProcess] = useState(false);
+  const [rateLimitStatus, setRateLimitStatus] = useState(
+    apiRateLimiter.getRateLimitStatus()
+  );
 
-  const {
-    authState,
-    reset: _resetAuth,
-    authenticate,
-  } = useInformaticaAuth();
+  // Update rate limit status periodically
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRateLimitStatus(apiRateLimiter.getRateLimitStatus());
+    }, 1000);
 
-  const {
-    jobState,
-    startTracking,
-    checkStatus: _checkStatus,
-    stopTracking,
-  } = useJobTracking();
+    return () => clearInterval(interval);
+  }, []);
+
+  const { authState, authenticate, logout } = useInformaticaAuth();
 
   const {
     fileState,
     validateFile,
     processFile,
-    uploadFile: _uploadFile,
+    uploadFile,
     uploadMappingRow,
-    updateRowStatus,
+    uploadMappingBatch,
     reset: resetFileUpload,
   } = useFileUpload();
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (authState.isAuthenticated) {
-        setShowTable(false);
-        resetFileUpload();
-      }
-    };
-    void checkAuth();
-  }, [authState.isAuthenticated, resetFileUpload]);
+  const { jobState, startTracking, stopTracking } = useJobTracking();
 
-  const handleFileChange = async (file: File) => {
-    try {
-      const isValid = await validateFile(file);
-      if (isValid) {
-        await processFile(file);
-      }
-    } catch (error) {
-      console.error('File processing failed:', error);
-    }
-  };
-
-  const handleSubmit = async (values: FileUploaderValues) => {
+  /**
+   * Handle form submission with file upload
+   */
+  const handleSubmit = async (
+    values: ExtendedFileUploaderValues
+  ): Promise<void> => {
     if (!values.file) return;
 
-    try {
-      const isValid = await validateFile(values.file);
-      if (isValid) {
-        await processFile(values.file);
-        setShowTable(true);
-      }
-    } catch (error) {
-      console.error('File processing failed:', error);
+    await validateFile(values.file);
+    await processFile(values.file);
+    setShowFileData(true);
+
+    if (autoProcess && fileState.fileData.length > 0) {
+      await uploadFile(
+        values.file,
+        values.catalogName || 'Default Catalog',
+        'Imported mappings'
+      );
     }
   };
 
-  const handleRowSubmit = async (row: FileDataRow) => {
-    try {
-      updateRowStatus(row.id, 'processing');
-      const uploadSuccess = await uploadMappingRow(row);
+  /**
+   * Get auth info from local storage
+   */
+  const getAuthFromLocalStorage = (): StoredAuthInfo => {
+    return {
+      session: {
+        sessionId: localStorage.getItem('informatica_session_id') || '',
+        orgId: localStorage.getItem('informatica_org_id') || '',
+        expiresAt: localStorage.getItem('informatica_session_expires') || '',
+      },
+      token: {
+        token: localStorage.getItem('informatica_token') || '',
+        expiresAt: Number(
+          localStorage.getItem('informatica_token_expires') || '0'
+        ),
+      },
+    };
+  };
 
-      if (uploadSuccess && fileState.catalogId) {
-        const auth = {
-          session: {
-            sessionId: localStorage.getItem('informatica_session_id') || '',
-            orgId: localStorage.getItem('informatica_org_id') || '',
-            expiresAt: localStorage.getItem('informatica_session_expires') || ''
-          },
-          token: {
-            token: localStorage.getItem('informatica_token') || '',
-            expiresAt: Number(localStorage.getItem('informatica_token_expires') || '0')
-          }
-        };
+  /**
+   * Handle single row submission
+   */
+  const handleRowSubmit = async (row: FileDataRow): Promise<void> => {
+    if (!authState.isAuthenticated) return;
+
+    try {
+      const auth = getAuthFromLocalStorage();
+
+      await uploadMappingRow(row);
+
+      if (fileState.catalogId) {
         startTracking(auth, fileState.catalogId);
       }
-    } catch (error) {
-      updateRowStatus(row.id, 'error', error instanceof Error ? error.message : 'Unknown error');
+    } catch (err) {
+      console.error('Failed to submit row:', err);
     }
   };
 
-  const handleAuthenticate = async (credentials: InformaticaAuthCredentials) => {
+  /**
+   * Handle batch submission of multiple rows
+   */
+  const handleBatchSubmit = async (rows: FileDataRow[]): Promise<void> => {
+    if (!authState.isAuthenticated || rows.length === 0) return;
+
+    try {
+      const auth = getAuthFromLocalStorage();
+
+      await uploadMappingBatch(rows);
+
+      if (fileState.catalogId) {
+        startTracking(auth, fileState.catalogId);
+      }
+    } catch (err) {
+      console.error('Failed to submit batch:', err);
+    }
+  };
+
+  /**
+   * Reset all form state
+   */
+  const _handleReset = (): void => {
+    resetFileUpload();
+    stopTracking();
+    setShowFileData(false);
+  };
+
+  /**
+   * Handle login form submission
+   */
+  const handleLogin = async (
+    credentials: InformaticaAuthCredentials
+  ): Promise<void> => {
     await authenticate(credentials);
   };
 
-  const handleOAuthLogin = async () => {
-    try {
-      await authenticate({
-        type: 'oauth',
-        username: '',
-        password: '',
-      } as InformaticaAuthCredentials);
-    } catch (error) {
-      console.error('OAuth login failed:', error);
+  /**
+   * Handle retry for job tracking
+   */
+  const handleRetry = async (): Promise<void> => {
+    if (jobState.jobId) {
+      const auth = getAuthFromLocalStorage();
+      startTracking(auth, jobState.jobId);
     }
   };
 
-  const handleReset = () => {
-    stopTracking();
-    setShowTable(false);
-    resetFileUpload();
-  };
-
-  // Render loading state
-  if (authState.isAuthenticating || fileState.isUploading) {
-    return (
-      <div className="flex h-48 items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
-        <span className="ml-2 text-gray-600 dark:text-gray-400">
-          {authState.isAuthenticating ? 'Authenticating...' : 'Processing file...'}
-        </span>
-      </div>
-    );
-  }
-
-  // Render job status if needed
-  if (jobState.jobId && (jobState.isPolling || jobState.status === 'COMPLETED' || jobState.status === 'FAILED')) {
-    return (
-      <JobStatus
-        jobId={jobState.jobId}
-        status={jobState.status}
-        error={jobState.error}
-        isPolling={jobState.isPolling}
-        onRetry={async () => {
-          if (jobState.jobId) {
-            const auth = {
-              session: {
-                sessionId: localStorage.getItem('informatica_session_id') || '',
-                orgId: localStorage.getItem('informatica_org_id') || '',
-                expiresAt: localStorage.getItem('informatica_session_expires') || ''
-              },
-              token: {
-                token: localStorage.getItem('informatica_token') || '',
-                expiresAt: Number(localStorage.getItem('informatica_token_expires') || '0')
-              }
-            };
-            startTracking(auth, jobState.jobId);
-          }
-        }}
-        onReset={handleReset}
-      />
-    );
-  }
-
   return (
-    <div>
-      {/* Step 1: Authentication */}
-      {!authState.isAuthenticated && (
-        <div className="mb-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Step 1: Authenticate
-          </h3>
-          <AuthForm
-            isLoading={authState.isAuthenticating}
-            error={authState.error}
-            onSubmit={handleAuthenticate}
-            onOAuthLogin={handleOAuthLogin}
-          />
-        </div>
-      )}
+    <div className="mx-auto max-w-7xl p-4 sm:p-6 lg:p-8">
+      <div className="overflow-hidden rounded-lg bg-gray-50 shadow dark:bg-gray-900">
+        <div className="px-4 py-5 sm:p-6">
+          <h2 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">
+            IDMC Metadata Upload
+          </h2>
+          <div className="mt-4">
+            {!authState.isAuthenticated && (
+              <AuthForm
+                isLoading={authState.isAuthenticating}
+                error={authState.error}
+                onSubmit={handleLogin}
+              />
+            )}
 
-      {/* Step 2: File Upload */}
-      {authState.isAuthenticated && !showTable && (
-        <div className="mb-6">
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Step 2: Upload Mapping File
-          </h3>
-          <FileUploader
-            isValidating={fileState.isValidating}
-            isUploading={fileState.isUploading}
-            fileName={fileState.fileName}
-            validationError={fileState.error}
-            isFileValid={!fileState.error && fileState.fileName !== null}
-            onSubmit={handleSubmit}
-            onFileChange={handleFileChange}
-          />
-        </div>
-      )}
+            {authState.isAuthenticated && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Upload Excel File
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="rounded-md bg-red-100 px-2.5 py-1.5 text-sm font-semibold text-red-600 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800"
+                  >
+                    Logout
+                  </button>
+                </div>
 
-      {/* Auto processing message */}
-      {autoProcessingMessage && (
-        <div className="mb-4 mt-4 rounded-md border border-blue-100 bg-blue-50 p-3 text-blue-700 dark:border-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-          <div className="flex items-center">
-            <div className="mr-2 animate-spin">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="12" y1="2" x2="12" y2="6"></line>
-                <line x1="12" y1="18" x2="12" y2="22"></line>
-                <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"></line>
-                <line x1="16.24" y1="16.24" x2="19.07" y2="19.07"></line>
-                <line x1="2" y1="12" x2="6" y2="12"></line>
-                <line x1="18" y1="12" x2="22" y2="12"></line>
-                <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"></line>
-                <line x1="16.24" y1="7.76" x2="19.07" y2="4.93"></line>
-              </svg>
-            </div>
-            {autoProcessingMessage}
+                <FileUploader
+                  isValidating={fileState.isValidating}
+                  isUploading={fileState.isUploading}
+                  fileName={fileState.fileName}
+                  validationError={fileState.error}
+                  isFileValid={fileState.validationResults.isValid}
+                  onFileChange={async (file: File) => {
+                    await validateFile(file);
+                  }}
+                  onSubmit={handleSubmit}
+                />
+
+                {/* Display validation errors if any */}
+                {fileState.validationResults.errors &&
+                  fileState.validationResults.errors.length > 0 && (
+                    <div className="rounded-md bg-red-50 p-4 dark:bg-red-900">
+                      <div className="flex">
+                        <div className="ml-3">
+                          <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                            Validation Errors
+                          </h3>
+                          <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul className="list-disc space-y-1 pl-5">
+                              {fileState.validationResults.errors.map(
+                                (err, idx) => (
+                                  <li key={idx}>{err}</li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                {/* Display general error if any */}
+                {fileState.error && (
+                  <div className="rounded-md bg-red-50 p-4 dark:bg-red-900">
+                    <div className="flex">
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-red-800 dark:text-red-200">
+                          Error
+                        </h3>
+                        <div className="mt-2 text-sm text-red-700 dark:text-red-300">
+                          {fileState.error}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display upload progress */}
+                {fileState.isUploading && (
+                  <div className="rounded-md bg-blue-50 p-4 dark:bg-blue-900">
+                    <div className="flex">
+                      <div className="ml-3 w-full">
+                        <h3 className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                          {fileState.batchProgress
+                            ? 'Processing Batch Upload'
+                            : 'Processing File'}
+                        </h3>
+                        {fileState.batchProgress ? (
+                          <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                            <p>
+                              Processing {fileState.batchProgress.completed} of{' '}
+                              {fileState.batchProgress.total} rows
+                            </p>
+                            <div className="mt-1 h-2 w-full rounded-full bg-blue-200 dark:bg-blue-700">
+                              <div
+                                className="h-2 rounded-full bg-blue-600 dark:bg-blue-400"
+                                style={{
+                                  width: `${(fileState.batchProgress.completed / fileState.batchProgress.total) * 100}%`,
+                                }}
+                              ></div>
+                            </div>
+                            <div className="mt-1 flex justify-between text-xs">
+                              <span>
+                                Success: {fileState.batchProgress.success}
+                              </span>
+                              <span>
+                                Failed: {fileState.batchProgress.failed}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                            <p>Upload progress: {0}%</p>
+                            <div className="mt-1 h-2 w-full rounded-full bg-blue-200 dark:bg-blue-700">
+                              <div
+                                className="h-2 rounded-full bg-blue-600 dark:bg-blue-400"
+                                style={{ width: `0%` }}
+                              ></div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Display API rate limit status */}
+                <div className="rounded-md bg-gray-100 p-4 dark:bg-gray-800">
+                  <div className="flex flex-wrap items-center justify-between">
+                    <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      API Rate Limits
+                    </h3>
+                    <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
+                      <span className="mr-4">
+                        Calls: {rateLimitStatus.callsInLastMinute}/
+                        {rateLimitStatus.limit}
+                      </span>
+                      <span>Queue: {rateLimitStatus.queueLength}</span>
+                    </div>
+                  </div>
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div
+                      className={`h-1.5 rounded-full ${
+                        rateLimitStatus.callsInLastMinute >
+                        rateLimitStatus.limit * 0.8
+                          ? 'bg-amber-500 dark:bg-amber-500'
+                          : 'bg-green-500 dark:bg-green-500'
+                      }`}
+                      style={{
+                        width: `${(rateLimitStatus.callsInLastMinute / rateLimitStatus.limit) * 100}%`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                {/* Display job status if available */}
+                {jobState.jobId && !jobState.error && (
+                  <div className="mt-8">
+                    <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      Job Status
+                    </h3>
+                    <JobStatus
+                      jobId={jobState.jobId}
+                      status={jobState.status || 'PENDING'}
+                      error={jobState.error}
+                      isPolling={jobState.isPolling}
+                      onRetry={async () => {
+                        if (jobState.jobId) {
+                          await handleRetry();
+                        }
+                      }}
+                      onReset={() => stopTracking()}
+                    />
+                  </div>
+                )}
+
+                {/* Display file data table if available */}
+                {showFileData && fileState.fileData.length > 0 && (
+                  <div className="mt-8">
+                    <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
+                      File Data
+                    </h3>
+
+                    {/* Show progress indicator when processing large files */}
+                    {fileState.isProcessing && fileState.processProgress && (
+                      <div className="mb-4">
+                        <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
+                          Processing file data: {fileState.processProgress.processed} of {fileState.processProgress.total} rows ({fileState.processProgress.percentage}%)
+                        </p>
+                        <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                          <div
+                            className="h-full rounded-full bg-blue-600 transition-all duration-300 ease-in-out dark:bg-blue-500"
+                            style={{ width: `${fileState.processProgress.percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+
+                    <FileDataTable
+                      data={fileState.fileData}
+                      onRowSubmit={handleRowSubmit}
+                      onBatchSubmit={handleBatchSubmit}
+                      initialPageSize={25}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      )}
-
-      {/* Step 3: Review and Process */}
-      {showTable && fileState.fileData && (
-        <div>
-          <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
-            Step 3: Review and Process
-          </h3>
-          <FileDataTable
-            data={fileState.fileData}
-            onRowSubmit={handleRowSubmit}
-          />
-        </div>
-      )}
+      </div>
     </div>
   );
 }

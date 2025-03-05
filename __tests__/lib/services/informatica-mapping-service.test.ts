@@ -5,13 +5,13 @@ import {
   mockFailedJobResponse,
   mockJobStatusResponse,
   mockRunningJobStatusResponse,
-  mockFailedJobStatusResponse
+  mockFailedJobStatusResponse,
 } from '../../mocks/handlers';
 import {
   authenticateWithInformatica,
   checkImportJobStatus,
   importMappingDocumentation,
-  uploadMappingFile
+  uploadMappingFile,
 } from '@/lib/services/informatica-mapping-service';
 
 // Mock fetch globally
@@ -93,12 +93,7 @@ describe('Informatica Mapping Service', () => {
     it('should handle authentication failure', async () => {
       // Mock failed authentication response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(
-          false,
-          mockFailedAuthResponse,
-          401,
-          'Unauthorized'
-        )
+        createMockResponse(false, mockFailedAuthResponse, 401, 'Unauthorized')
       );
 
       await expect(
@@ -108,7 +103,9 @@ describe('Informatica Mapping Service', () => {
           baseUrl: 'https://test-base-url.com',
           apiUrl: 'https://test-api-url.com/api',
         })
-      ).rejects.toThrow(`Login failed: ${JSON.stringify(mockFailedAuthResponse)}`);
+      ).rejects.toThrow(
+        `Login failed: ${JSON.stringify(mockFailedAuthResponse)}`
+      );
     });
 
     it('should handle network errors', async () => {
@@ -175,12 +172,7 @@ describe('Informatica Mapping Service', () => {
     it('should handle import failure', async () => {
       // Mock failed import response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(
-          false,
-          mockFailedJobResponse,
-          400,
-          'Bad Request'
-        )
+        createMockResponse(false, mockFailedJobResponse, 400, 'Bad Request')
       );
 
       const result = await importMappingDocumentation(
@@ -193,8 +185,7 @@ describe('Informatica Mapping Service', () => {
 
       expect(result).toEqual({
         success: false,
-        error:
-          `Failed to import mapping documentation: ${JSON.stringify(mockFailedJobResponse)}`,
+        error: `Failed to import mapping documentation: ${JSON.stringify(mockFailedJobResponse)}`,
       });
     });
   });
@@ -239,12 +230,7 @@ describe('Informatica Mapping Service', () => {
     it('should handle upload failure', async () => {
       // Mock failed upload response
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(
-          false,
-          mockFailedJobResponse,
-          400,
-          'Bad Request'
-        )
+        createMockResponse(false, mockFailedJobResponse, 400, 'Bad Request')
       );
 
       const result = await uploadMappingFile(
@@ -344,12 +330,7 @@ describe('Informatica Mapping Service', () => {
     it('should handle job status check failure', async () => {
       // Mock failed job status check
       mockFetch.mockResolvedValueOnce(
-        createMockResponse(
-          false,
-          { error: 'Job not found' },
-          404,
-          'Not Found'
-        )
+        createMockResponse(false, { error: 'Job not found' }, 404, 'Not Found')
       );
 
       await expect(
@@ -360,7 +341,9 @@ describe('Informatica Mapping Service', () => {
           },
           'invalid-job-id'
         )
-      ).rejects.toThrow('Failed to check job status: {"error":"Job not found"}');
+      ).rejects.toThrow(
+        'Failed to check job status: {"error":"Job not found"}'
+      );
     });
   });
 });

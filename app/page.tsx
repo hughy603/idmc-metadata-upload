@@ -1,5 +1,5 @@
-import Header from './components/header'
-import UploadForm from './components/upload-form'
+import Header from './components/header';
+import UploadForm from './components/upload-form';
 
 export default function Home(): JSX.Element {
   return (
@@ -17,5 +17,5 @@ export default function Home(): JSX.Element {
         &copy; {new Date().getFullYear()} IDMC Metadata Upload Tool
       </footer>
     </div>
-  )
+  );
 }

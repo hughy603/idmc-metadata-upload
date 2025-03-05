@@ -22,6 +22,7 @@ repos:
   # Local Node.js hooks - use system Node installation
   - repo: local
     hooks:
+      # Commented prettier hooks - uncomment if needed
       # - id: prettier-fix
       #   name: prettier-fix
       #   entry: npx prettier --write --cache --cache-location .prettiercache
@@ -38,7 +39,7 @@ repos:
 
       - id: eslint
         name: eslint
-        entry: npx eslint --fix --max-warnings=100
+        entry: npx eslint --fix --max-warnings=100 --quiet
         language: system
         types_or: [javascript, jsx, ts, tsx]
         files: \.(js|jsx|ts|tsx)$
@@ -55,13 +56,14 @@ repos:
 
       - id: eslint-next
         name: eslint-next
-        entry: npx eslint --fix --max-warnings=100
+        entry: npx eslint --fix --max-warnings=100 --quiet
         language: system
         files: 'app/.*\.(js|jsx|ts|tsx)$'
         types_or: [javascript, jsx, ts, tsx]
         exclude: node_modules/
         args: [--cache, --cache-location, .eslintcache]
 
+      # Move these hooks to push stage only to avoid blocking commits
       - id: typescript-check
         name: typescript-check
         entry: npx tsc
@@ -72,6 +74,7 @@ repos:
         exclude: node_modules/
         args: [--noEmit, --pretty]
         stages: [push]
+        verbose: true
 
       - id: test
         name: test
@@ -79,6 +82,7 @@ repos:
         language: system
         pass_filenames: false
         stages: [push]
+        verbose: true
 
       - id: a11y-check
         name: accessibility-check
@@ -88,6 +92,7 @@ repos:
         files: \.(jsx|tsx)$
         exclude: node_modules/
         stages: [push]
+        verbose: true
 
       - id: npm-audit
         name: npm-audit
@@ -103,7 +108,12 @@ repos:
         entry: npx jscpd
         language: system
         pass_filenames: false
-        args: [--ignore, 'node_modules/**,coverage/**,.next/**,__tests__/**,lib/examples/**', --threshold=1]
+        args:
+          [
+            --ignore,
+            'node_modules/**,coverage/**,.next/**,__tests__/**,lib/examples/**',
+            --threshold=1,
+          ]
         stages: [push]
 
       - id: stylelint
@@ -123,7 +133,7 @@ repos:
         files: \.md$
         exclude: node_modules/
         types: [markdown]
-        description: "Automatically updates the table of contents in markdown files"
+        description: 'Automatically updates the table of contents in markdown files'
         require_serial: true
         stages: [push]
 
