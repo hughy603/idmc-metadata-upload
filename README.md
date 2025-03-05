@@ -1,69 +1,23 @@
 # IDMC Metadata Upload
 
-<!-- toc -->
+A modern web application for uploading and managing metadata mappings to Informatica Cloud's Data Catalog.
 
-## Introduction
+## Quick Links
 
-This project handles metadata uploads for IDMC.
+- [User Guide](docs/USER_GUIDE.md)
+- [Architecture Documentation](docs/ARCHITECTURE.md)
+- [Contributing Guidelines](CONTRIBUTING.md)
+- [Testing Practices](TESTING_PRACTICES.md)
+- [Version Control Strategy](VERSION_CONTROL_STRATEGY.md)
 
 ## Features
 
-- Feature 1
-- Feature 2
-
-## Installation
-
-```bash
-npm install
-```
-
-## Usage
-
-```bash
-npm run dev
-```
-
-## Contributing
-
-Please read the [contributing guide](CONTRIBUTING.md).
-
-## Overview
-
-The IDMC Metadata Upload tool is a web application that allows users to:
-
-1. Upload Excel or CSV files containing data mapping documentation
-2. Validate the uploaded files for correct format and content
-3. Submit the validated mappings to Informatica Cloud's Data Catalog API
-4. Track the status of submitted mapping information
-
-## Mapping File Format
-
-The tool expects Excel (.xlsx) or CSV (.csv) files with the following columns:
-
-### Required Columns:
-
-- **SourceSystem**: The name of the source system
-- **SourceTable**: The name of the source table/object
-- **SourceColumn**: The name of the source column/field
-- **TargetSystem**: The name of the target system
-- **TargetTable**: The name of the target table/object
-- **TargetColumn**: The name of the target column/field
-
-### Optional Columns:
-
-- **TransformationLogic**: The transformation logic applied to the source data
-- **BusinessTerm**: Associated business term(s)
-- **Description**: Additional description or notes
-
-## Technology Stack
-
-- **Frontend Framework**: Next.js 14 with App Router
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Form Handling**: React Hook Form with Zod validation
-- **API Integration**: Custom services for Informatica Cloud APIs
-- **File Parsing**: xlsx library for Excel and CSV parsing
-- **Testing**: Jest and React Testing Library
+- Excel and CSV file upload support
+- Batch processing capabilities
+- Real-time validation
+- Progress tracking
+- Error recovery
+- Responsive UI
 
 ## Getting Started
 
@@ -75,162 +29,58 @@ The tool expects Excel (.xlsx) or CSV (.csv) files with the following columns:
 
 ### Installation
 
-1. Clone the repository:
+```bash
+# Clone the repository
+git clone https://github.com/your-organization/idmc-metadata-upload.git
+cd idmc-metadata-upload
 
-   ```bash
-   git clone https://github.com/your-organization/idmc-metadata-upload.git
-   cd idmc-metadata-upload
-   ```
+# Install dependencies
+npm install
 
-2. Install the dependencies:
+# Set up environment variables
+cp .env.example .env.local
 
-   ```bash
-   npm install
-   # or
-   yarn install
-   ```
+# Start development server
+npm run dev
+```
 
-3. Start the development server:
-
-   ```bash
-   npm run dev
-   # or
-   yarn dev
-   ```
-
-4. Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
-
-## Usage
-
-1. Prepare your mapping documentation file with the required columns
-2. Enter your Informatica Cloud credentials
-3. Select your Informatica Cloud region
-4. Upload your mapping file
-5. Review the mapping information and ensure it is correct
-6. Click "Upload to Informatica" to submit the data
-7. The UI will display the job ID and status upon successful submission
-
-## Authentication
-
-The tool requires authentication with Informatica Cloud's REST API:
-
-1. Username: Your Informatica Cloud username
-2. Password: Your Informatica Cloud password
-3. Region: Select the appropriate region for your Informatica Cloud instance
-
-## API Integration
-
-The application integrates with the following Informatica Cloud Data Catalog APIs:
-
-- Authentication API for obtaining session tokens
-- Import APIs for submitting mapping documentation
-- Job monitoring APIs for tracking submission status
-
-## Testing
-
-The project uses Jest and React Testing Library for testing. Tests are organized to cover:
-
-- API services for Informatica Cloud
-- File parsing utilities
-- UI components and interactions
-
-### Running Tests
+### Development Scripts
 
 ```bash
-# Run all tests
+# Run development server
+npm run dev
+
+# Run tests
 npm test
 
-# Run tests in watch mode during development
-npm run test:watch
+# Build for production
+npm run build
 
-# Generate coverage report
-npm run test:coverage
+# Start production server
+npm start
+
+# Run linting
+npm run lint
+
+# Format code
+npm run format
 ```
 
-See [Testing Documentation](docs/TESTING.md) for more details on our testing approach.
+## Documentation
 
-## Testing Pre-commit Hooks
+- [User Guide](docs/USER_GUIDE.md) - Comprehensive guide for end users
+- [Architecture](docs/ARCHITECTURE.md) - System architecture and technical details
+- [Contributing](CONTRIBUTING.md) - Guidelines for contributors
+- [Testing](TESTING_PRACTICES.md) - Testing practices and guidelines
+- [Version Control](VERSION_CONTROL_STRATEGY.md) - Version control workflow
 
-This is a test to see if the Prettier hook works correctly.
+## Support
 
-const testFunction = ( ) => {
-return "This should be formatted"
-}
-
-## Project Structure
-
-```
-idmc-metadata-upload/
-├── app/
-│   ├── components/
-│   │   ├── upload-form.tsx     # Main form component
-│   │   ├── file-data-table.tsx # Table display component
-│   │   └── header.tsx          # Header component
-│   ├── globals.css             # Global styles
-│   ├── layout.tsx              # Root layout
-│   └── page.tsx                # Home page
-├── lib/
-│   ├── services/
-│   │   └── informatica-mapping-service.ts # API integration service
-│   └── utils/
-│       └── mapping-file-parser.ts         # File parsing utility
-├── __tests__/                  # Test files
-│   ├── app/
-│   ├── lib/
-│   └── mocks/
-├── public/                     # Static assets
-├── docs/                       # Documentation
-├── jest.config.js              # Jest configuration
-├── package.json                # Dependencies
-└── README.md                   # Project documentation
-```
-
-## Development Guidelines
-
-When contributing to this project, please follow these guidelines:
-
-1. Follow consistent code style using TypeScript and React best practices
-2. Write clean, maintainable, and tested code
-3. Document new features and API changes
-4. Use meaningful commit messages
-5. Create pull requests with appropriate descriptions
-6. Ensure tests pass and maintain code coverage above 80%
-
-### Variable Naming Conventions
-
-This project follows these variable naming conventions:
-
-1. Use descriptive camelCase for all variables and function names
-2. Only use underscore prefix (`_variableName`) for variables that are intentionally unused
-3. Use PascalCase for class names, interfaces, and type aliases
-4. Use UPPER_CASE for constants and enum values
-
-To maintain consistent naming across the codebase, we provide a script that can automatically fix common naming issues:
-
-```bash
-# Fix variable naming issues
-npm run fix:naming
-```
-
-This script:
-
-- Removes unnecessary underscore prefixes from variables that are actually used
-- Updates test files to use consistent naming
-- Runs ESLint to apply naming convention rules
-- Verifies that tests still pass after the changes
-
-## Troubleshooting
-
-Common issues and their solutions:
-
-1. **Authentication failures**: Ensure your username and password are correct and that you have selected the right region.
-2. **File parsing errors**: Verify your file has the required columns with the correct names.
-3. **API errors**: Check the error messages returned from the Informatica Cloud API for specific details.
+For support:
+1. Check the [User Guide](docs/USER_GUIDE.md)
+2. Contact your system administrator
+3. Submit issues through the support portal
 
 ## License
 
 This project is proprietary and confidential.
-
-## Contact
-
-For questions or support, please contact your organization's administrator.

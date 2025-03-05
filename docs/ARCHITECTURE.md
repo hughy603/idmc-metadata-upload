@@ -1,150 +1,294 @@
-# Application Architecture
+# IDMC Metadata Upload Architecture
 
-This document provides an overview of the IDMC Metadata Upload application's architecture, including component relationships and data flow.
+This document outlines the architecture of the IDMC Metadata Upload application, including component relationships, data flow, and system interactions.
 
-## Architecture Diagram
+## System Overview
 
 ```mermaid
-graph TD
-    subgraph "Frontend Components"
-        UploadForm[Upload Form]
-        AuthForm[Auth Form]
-        FileUploader[File Uploader]
-        FileDataTable[File Data Table]
-        JobStatus[Job Status]
+graph TB
+    subgraph "Frontend Layer"
+        UI[Web UI]
+        FC[File Component]
+        TC[Table Component]
+        VS[Validation Service]
     end
 
-    subgraph "React Hooks"
-        useFileUpload[useFileUpload]
-        useInformaticaAuth[useInformaticaAuth]
-        useJobTracking[useJobTracking]
+    subgraph "Backend Layer"
+        API[Next.js API Routes]
+        PS[Processing Service]
+        FS[File Service]
     end
 
-    subgraph "Services"
-        ApiRateLimiter[API Rate Limiter]
-        InformaticaMappingService[Informatica Mapping Service]
-        AuthService[Auth Service]
+    subgraph "External Services"
+        IC[Informatica Cloud]
+        DC[Data Catalog]
     end
 
-    subgraph "Utilities"
-        MappingFileParser[Mapping File Parser]
-        AuthUtils[Auth Utilities]
-    end
-
-    subgraph "External APIs"
-        InformaticaAPI[Informatica Cloud API]
-    end
-
-    %% Component relationships
-    UploadForm --> AuthForm
-    UploadForm --> FileUploader
-    UploadForm --> FileDataTable
-    UploadForm --> JobStatus
-
-    UploadForm --> useFileUpload
-    UploadForm --> useInformaticaAuth
-    UploadForm --> useJobTracking
-
-    useFileUpload --> InformaticaMappingService
-    useFileUpload --> MappingFileParser
-
-    useInformaticaAuth --> AuthService
-    useInformaticaAuth --> AuthUtils
-
-    useJobTracking --> InformaticaMappingService
-
-    InformaticaMappingService --> ApiRateLimiter
-    AuthService --> ApiRateLimiter
-
-    ApiRateLimiter --> InformaticaAPI
-    InformaticaMappingService --> InformaticaAPI
-    AuthService --> InformaticaAPI
-
-    %% Styling
-    classDef component fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef hook fill:#bbf,stroke:#333,stroke-width:2px;
-    classDef service fill:#bfb,stroke:#333,stroke-width:2px;
-    classDef utility fill:#fbb,stroke:#333,stroke-width:2px;
-    classDef external fill:#ddd,stroke:#333,stroke-width:2px;
-
-    class UploadForm,AuthForm,FileUploader,FileDataTable,JobStatus component;
-    class useFileUpload,useInformaticaAuth,useJobTracking hook;
-    class ApiRateLimiter,InformaticaMappingService,AuthService service;
-    class MappingFileParser,AuthUtils utility;
-    class InformaticaAPI external;
+    UI --> FC
+    UI --> TC
+    FC --> VS
+    VS --> API
+    API --> PS
+    PS --> FS
+    PS --> IC
+    IC --> DC
 ```
 
-## Component Descriptions
+## Component Architecture
 
-### Frontend Components
+```mermaid
+classDiagram
+    class FileUploadComponent {
+        +handleFileSelect()
+        +validateFile()
+        +processFile()
+    }
 
-- **UploadForm**: The main container component that orchestrates the entire upload process.
-- **AuthForm**: Handles user authentication with Informatica Cloud.
-- **FileUploader**: Manages file selection and initial validation.
-- **FileDataTable**: Displays the parsed file data and provides batch processing capabilities.
-- **JobStatus**: Shows the status of submitted jobs.
+    class FileDataTable {
+        +displayData()
+        +handleRowSelection()
+        +updateStatus()
+        +retryProcessing()
+    }
 
-### React Hooks
+    class ValidationService {
+        +validateColumns()
+        +validateDataTypes()
+        +validateRules()
+    }
 
-- **useFileUpload**: Manages file upload state and operations.
-- **useInformaticaAuth**: Handles authentication state and operations.
-- **useJobTracking**: Tracks the status of submitted jobs.
+    class ProcessingService {
+        +processRows()
+        +batchProcess()
+        +handleErrors()
+    }
 
-### Services
-
-- **ApiRateLimiter**: Ensures API calls don't exceed Informatica Cloud's rate limits.
-- **InformaticaMappingService**: Handles communication with Informatica Cloud's mapping APIs.
-- **AuthService**: Manages authentication with Informatica Cloud.
-
-### Utilities
-
-- **MappingFileParser**: Parses Excel and CSV files into structured data.
-- **AuthUtils**: Provides authentication utility functions.
+    FileUploadComponent --> ValidationService
+    FileUploadComponent --> FileDataTable
+    FileDataTable --> ProcessingService
+    ProcessingService --> ValidationService
+```
 
 ## Data Flow
 
-1. **Authentication Flow**:
+```mermaid
+sequenceDiagram
+    participant User
+    participant UI as Web UI
+    participant VS as Validation Service
+    participant PS as Processing Service
+    participant IC as Informatica Cloud
 
-   - User enters credentials in AuthForm
-   - useInformaticaAuth hook calls AuthService
-   - AuthService authenticates with Informatica Cloud API
-   - Authentication token is stored for future API calls
-
-2. **File Upload Flow**:
-
-   - User selects a file in FileUploader
-   - File is validated and parsed by MappingFileParser
-   - Parsed data is displayed in FileDataTable
-   - User can submit individual rows or batches
-
-3. **API Call Flow**:
-   - All API calls go through ApiRateLimiter
-   - ApiRateLimiter queues calls if rate limits are approached
-   - InformaticaMappingService sends mapping data to Informatica Cloud
-   - Job status is tracked by useJobTracking
+    User->>UI: Upload File
+    UI->>VS: Validate File
+    VS-->>UI: Validation Results
+    UI->>PS: Process Valid Data
+    PS->>IC: Submit Mapping Data
+    IC-->>PS: Processing Status
+    PS-->>UI: Update Status
+    UI-->>User: Display Results
+```
 
 ## State Management
 
-The application uses React's built-in state management with hooks. Each major feature has its own custom hook:
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> FileSelected: Select File
+    FileSelected --> Validating: Validate
+    Validating --> ValidationError: Invalid
+    Validating --> Ready: Valid
+    ValidationError --> FileSelected: Retry
+    Ready --> Processing: Submit
+    Processing --> Complete: Success
+    Processing --> Error: Fail
+    Error --> Ready: Retry
+    Complete --> [*]
+```
 
-- **useFileUpload**: Manages file state, validation, and upload operations
-- **useInformaticaAuth**: Manages authentication state
-- **useJobTracking**: Manages job tracking state
+## Directory Structure
 
-This approach provides clean separation of concerns while keeping related state and logic together.
+```mermaid
+graph TD
+    A[Root] --> B[app]
+    A --> C[docs]
+    A --> D[lib]
+    A --> E[public]
 
-## Error Handling
+    B --> F[components]
+    B --> G[api]
+    B --> H[styles]
 
-Error handling is implemented at multiple levels:
+    F --> I[FileUpload.tsx]
+    F --> J[FileDataTable.tsx]
+    F --> K[ValidationDisplay.tsx]
 
-1. **Component Level**: UI components display appropriate error messages
-2. **Hook Level**: Custom hooks catch and process errors
-3. **Service Level**: Services implement retry logic and error normalization
-4. **API Level**: ApiRateLimiter handles API failures and retries
+    D --> L[services]
+    D --> M[utils]
+
+    L --> N[informatica.ts]
+    L --> O[validation.ts]
+
+    M --> P[file-processing.ts]
+    M --> Q[data-validation.ts]
+```
+
+## Security Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Security Layers"
+        A[Authentication] --> B[Authorization]
+        B --> C[Data Validation]
+        C --> D[API Security]
+        D --> E[External Service Security]
+    end
+
+    subgraph "Security Features"
+        F[JWT Tokens]
+        G[Role-Based Access]
+        H[Input Sanitization]
+        I[API Rate Limiting]
+        J[Secure Credentials]
+    end
+
+    A --- F
+    B --- G
+    C --- H
+    D --- I
+    E --- J
+```
+
+## Error Handling Flow
+
+```mermaid
+flowchart LR
+    A[Error Occurs] --> B{Error Type}
+    B -->|Validation| C[Display in UI]
+    B -->|Processing| D[Retry Option]
+    B -->|Network| E[Auto-Retry]
+    B -->|System| F[Admin Alert]
+
+    C --> G[User Action]
+    D --> G
+    E --> G
+    F --> G
+
+    G --> H[Resolution]
+```
+
+## Deployment Architecture
+
+```mermaid
+flowchart TB
+    subgraph "Development"
+        A[Local Dev]
+        B[Testing]
+        C[Staging]
+    end
+
+    subgraph "Production"
+        D[Load Balancer]
+        E[App Servers]
+        F[API Servers]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    D --> F
+```
+
+## Performance Monitoring
+
+```mermaid
+graph LR
+    A[Metrics Collection] --> B[Performance Analysis]
+    B --> C[Alerting]
+    C --> D[Auto-Scaling]
+    D --> E[Resource Optimization]
+    E --> A
+```
+
+## Integration Points
+
+The application integrates with several external systems and services:
+
+1. **Informatica Cloud API**
+   - Authentication
+   - Data Catalog operations
+   - Job monitoring
+
+2. **File Processing**
+   - Excel file parsing
+   - CSV processing
+   - Data validation
+
+3. **User Management**
+   - Authentication
+   - Authorization
+   - Session management
 
 ## Performance Considerations
 
-- **Batch Processing**: Large uploads are processed in batches
-- **Rate Limiting**: API calls are rate-limited to prevent throttling
-- **Optimistic Updates**: UI updates optimistically before API calls complete
-- **Lazy Loading**: Components are loaded only when needed
+- File size limits: 10MB
+- Batch processing: 100 rows recommended
+- API rate limiting: 100 requests per minute
+- Auto-retry logic for failed operations
+- Caching for frequently accessed data
+
+## Security Measures
+
+1. **Authentication**
+   - JWT-based authentication
+   - Session management
+   - Secure credential storage
+
+2. **Authorization**
+   - Role-based access control
+   - Feature-based permissions
+   - API endpoint protection
+
+3. **Data Security**
+   - Input validation
+   - Data sanitization
+   - Secure transmission
+
+## Monitoring and Logging
+
+The application implements comprehensive monitoring and logging:
+
+1. **Application Metrics**
+   - Request/response times
+   - Error rates
+   - Processing success rates
+
+2. **System Metrics**
+   - CPU usage
+   - Memory utilization
+   - Network performance
+
+3. **Business Metrics**
+   - File processing volumes
+   - Success/failure rates
+   - User activity
+
+## Scaling Strategy
+
+The application is designed to scale horizontally:
+
+1. **Application Layer**
+   - Multiple app instances
+   - Load balancing
+   - Session management
+
+2. **Processing Layer**
+   - Batch processing
+   - Queue management
+   - Resource allocation
+
+3. **Storage Layer**
+   - Distributed caching
+   - File storage optimization
+   - Database scaling
