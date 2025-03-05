@@ -1,0 +1,112 @@
+[
+  {
+    "SourceSystem": "SAP ERP",
+    "SourceTable": "CUSTOMER",
+    "SourceColumn": "KUNNR",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "DIM_CUSTOMER",
+    "TargetColumn": "CUSTOMER_ID",
+    "TransformationLogic": "CAST(KUNNR AS INT)",
+    "BusinessTerm": "Customer ID",
+    "Description": "Primary key mapping for customer dimension"
+  },
+  {
+    "SourceSystem": "SAP ERP",
+    "SourceTable": "CUSTOMER",
+    "SourceColumn": "NAME1",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "DIM_CUSTOMER",
+    "TargetColumn": "CUSTOMER_NAME",
+    "TransformationLogic": "TRIM(NAME1)",
+    "BusinessTerm": "Customer Name",
+    "Description": "Customer's primary business name"
+  },
+  {
+    "SourceSystem": "SAP ERP",
+    "SourceTable": "CUSTOMER",
+    "SourceColumn": "STRAS",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "DIM_CUSTOMER",
+    "TargetColumn": "STREET_ADDRESS",
+    "TransformationLogic": "TRIM(STRAS)",
+    "BusinessTerm": "Street Address",
+    "Description": "Customer's street address"
+  },
+  {
+    "SourceSystem": "SAP ERP",
+    "SourceTable": "CUSTOMER",
+    "SourceColumn": "ORT01",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "DIM_CUSTOMER",
+    "TargetColumn": "CITY",
+    "TransformationLogic": "TRIM(ORT01)",
+    "BusinessTerm": "City",
+    "Description": "Customer's city"
+  },
+  {
+    "SourceSystem": "SAP ERP",
+    "SourceTable": "CUSTOMER",
+    "SourceColumn": "LAND1",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "DIM_CUSTOMER",
+    "TargetColumn": "COUNTRY_CODE",
+    "TransformationLogic": "UPPER(LAND1)",
+    "BusinessTerm": "Country Code",
+    "Description": "ISO country code"
+  },
+  {
+    "SourceSystem": "CRM System",
+    "SourceTable": "SALES",
+    "SourceColumn": "SALES_ID",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "FACT_SALES",
+    "TargetColumn": "SALES_KEY",
+    "TransformationLogic": "CAST(SALES_ID AS INT)",
+    "BusinessTerm": "Sales ID",
+    "Description": "Primary key for sales transactions"
+  },
+  {
+    "SourceSystem": "CRM System",
+    "SourceTable": "SALES",
+    "SourceColumn": "CUSTOMER_ID",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "FACT_SALES",
+    "TargetColumn": "CUSTOMER_KEY",
+    "TransformationLogic": "LOOKUP(DIM_CUSTOMER, CUSTOMER_ID, CUSTOMER_KEY)",
+    "BusinessTerm": "Customer Key",
+    "Description": "Foreign key reference to customer dimension"
+  },
+  {
+    "SourceSystem": "CRM System",
+    "SourceTable": "SALES",
+    "SourceColumn": "AMOUNT",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "FACT_SALES",
+    "TargetColumn": "SALES_AMOUNT",
+    "TransformationLogic": "CAST(AMOUNT AS DECIMAL(18,2))",
+    "BusinessTerm": "Sales Amount",
+    "Description": "Monetary value of the sale"
+  },
+  {
+    "SourceSystem": "CRM System",
+    "SourceTable": "SALES",
+    "SourceColumn": "SALES_DATE",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "FACT_SALES",
+    "TargetColumn": "SALES_DATE_KEY",
+    "TransformationLogic": "TO_CHAR(SALES_DATE, 'YYYYMMDD')",
+    "BusinessTerm": "Sales Date",
+    "Description": "Date when the sale occurred"
+  },
+  {
+    "SourceSystem": "CRM System",
+    "SourceTable": "SALES",
+    "SourceColumn": "PAYMENT_TYPE",
+    "TargetSystem": "Data Warehouse",
+    "TargetTable": "FACT_SALES",
+    "TargetColumn": "PAYMENT_TYPE_CODE",
+    "TransformationLogic": "CASE WHEN PAYMENT_TYPE = 'CC' THEN 'CREDIT_CARD' WHEN PAYMENT_TYPE = 'CA' THEN 'CASH' ELSE 'OTHER' END",
+    "BusinessTerm": "Payment Type",
+    "Description": "Method of payment for the sale"
+  }
+] 

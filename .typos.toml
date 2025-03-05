@@ -1,0 +1,29 @@
+[default]
+extend-ignore-re = [
+  # Ignore URLs
+  "https?://[^\\s]*",
+  # Ignore hex/UUIDs
+  "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+  "[0-9a-fA-F]{32}",
+]
+
+[default.extend-words]
+# Domain-specific or intentional terms to allow
+IDMC = "IDMC"
+Informatica = "Informatica"
+
+[files]
+extend-exclude = [
+  "node_modules/",
+  ".next/",
+  "coverage/",
+  "package-lock.json",
+  "*.min.js",
+  "*.map",
+  ".git/",
+  ".vscode/"
+]
+
+[default.extend-identifiers]
+# Variable names or code identifiers to skip
+createElement = "createElement"

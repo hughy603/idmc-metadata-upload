@@ -1,0 +1,26 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Check for staged files
+if git diff --cached --quiet; then
+  echo "No staged files found. Skipping pre-commit hooks."
+  exit 0
+fi
+
+# Run linting and formatting on staged files
+npx lint-staged
+
+# Run TypeScript type checking
+echo "🔍 Checking TypeScript types..."
+npm run typecheck
+
+# Check for .env files that shouldn't be committed
+if git diff --cached --name-only | grep -q '\.env$\|\.env\.[^.]*$' | grep -v '\.env\.example$\|\.env\.template$'; then
+  echo "⚠️ Warning: You're trying to commit .env files which may contain secrets."
+  echo "Please make sure they don't contain sensitive information."
+  echo "Press any key to continue or Ctrl+C to abort..."
+  read -n 1
+fi
+
+# Successfully passed all checks
+echo "✅ Pre-commit hooks passed successfully!" 

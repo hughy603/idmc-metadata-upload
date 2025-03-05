@@ -1,0 +1,11 @@
+SourceSystem,SourceTable,SourceColumn,TargetSystem,TargetTable,TargetColumn,TransformationLogic,BusinessTerm,Description
+SAP ERP,CUSTOMER,KUNNR,Data Warehouse,DIM_CUSTOMER,CUSTOMER_ID,CAST(KUNNR AS INT),Customer ID,Primary key mapping for customer dimension
+SAP ERP,CUSTOMER,NAME1,Data Warehouse,DIM_CUSTOMER,CUSTOMER_NAME,TRIM(NAME1),Customer Name,Customer's primary business name
+SAP ERP,CUSTOMER,STRAS,Data Warehouse,DIM_CUSTOMER,STREET_ADDRESS,TRIM(STRAS),Street Address,Customer's street address
+SAP ERP,CUSTOMER,ORT01,Data Warehouse,DIM_CUSTOMER,CITY,TRIM(ORT01),City,Customer's city
+SAP ERP,CUSTOMER,LAND1,Data Warehouse,DIM_CUSTOMER,COUNTRY_CODE,UPPER(LAND1),Country Code,ISO country code
+CRM System,SALES,SALES_ID,Data Warehouse,FACT_SALES,SALES_KEY,CAST(SALES_ID AS INT),Sales ID,Primary key for sales transactions
+CRM System,SALES,CUSTOMER_ID,Data Warehouse,FACT_SALES,CUSTOMER_KEY,"LOOKUP(DIM_CUSTOMER, CUSTOMER_ID, CUSTOMER_KEY)",Customer Key,Foreign key reference to customer dimension
+CRM System,SALES,AMOUNT,Data Warehouse,FACT_SALES,SALES_AMOUNT,"CAST(AMOUNT AS DECIMAL(18,2))",Sales Amount,Monetary value of the sale
+CRM System,SALES,SALES_DATE,Data Warehouse,FACT_SALES,SALES_DATE_KEY,"TO_CHAR(SALES_DATE, 'YYYYMMDD')",Sales Date,Date when the sale occurred
+CRM System,SALES,PAYMENT_TYPE,Data Warehouse,FACT_SALES,PAYMENT_TYPE_CODE,CASE WHEN PAYMENT_TYPE = 'CC' THEN 'CREDIT_CARD' WHEN PAYMENT_TYPE = 'CA' THEN 'CASH' ELSE 'OTHER' END,Payment Type,Method of payment for the sale

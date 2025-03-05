@@ -1,0 +1,139 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+      - id: detect-private-key
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: check-ast
+      - id: check-docstring-first
+      - id: debug-statements
+      - id: check-symlinks
+      - id: mixed-line-ending
+        args: ['--fix=lf']
+
+  - repo: local
+    hooks:
+      - id: prettier-fix
+        name: prettier-fix
+        entry: npx prettier --write --cache --cache-location .prettiercache
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, css, markdown]
+        exclude: node_modules/
+
+      - id: prettier-check
+        name: prettier-check
+        entry: npx prettier --check --cache --cache-location .prettiercache
+        language: system
+        types_or: [javascript, jsx, ts, tsx, json, css, markdown]
+        exclude: node_modules/
+
+      - id: eslint
+        name: eslint
+        entry: npx eslint --fix --max-warnings=20
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        files: \.(js|jsx|ts|tsx)$
+        exclude: node_modules/
+        args: [--cache, --cache-location, .eslintcache]
+
+      - id: eslint-next
+        name: eslint-next
+        entry: npx eslint --fix --max-warnings=20
+        language: system
+        files: 'app/.*\.(js|jsx|ts|tsx)$'
+        types_or: [javascript, jsx, ts, tsx]
+        exclude: node_modules/
+        args: [--cache, --cache-location, .eslintcache]
+
+      - id: typescript-check
+        name: typescript-check
+        entry: npx tsc
+        language: system
+        pass_filenames: false
+        types_or: [javascript, jsx, ts, tsx]
+        files: \.(js|jsx|ts|tsx)$
+        exclude: node_modules/
+        args: [--noEmit, --pretty]
+
+      - id: test
+        name: test
+        entry: npx jest
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+      - id: a11y-check
+        name: accessibility-check
+        entry: npx @axe-core/cli --stdout
+        language: system
+        types_or: [javascript, jsx, ts, tsx]
+        files: \.(jsx|tsx)$
+        exclude: node_modules/
+
+      - id: npm-audit
+        name: npm-audit
+        entry: npm audit
+        language: system
+        pass_filenames: false
+        always_run: true
+        args: [--audit-level=high]
+        stages: [push]
+
+      - id: jscpd
+        name: jscpd
+        entry: npx jscpd
+        language: system
+        pass_filenames: false
+        args: [--ignore, 'node_modules/**,coverage/**,.next/**', --threshold=1]
+        stages: [push]
+
+      - id: stylelint
+        name: stylelint
+        entry: npx stylelint
+        language: system
+        types_or: [css]
+        files: \.(css)$
+        exclude: node_modules/
+
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
+    rev: v1.1.2
+    hooks:
+      - id: markdown-toc
+
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.8.3
+    hooks:
+      - id: bandit
+        name: bandit-package-json-scan
+        args: ['-r', 'package.json']
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.0
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.13.1-beta
+    hooks:
+      - id: hadolint
+        files: Dockerfile
+        stages: [commit]
+
+  - repo: https://github.com/crate-ci/typos
+    rev: v1.19.0
+    hooks:
+      - id: typos
+        exclude: node_modules/|package-lock.json
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v4.4.1
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]

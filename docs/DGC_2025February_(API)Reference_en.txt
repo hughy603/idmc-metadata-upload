@@ -1,0 +1,5104 @@
+Informatica® Cloud Data Governance and
+Catalog
+2025 February
+
+API Reference
+
+Informatica Cloud Data Governance and Catalog API Reference
+2025 February
+© Copyright Informatica LLC 2021, 2025
+
+This software and documentation are provided only under a separate license agreement containing restrictions on use and disclosure. No part of this document may be
+reproduced or transmitted in any form, by any means (electronic, photocopying, recording or otherwise) without prior consent of Informatica LLC.
+U.S. GOVERNMENT RIGHTS Programs, software, databases, and related documentation and technical data delivered to U.S. Government customers are "commercial
+computer software" or "commercial technical data" pursuant to the applicable Federal Acquisition Regulation and agency-specific supplemental regulations. As such,
+the use, duplication, disclosure, modification, and adaptation is subject to the restrictions and license terms set forth in the applicable Government contract, and, to the
+extent applicable by the terms of the Government contract, the additional rights set forth in FAR 52.227-19, Commercial Computer Software License.
+Informatica, Informatica Cloud, Informatica Intelligent Cloud Services, PowerCenter, PowerExchange, and the Informatica logo are trademarks or registered trademarks
+of Informatica LLC in the United States and many jurisdictions throughout the world. A current list of Informatica trademarks is available on the web at https://
+www.informatica.com/trademarks.html. Other company and product names may be trade names or trademarks of their respective owners.
+Portions of this software and/or documentation are subject to copyright held by third parties. Required third party notices are included with the product.
+The information in this documentation is subject to change without notice. If you find any problems in this documentation, report them to us at
+infa_documentation@informatica.com.
+Informatica products are warranted according to the terms and conditions of the agreements under which they are provided. INFORMATICA PROVIDES THE
+INFORMATION IN THIS DOCUMENT "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WITHOUT ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND ANY WARRANTY OR CONDITION OF NON-INFRINGEMENT.
+Publication Date: 2025-02-20
+
+Table of Contents
+Preface. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 5
+
+Chapter 1: Introduction. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+Authentication. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 6
+Send Requests. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 7
+Response Codes. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 8
+Download Sample API Collections. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 9
+
+Chapter 2: Search for assets. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+List assets in the catalog. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+Request parameters. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+Request body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 11
+Example requests. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+Response body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+Get details of an asset. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+Request parameters. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+Examples. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+Response body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+List details of multiple assets. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+Request parameters. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
+Request body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+Example request. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+
+Chapter 3: Export assets. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+Export assets using search queries. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+Request parameters. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 46
+Request body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+Example requests. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 47
+Export assets using asset IDs. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+Request parameters. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 49
+Request body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
+Example request. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 50
+Response body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51
+
+Chapter 4: Import assets. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 52
+Request body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+Example request. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 53
+Response body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54
+
+Table of Contents
+
+3
+
+Chapter 5: Upload data quality scores. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55
+Request Body. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 55
+Example request. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 56
+
+Chapter 6: Run a catalog source job. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 57
+Chapter 7: Monitor jobs. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 58
+Chapter 8: API Rate Limits. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 59
+Appendix A: Appendix. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+Search query examples. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+
+4
+
+Table of Contents
+
+Preface
+Read API Reference to create and manage assets in Data Governance and Catalog using the APIs that
+Informatica provides.
+This help is written for developers and administrators who are responsible for implementing Data
+Governance and Catalog. This help assumes that you have a basic knowledge of how to use Data
+Governance and Catalog. It also assumes that you understand JSON and API programming techniques.
+
+5
+
+Chapter 1
+
+Introduction
+You can make API calls to Data Governance and Catalog using a REST client, the cURL tool, or a suitable
+programming interface. Using these API calls, you can create and manage assets, search for assets, and
+view asset details.
+
+Authentication
+Before you make REST API calls, you must authenticate yourself with JWT authentication. First, use the Login
+API with your organization user name and password to receive the session ID and org ID. Then, use the
+session ID and org ID to generate a JSON Web (JW) token. Subsequently, you use the session ID and JW
+token to secure your API calls without having to authenticate yourself for each call.
+
+Obtain the session ID
+To get a session ID, use the Login API V1. The Login API is also available with SAML. For more information
+about logging in using SAML, see the REST API Reference in the Administrator help. Ensure that you have
+your Informatica Intelligent Cloud Services user name and password.
+Send the POST request with the following URI, header, and request body:
+URI
+
+<LoginURL>/identity-service/api/v1/Login
+Note that <LoginURL> is the Informatica Intelligent Cloud Services login URL based on the region,
+such as https://dm-us.informaticacloud.com, https://dm-em.informaticacloud.com, https://dmap.informaticacloud.com, https://dm-uk.informaticacloud.com, and so on.
+
+Header
+
+Content-Type: application/json
+
+Request Body
+
+{
+}
+
+"username": "<your_IICS_user>",
+"password": "<your_IICS_password>",
+
+The response generates the session ID and the org ID. Note the value of the sessionId field to include in the
+subsequent API call.
+
+6
+
+Generate a JW Access Token
+Use the value from the sessionId field that you obtained from the previous Login API response, and send the
+POST request with the following URL and headers to generate a JW access token:
+URI
+
+<LoginURL>/identity-service/api/v1/jwt/Token?client_id=idmc_api&nonce=1234
+Note that <LoginURL> is the Informatica Intelligent Cloud Services login URL based on the region, such as
+https://dm-us.informaticacloud.com, https://dm-em.informaticacloud.com, https://dmap.informaticacloud.com, https://dm-uk.informaticacloud.com, and so on.
+
+Headers
+
+- cookie: USER_SESSION=<sessionId value>
+- IDS-SESSION-ID: <sessionId value>
+
+The response generates the JW access token that you include in the authorization header for all subsequent
+API calls. The access token expires after 30 minutes from the initial grant of the token. You must regenerate
+the access token after every 30 minutes to authenticate your API calls.
+
+Send Requests
+When you make an API call in the REST client, the request is sent in JSON format. Depending on the request,
+the REST client receives a response in JSON format that contains the information for the request that was
+sent.
+To make an API call, enter the URL to access the API, header requests, methods, and request parameters.
+
+URL
+Here's the URL structure for requests:
+<baseApiUrl><endpoint>
+The base API URL differs for each pod. The following table describes the base API URL to use for different
+regions:
+Region
+
+Base API URL
+
+APJ
+
+https://idmc-api.dm-ap.informaticacloud.com/
+
+Canada
+
+https://idmc-api.dm-na.informaticacloud.com/
+
+EMEA
+
+https://idmc-api.dm-em.informaticacloud.com/
+
+North America
+
+https://idmc-api.dm-us.informaticacloud.com/
+
+United Kingdom
+
+https://idmc-api.dm-uk.informaticacloud.com/
+
+Send Requests
+
+7
+
+Headers
+The following table describes the header request that you should use to send the Data Governance and
+Catalog API requests:
+Header
+
+Description
+
+Content-Type:application/
+json
+
+This header is required for the POST method. It indicates that the client is
+sending a JSON request.
+
+Authorization:Bearer
+<jwt_token>
+
+This header is required to secure all your API requests.
+
+X-INFA-ORG-ID:<Org ID>
+
+This header is required for POST and GET methods. It indicates the user's
+organization to send API requests to.
+The org ID is obtained from the Login API.
+
+IDS-SESSION-ID
+
+This header is required for sending API requests to upload your data quality
+scores to Data Governance and Catalog.
+
+Response Codes
+When you call any of the Data Governance and Catalog APIs, the response returns one of the standard HTTP
+response codes with information about the success or failure of the API call.
+The standard response codes are defined in the following table:
+
+8
+
+Response Code
+
+Description
+
+200 OK
+
+The request was completed successfully.
+
+201 Created
+
+The request was completed and the new resource is created successfully.
+
+202 Accepted
+
+The request was accepted for processing, but has not been completed.
+
+204
+
+No content to send back.
+
+400 Bad Request
+
+The request could not be processed because it contains missing or invalid information.
+
+401 Unauthorized
+
+The request is not authorized. The authentication may be missing or invalid.
+
+403 Forbidden
+
+The user cannot be authorized to perform this request.
+
+404 Not Found
+
+The request includes a resource URL that does not exist.
+
+405 Method Not Allowed
+
+The HTTP method specified in the request is not supported for this request.
+
+429 Too Many Requests
+
+The user has sent too many requests in a given amount of time and has reached the API
+rate limit.
+
+500 Internal Server Error
+
+The server encountered an error because of which the request is not fulfilled.
+
+Chapter 1: Introduction
+
+Download Sample API Collections
+Informatica provides sample API collections in Postman that you can use to search for assets, export and
+import assets, and monitor jobs in Data Governance and Catalog.
+For information about the sample Postman collection for Data Governance and Catalog APIs, see the
+Knowledge Base article KB 000209295.
+
+Download Sample API Collections
+
+9
+
+Chapter 2
+
+Search for assets
+Use the search API to either list the assets in the catalog or get details of a specific asset in the catalog. You
+can search for all types of assets including business assets, technical assets, classifications, glossary
+assets, and more. Based on the search query that you enter, appropriate search results are returned.
+The following image shows the overall process of using the search API and the expected response for each
+endpoint:
+
+List assets in the catalog
+Send a POST request to view the list of assets in the catalog that match your search query. While sending the
+request, you can specify the search query as request URL parameters and specify the filter criteria in the body
+of the request.
+To view the list of assets in the catalog, submit a request with the following method and endpoint:
+
+10
+
+Method
+
+Endpoint
+
+POST
+
+<baseApiUrl>/data360/search/v1/assets
+
+The base API URL differs for each pod. For more information, see “Send Requests” on page 7.
+
+Request parameters
+To view the list of specific assets, enter the search queries using URL parameters for POST request.
+You can use the following request URL parameters to specify your search query:
+Parameter
+
+Description
+
+knowledgeQuery
+
+Specify the asset type or name along with any search criteria. For
+information about search query examples, see “Search query
+examples” on page 60.
+For example, knowledgeQuery=Business Terms and
+knowledgeQuery=data elements related to business term.
+
+segments
+
+Specify the level of asset detail that you want the API request to return.
+Enter any segment value from the following values:
+- all. Returns the summary, system attributes, and the API request
+link to view further details of the asset.
+- summary. Returns the name, description, and location of the asset.
+- systemAttributes. Returns the origin, class type of the asset,
+base types, user that created or updated the asset, and the date on
+which the asset was created or updated.
+- customAttributes. Returns the custom fields specified for the
+asset.
+- selfAttributes. Returns the properties of assets.
+- details. Returns the URI for the asset that you can click to send a
+request to view further details of a specific asset.
+The default value is segments=all.
+
+Request body
+Use the request body to specify parameters to filter, rank, and sort your search results. The API response
+returns a maximum of 100 results that match the specified criteria.
+In the body of the request, specify the parameters in the following format:
+{
+
+"from": 0,
+"size": 10,
+"searchFields": [
+"string"
+],
+"filterSpec": [
+{
+"type": "dsl",
+"attribute": "string",
+"values": [
+"string"
+],
+"expr": "string"
+}
+],
+"rankingSpec":
+{ "boostSpec": [
+{
+"fields": [
+"string"
+]
+}
+],
+
+List assets in the catalog
+
+11
+
+"scoringSpec": [{
+"type": "simple",
+"attribute": "core.identity",
+"order":"asc"
+},
+{
+"type": "simple",
+"attribute": "core.name",
+"order":"asc"
+}]
+
+}
+
+}
+,
+"after":["03c1883a-dcb7-4ae0-a6a5-c2743e52fb69",
+"column67"]
+
+The following table describes the important parameters that you can specify in the body of the request:
+Parameter
+
+Type
+
+Description
+
+pagination parameters
+from and size
+
+Numeric
+
+Use the following parameters to retrieve records using pagination:
+- from. Specify a numeric value to set an offset for pagination. The
+default value is zero.
+- size. Specify a numeric value to set the maximum number of
+results to display on each page starting from the offset value.
+The default value is 10. You can set a maximum page size of 100
+results.
+The following examples show how you can use the from and size
+parameters:
+{
+}
+
+"from": 0,
+"size": 50
+
+Retrieves 50 records per page starting from the first record,
+assuming that the total_hits is more than 50 records.
+{
+}
+
+"from": 50,
+"size": 50
+
+Retrieves 50 records per page starting from the 50th record,
+assuming that the total_hits is more than 50 records.
+searchFields
+
+String
+
+Specify the asset fields that you want to search. For example, you
+can search for assets whose name and description fields match the
+term SSN.
+This does not influence the ordering of the search results.
+
+12
+
+Chapter 2: Search for assets
+
+Parameter
+
+Type
+
+Description
+
+filterSpec
+
+String
+
+Specify a list of fields and values that you want the API to use to
+filter search results. You can use any of the following filter type or a
+combination of both filter types:
+Simple. Specify the asset attribute and one or more values to match
+the assets. For example, the following filterSpec parameter
+returns the assets that are in the 'Published' lifecycle status:
+{
+
+}
+
+"from": 0,
+"size": 100,
+"filterSpec": [
+{
+"type": "simple",
+"attribute": "core.assetLifecycle",
+"values": [
+"Published"
+]
+}
+]
+
+dsl. Specify an advanced filter expression to match the assets. For
+example, the following filterSpec parameter returns business
+terms that are created in the last one hour:
+{
+
+"from": 0,
+"size": 100,
+"filterSpec": [
+{
+"type": "dsl",
+"expr": "core.classType
+core.infa.ccfg.models.governance.BusinessTerm and
+core.createdOn within last 1 hour"
+}
+]
+}
+rankingSpec
+
+NA
+
+Determines the order in which the assets appear in the search
+response. You can order the assets by specifying the asset scoring
+or boosting criteria or both.
+
+List assets in the catalog
+
+13
+
+Parameter
+
+Type
+
+Description
+
+boostSpec
+
+String
+
+Specify one or more fields by which you want to sort the search
+results. If you specify multiple fields, all specified fields are treated
+equally for sorting.
+For example, the following boostSpec parameter first returns
+assets whose names match the search criteria, followed by the
+assets whose descriptions match the criteria.
+{
+
+}
+
+14
+
+Chapter 2: Search for assets
+
+"explain": false,
+"from": 0,
+"size": 100,
+"rankingSpec": {
+"boostSpec": [
+{
+"fields": [
+"core.name"
+]
+},
+{
+"fields": [
+"core.description"
+]
+}
+]
+}
+
+Parameter
+
+Type
+
+scoringSpec
+
+String
+
+Description
+Specify one of the following two types of scoring criteria:
+Simple. Specify the sorting order (ascending or descending) on
+attributes such as name or identity.
+For example, the following scoringSpec parameter returns
+business terms that are sorted in the descending order of their
+names.
+{
+
+"from": 0,
+"size": 100,
+"rankingSpec": {
+"scoringSpec": [
+{
+"type": "simple",
+"attribute": "core.name",
+"order": "desc"
+}
+]
+},
+"filterSpec": [
+{
+"type": "dsl",
+"expr": "core.classType
+com.infa.ccgf.models.governance.BusinessTerm"
+}
+]
+}
+dsl. Specify an advanced filter criteria in an expression to sort the
+search results. For example, the following scoringSpec parameter
+returns the list of business term assets sorted by assets that have
+an average rating greater than one.
+{
+
+"from": 0,
+"size": 100,
+"rankingSpec": {
+"scoringSpec": [
+{
+"type": "dsl",
+"expr":
+"core.supplement.averageRating greater than 1"
+}
+]
+},
+"filterSpec": [
+{
+"type": "dsl",
+"expr": "core.classType
+com.infa.ccgf.models.governance.BusinessTerm"
+}
+]
+}
+
+after
+
+Object
+
+Enter the value from the SortValues field of an asset that the API
+response returns. When you run the API request with this value, the
+response returns the next set of specified assets after the asset
+that you have specified the value for.
+
+List assets in the catalog
+
+15
+
+Search for more than 10000 assets
+To search more than 10000 assets, set the scoringSpec type in the rankingSpec parameter to Simple.
+Among the attributes that you specify for the sorting order, specify at least one attribute that has unique
+values. For example, you can sort the order on the core.identity attribute, which is the internal ID of the
+asset.
+You can retrieve a maximum of 100 assets with each API request. To see the next 100 assets, copy the value
+from the SortValues field of the last asset that the response returns and enter it in the after field of the
+request body before you send the request again.
+
+Example requests
+List the next set of results from the catalog
+The following request returns the first 50 assets sorted in the ascending order of their internal IDs.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=*&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+
+}
+
+"from": 0,
+"size": 50,
+"rankingSpec": {
+"scoringSpec": [
+{
+"type": "simple",
+"attribute": "core.identity",
+"order": "asc"
+}
+]
+}
+
+To see the next 50 assets and so on, copy the value from the SortValues parameter of the 50th asset that
+the response returns and enter it in the after parameter of the request body as shown in the following
+example.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=*&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+
+}
+
+"size": 50,
+"rankingSpec": {
+"scoringSpec": [
+{
+"type": "simple",
+"attribute": "core.identity",
+"order": "asc"
+}
+]
+},
+"after" : ["<The value from the sortValues field of the 50th asset>"]
+
+To continue retrieving more assets from the catalog, replace the value of the after parameter in the request
+body during each API request.
+
+16
+
+Chapter 2: Search for assets
+
+List business terms
+The following request returns up to 100 business terms based on the size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=*&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+
+}
+
+"from": 0,
+"size": 100,
+"filterSpec": [
+{
+"type": "simple",
+"attribute": "core.classType",
+"values": [
+"com.infa.ccgf.models.governance.BusinessTerm"
+]
+}
+]
+
+List business terms in the 'Draft' lifecycle status
+The following request returns business terms that are in the 'Draft' lifecycle status. The response displays up
+to 100 business terms based on the size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=*&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+
+}
+
+"from": 0,
+"size": 100,
+"filterSpec": [
+{
+"type": "simple",
+"attribute": "core.classType",
+"values": [
+"com.infa.ccgf.models.governance.BusinessTerm"
+]
+},
+{
+"type": "simple",
+"attribute": "core.assetLifecycle",
+"values": [
+"Draft"
+]
+}
+]
+
+List business terms created in the last 30 days
+The following request returns business terms created in the last 30 days based on the filterSpec body
+parameter. The response displays up to 50 business terms based on the size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=*&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+
+List assets in the catalog
+
+17
+
+{
+
+"from": 0,
+"size": 50,
+"filterSpec": [
+{
+"type": "dsl",
+"expr": "core.classType com.infa.ccgf.models.governance.BusinessTerm and
+core.createdOn within last 30 day"
+}
+]
+}
+
+List data elements related to business terms
+The following request returns data elements that are related to business terms based on the knowledgeQuery
+parameter. The response displays up to 50 data elements based on the size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=data elements related to business term&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+}
+
+"from": 0,
+"size": 50
+
+List assets related to the business term 'email'
+The following request returns up to 100 assets related to the business term 'email' based on the
+knowledgeQuery URL parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=all related to business term email&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+}
+
+"from": 0,
+"size": 100
+
+List the tables that are profiled
+The following request returns up to 50 tables that are profiled based on the knowledgeQuery URL parameter.
+The list of tables appear in the order of the average rating as specified in the scoringSpec body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=tables which are profiled&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+
+18
+
+"from": 0,
+"size": 50,
+"rankingSpec": {
+"scoringSpec": [
+{
+"type": "simple",
+"attribute": "core.supplement.averageRating",
+"values": [
+"5"
+]
+}
+
+Chapter 2: Search for assets
+
+}
+
+}
+
+]
+
+List data elements related to business terms that are critical data elements
+The following request returns up to 50 data elements that are marked as critical data element and related to
+the business terms 'Country' and 'First Name' as specified in the filterSpec body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=data elements related to business term which are critical data
+element&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+"from": 0,
+"size": 50,
+"filterSpec": [
+{
+"type": "simple",
+"attribute": "core.name",
+"values": [
+"Country", "FirstName"
+]
+}
+]
+}
+
+List the system assets
+The following request returns the system assets with the names 'Consumer Website' and 'Snowflake Product'
+as specified in the filterSpec body parameter. The response displays up to 100 system assets based on the
+size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=system&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+
+}
+
+"from": 0,
+"size": 100,
+"filterSpec": [
+{
+"type": "simple",
+"attribute": "core.name",
+"values": [
+"Consumer Website",
+"Snowflake Product"
+]
+}
+]
+
+List data classifications
+The following request returns up to 100 data classifications as specified in the size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=classification&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+
+List assets in the catalog
+
+19
+
+{
+}
+
+"from": 0,
+"size": 100
+
+List data entity classifications
+The following request returns data entity classifications as specified in the filterSpec body parameter. The
+response returns up to 50 classifications as specified in the size body parameter.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets?
+knowledgeQuery=classification&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID: <Org ID>
+Body
+{
+"from": 0,
+"size": 50,
+"filterSpec": [
+{
+"type": "dsl",
+"expr": "core.classType core.DataEntityClassification"
+}
+]
+}
+
+Response body
+The POST request response returns the list of assets that match the search criteria.
+The response displays the total_hits parameter that shows the total number of assets that match the
+search criteria. The response returns 100 assets per page.
+The following table describes the possible response body parameters for each asset in the response body:
+Parameter
+
+Description
+
+identity
+
+The internal ID of the asset. You can derive this ID by looking at the URL of the asset page in
+the Data Governance and Catalog application.
+
+externalID
+
+The unique reference ID of the asset.
+
+summary
+
+Contains the name, description, and location of the asset in the catalog.
+
+systemAttributes
+
+Contains the following meta parameters:
+modifiedOn. The date on which the asset was last modified
+createdBy. The user who created the asset.
+modifiedBy. The user who last modified the asset.
+classType. The type of asset.
+origin. The origin of the assets in the catalog.
+createdOn. The date on which the asset was created.
+
+-
+
+20
+
+customAttributes
+
+Contains the user-configured attributes of the asset.
+
+selfAttributes
+
+Contains different types of details depending on whether the asset is a business asset or a
+technical asset. Details include the lifecycle status, profiling and classification status, rating,
+information about whether the asset is a certified asset or a critical data element, and so on.
+
+Chapter 2: Search for assets
+
+Parameter
+
+Description
+
+details
+
+Contains the URI for the particular asset. Click the URI to send a request to view complete
+details of that asset.
+
+sortValues
+
+Contains a value to indicate the position of the asset in the response body. Enter this value in
+the after field of the request body to return the next set of specified assets after this asset.
+
+Example response
+The following example is an excerpt from a POST request to view business terms in the 'Draft' lifecycle
+status.
+{
+
+"summary": {
+"total_hits": "1038"
+},
+"hits": [
+{
+"core.identity": "2f8e6839-14fe-4b25-a868-a6324be30164",
+"core.externalId": "BT-06092022-24",
+"summary": {
+"core.location": "CDGC://2f8e6839-14fe-4b25-a868-a6324be30164",
+"core.name": "BT-06092022-24",
+"core.description": " Desc Create using admin user from group and
+\nDeleteed stakeholder user."
+},
+"systemAttributes": {
+"core.modifiedOn": 1689252674028,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.classType": "com.infa.ccgf.models.governance.BusinessTerm",
+"core.origin": "CDGC",
+"type": [
+"core.IClassBusiness",
+"core.IClass",
+"com.infa.ccgf.models.governance.GlossaryBase",
+"com.infa.ccgf.models.governance.BusinessTerm"
+],
+"core.createdOn": 1689252674028
+},
+"customAttributes": {
+"com.infa.odin.models.custom.ca_2205258177888237465": "default",
+"com.infa.odin.models.custom.ca_5534006856514172118": "default"
+},
+"selfAttributes": {
+"com.infa.ccgf.models.governance.FormatType": "Text",
+"core.mergedObjects": [],
+"com.infa.ccgf.models.governance.BusinessLogic": "BusinessLogic",
+"com.infa.ccgf.models.governance.isCDE": true,
+"core.supplement.certified": [
+false
+],
+"core.assetLifecycle": "Draft",
+"com.infa.ccgf.models.governance.Examples": [
+"Example-1",
+"Exampl25"
+],
+"com.infa.ccgf.models.governance.securityClassification": "Confidential",
+"com.infa.ccgf.models.governance.AliasNames": [
+"BT",
+"BTObject"
+],
+"core.producer": "CDGC",
+"com.infa.ccgf.models.governance.FormatDescription": "Format Description"
+},
+"details": "/data360/search/assets/BT-06092022-24?
+
+List assets in the catalog
+
+21
+
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+"sortValues":[
+"03c1ea71-cac8-4e39-9f4a-6774c657a8cf",
+"idsltc"
+]
+}
+]
+}
+
+Get details of an asset
+To retrieve complete details of a particular asset, send a GET request using the search API. Based on the
+request URL parameters that you pass, the response includes details such as profiling, classification,
+relationships, custom attributes, and lineage information of the specified asset.
+To get the details of an asset, submit a request with the following method and endpoint, and specify the
+asset ID:
+Method
+
+Endpoint
+
+GET
+
+<baseApiUrl>/data360/search/v1/assets/<assetID>
+
+The <baseApiUrl> differs for each pod. For more information about the base API URL, see “Send
+Requests” on page 7.
+The <assetID> that you enter can be the internal ID or the external ID of the asset. You can specify in the
+scheme parameter of the request URL whether you want to search the asset by external ID or internal ID.
+If you don't know the ID of a particular asset, you can first send a POST request using the <baseApiUrl>/
+data360/search/assets endpoint to view the list of assets in the catalog. The response for this request
+returns the internal ID of each asset in the core.identity parameter and the unique reference ID of the asset
+in the core.externalId parameter. For more information, see “List assets in the catalog” on page 10.
+
+22
+
+Chapter 2: Search for assets
+
+Request parameters
+In the request URL parameters, specify the type of asset ID that you want to use to search for assets. To limit
+the API response to specific details of an asset, you can additionally specify the type of asset details that you
+want the request to return.
+
+Request parameters
+Use the following parameters in the request URL:
+Parameter
+
+Description
+
+scheme
+
+Specify the type of asset ID you want to use to query assets. Enter one
+of the following values:
+- internal. Indicates that the asset ID that you specify in the request
+is the internal ID of the asset.
+- external. Indicates that the asset ID that you specify in the request
+is the unique reference ID of the asset.
+
+segments
+
+Specify the type of asset details that you want the API request to
+return. The default value is segments=all.Enter any segment value
+from the following values:
+- all. Returns the internal ID, external ID, summary, system attributes,
+and the API request link to view further details of the asset.
+- summary. Returns the name, description, and location of the asset.
+- systemAttributes. Returns the origin, class type, base types, user
+that created or updated the asset and the date on which the asset
+was created or updated.
+- stakeholdership. Returns the type of user and role that are
+assigned as stakeholder for the asset.
+- customAttributes. Returns the custom attributes specified for the
+asset.
+- selfAttributes. Returns the properties of assets.
+- dataProfile. Returns the profiling statistics of the asset.
+- dataClassification. Returns the data classification associated
+with the asset.
+- glossary. Returns the glossary associated with the asset.
+- dataQuality. Returns the data quality score of the asset.
+- hierarchy. Returns the immediate child assets of the asset.
+- hierarchy:all. Returns all the attributes of the immediate child
+assets in the hierarchy.
+- hierarchy:selfAttributes. Returns the properties of the
+immediate child assets in the hierarchy.
+- hierarchy:systemAttributes. Returns the system attributes of
+the immediate child assets in the hierarchy.
+- hierarchy:customAttributes. Returns the custom attributes of
+the immediate assets in the hierarchy.
+- neighborhood. Returns assets that are in a direct relationship with
+the searched asset.
+- neighborhood:all. Returns assets that are in a direct or indirect
+relationship with the searched asset.
+- neighborhood:<classtype>. Returns assets of the specified
+class type that are in a direct relationship with the searched asset.
+- lineage-level. Returns the lineage level of the asset, that is data
+element or data set level. The default value for lineage-level is
+dataset.
+- lineage-direction. Returns the direction of the asset in the
+lineage, that is inbound or outbound. The default value for lineagedirection is all.
+- lineage-level:dataset. Returns assets that have a direct
+relationship with the searched asset.
+
+Get details of an asset
+
+23
+
+Parameter
+
+Description
+- lineage-direction:all. Returns assets that are in a direct
+
+inbound and outbound relationship with the searched asset.
+
+- lineage-direction:inbound. Returns assets that are in a direct
+
+inbound relationship with the searched asset.
+
+- lineage-direction:outbound. Returns assets that are in a
+
+direct outbound relationship with the searched asset.
+
+- descendants. Returns the immediate children and related child
+
+assets.
+
+- descendants:all. Returns all the details of the immediate and
+
+related child assets.
+
+- descendants:systemAttributes. Returns the system attributes
+
+of the immediate and related child assets.
+
+- descendants:selfAttributes. Returns the properties of the
+
+immediate and related child assets.
+
+- descendants:customAttributes. Returns the custom attributes
+
+of the immediate and related child assets.
+
+Examples
+Search for a business term using the asset ID
+The following example shows the GET request to get all the details of a business term by specifying its
+internal ID.
+GET https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets/
+612adac1-5863-468f-a38c-fb3ba0a5686e?scheme=internal&segments=all
+The following example shows the response for the request. The response returns all details of the business
+term 'AddressLine2' because the segments parameter in the request is set to all.
+{
+
+24
+
+"core.identity": "17b1e3ed-f64f-487a-b073-06b78ec30259",
+"core.externalId": "lower-68",
+"summary": {
+"core.location": "CDGC://17b1e3ed-f64f-487a-b073-06b78ec30259",
+"core.name": "AddressLine2"
+},
+"systemAttributes": {
+"core.modifiedOn": 1688816931942,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.classType": "com.infa.ccgf.models.governance.BusinessTerm",
+"core.origin": "CDGC",
+"type": [
+"core.IClassBusiness",
+"core.IClass",
+"com.infa.ccgf.models.governance.GlossaryBase",
+"com.infa.ccgf.models.governance.BusinessTerm"
+],
+"core.createdOn": 1688816931942
+},
+"customAttributes": {
+"com.infa.odin.models.custom.ca_2205258177888237465": "default",
+"com.infa.odin.models.custom.ca_5534006856514172118": "default"
+},
+"selfAttributes": {
+"com.infa.ccgf.models.governance.FormatType": "Text",
+"core.supplement.certified": [
+false
+],
+"core.assetLifecycle": "Published",
+"core.producer": "CDGC",
+
+Chapter 2: Search for assets
+
+"com.infa.ccgf.models.governance.isCDE": false
+},
+"dataProfile": {
+"core.classType": "com.infa.ccgf.models.governance.BusinessTerm",
+"core.identity": "17b1e3ed-f64f-487a-b073-06b78ec30259",
+"core.producer": "CDGC",
+"core.origin": "CDGC",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+},
+"neighborhood": [
+{
+"type": "com.infa.odin.models.file.flat.FlatField",
+"neighbors": [
+{
+"neighbor": "AddressLine2",
+"details": "/data360/search/assets/86aa9780-99d3-4efb-95eab4d691bb97d0?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "lower-68 ( AddressLine2 ) <-com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase -- dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField
+( AddressLine2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+"curationStatus": "AUTO_ACCEPTED",
+"from": "AddressLine2",
+"to": "AddressLine2",
+"fromType":
+"com.infa.odin.models.file.flat.FlatField",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "99068dfb-2c91-34e2bd37-5232fde620b1://99068dfb-2c91-34e2-bd37-5232fde620b1/dqprofiling-dockerpod/courses/
+person1.csv/AddressLine2",
+"toLocation": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"attributes": {
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "99068dfb-2c91-34e2bd37-5232fde620b1",
+"core.modifiedOn": 1689076624370,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.confidenceScore": 100.0,
+"core.inferred": true,
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.producer": "discovery-capability",
+"core.createdOn": 1689076624370,
+"core.curationStatus": "AUTO_ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/
+86aa9780-99d3-4efb-95ea-b4d691bb97d0?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "86aa9780-99d3-4efb-95eab4d691bb97d0",
+"core.classType":
+"com.infa.odin.models.file.flat.FlatField",
+"core.location": "99068dfb-2c91-34e2bd37-5232fde620b1://99068dfb-2c91-34e2-bd37-5232fde620b1/dqprofiling-dockerpod/courses/
+person1.csv/AddressLine2",
+
+Get details of an asset
+
+25
+
+"core.externalId": "dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField",
+"core.name": "AddressLine2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+},
+{
+"neighbor": "AddressLine2",
+"details": "/data360/search/assets/00b1dbb0-ee68-43e9a833-675b5c8f0ab2?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "lower-68 ( AddressLine2 ) <-com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase -- dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField
+( AddressLine2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+"curationStatus": "AUTO_ACCEPTED",
+"from": "AddressLine2",
+"to": "AddressLine2",
+"fromType":
+"com.infa.odin.models.file.flat.FlatField",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "27397996ad9a-3f32-8093-2e4b80fcd93c://27397996-ad9a-3f32-8093-2e4b80fcd93c/dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2",
+"toLocation": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"attributes": {
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "27397996ad9a-3f32-8093-2e4b80fcd93c",
+"core.modifiedOn": 1688819441749,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.confidenceScore": 100.0,
+"core.inferred": true,
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.producer": "discovery-capability",
+"core.createdOn": 1688819441749,
+"core.curationStatus": "AUTO_ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/00b1dbb0ee68-43e9-a833-675b5c8f0ab2?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "00b1dbb0-ee68-43e9a833-675b5c8f0ab2",
+
+26
+
+Chapter 2: Search for assets
+
+"core.classType":
+"com.infa.odin.models.file.flat.FlatField",
+"core.location": "27397996ad9a-3f32-8093-2e4b80fcd93c://27397996-ad9a-3f32-8093-2e4b80fcd93c/dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2",
+"core.externalId": "dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField",
+"core.name": "AddressLine2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+}
+]
+},
+{
+"type": "com.infa.odin.models.relational.Column",
+"neighbors": [
+{
+"neighbor": "CDGCTABL31COL2",
+"details": "/data360/search/assets/81e8ea5a-c888-4c40a780-849ac48e66fd?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "lower-68 ( AddressLine2 ) <-com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase -- CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column
+( CDGCTABL31COL2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+"curationStatus": "ACCEPTED",
+"from": "CDGCTABL31COL2",
+"to": "AddressLine2",
+"fromType": "com.infa.odin.models.relational.Column",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"toLocation": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"attributes": {
+"core.modifiedOn": 1692806775314,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.inferred": false,
+"core.producer": "CDGC",
+"core.origin": "CDGC",
+"core.createdOn": 1692806775314,
+"core.curationStatus": "ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/81e8ea5ac888-4c40-a780-849ac48e66fd?
+
+Get details of an asset
+
+27
+
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "81e8ea5a-c888-4c40a780-849ac48e66fd",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+}
+]
+}
+]
+}
+
+Search for a column using the asset ID
+The following example shows the GET request to get all the details of a column by specifying its internal ID.
+GET https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets/
+6bb417e6-94bb-48eb-88b6-7c6887b58fb6?scheme=internal&segments=all
+The following example shows the request response. The response includes all details of the column such as
+the summary, system attributes, glossary associations, data profiling statistics, and relationships with other
+assets.
+{
+
+"core.identity": "5ab1fc47-68aa-4182-ab8e-80c8dc58e95d",
+"core.externalId": "ab2cc915-4b30-396a-9632-bd89f02ddf1c://CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"summary": {
+"core.location": "ab2cc915-4b30-396a-9632-bd89f02ddf1c://ab2cc915-4b30-396a-9632bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.name": "CDGCTABL31COL2",
+"core.description": ""
+},
+"systemAttributes": {
+"core.modifiedOn": 1692954334099,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.classType": "com.infa.odin.models.relational.Column",
+"core.origin": "ab2cc915-4b30-396a-9632-bd89f02ddf1c",
+"type": [
+"core.IClassTechnical",
+"core.IClass",
+"core.DataElement",
+"com.infa.odin.models.relational.Column"
+],
+"core.createdOn": 1689007685160
+},
+
+28
+
+Chapter 2: Search for assets
+
+"selfAttributes": {
+"com.infa.odin.models.relational.DatatypeLength": "100",
+"core.reference": false,
+"core.Position": 2,
+"core.rankArray": [],
+"core.patternStatistics": [],
+"com.infa.odin.models.relational.PrimaryKeyColumn": "false",
+"core.mergedObjects": [],
+"core.businessName": "Customer Records",
+"core.profiled": false,
+"core.resourceType": "Snowflake",
+"core.businessDescription": "",
+"core.lastProfiledState": "Not Profiled",
+"com.infa.odin.models.relational.Datatype": "VARCHAR",
+"core.supplement.certified": [
+false
+],
+"com.infa.odin.models.relational.Nullable": "true",
+"core.assetLifecycle": "Published",
+"core.resourceName": "SnowFlake_10June_22-10",
+"core.inferredDataTypeSummaries": []
+},
+"dataProfile": {
+"core.lastProfiledState": "Not Profiled",
+"core.topNValueFrequenciesSample": [],
+"core.rankArray": [],
+"core.patternStatistics": [],
+"core.profiled": false,
+"core.classType": "com.infa.odin.models.relational.Column",
+"core.identity": "5ab1fc47-68aa-4182-ab8e-80c8dc58e95d",
+"core.origin": "ab2cc915-4b30-396a-9632-bd89f02ddf1c",
+"core.externalId": "ab2cc915-4b30-396a-9632-bd89f02ddf1c://CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2",
+"core.inferredDataTypeSummaries": [],
+"core.description": ""
+},
+"glossary": [
+{
+"core.identity": "7bc6fa52-b563-48a2-9f3a-643b02cc4421",
+"details": "/data360/search/assets/MLMRSCOE-24?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"core.externalId": "MLMRSCOE-24",
+"core.name": "Customer Records",
+"core.curationStatus": "ACCEPTED"
+}
+],
+"neighborhood": [
+{
+"type": "com.infa.odin.models.relational.Table",
+"neighbors": [
+{
+"neighbor": "CDGCTABLE3",
+"details": "/data360/search/assets/4e648258-9937-4197a933-92d35889fbb0?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/CDGCTABLE3/
+CDGCTABL31COL2~com.infa.odin.models.relational.Column ( CDGCTABL31COL2 ) <-com.infa.odin.models.relational.TableToColumn -- CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3~com.infa.odin.models.relational.Table ( CDGCTABLE3 ) ",
+"collection": [
+{
+"association":
+"com.infa.odin.models.relational.TableToColumn",
+"curationStatus": "NONE",
+"from": "CDGCTABLE3",
+"to": "CDGCTABL31COL2",
+"fromType": "com.infa.odin.models.relational.Table",
+"toType": "com.infa.odin.models.relational.Column",
+
+Get details of an asset
+
+29
+
+"fromLocation": "ab2cc915-4b30-396a-9632bd89f02ddf1c://ab2cc915-4b30-396a-9632-bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3",
+"toLocation": "ab2cc915-4b30-396a-9632bd89f02ddf1c://ab2cc915-4b30-396a-9632-bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2",
+"attributes": {
+"core.modifiedOn": 1689007798639,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind": "core.ParentChild",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "ab2cc915-4b30-396a-9632bd89f02ddf1c",
+"core.createdOn": 1689007798639
+},
+"details": {
+"fromUri": "/data360/search/assets/
+4e648258-9937-4197-a933-92d35889fbb0?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/
+5ab1fc47-68aa-4182-ab8e-80c8dc58e95d?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "4e648258-9937-4197a933-92d35889fbb0",
+"core.classType":
+"com.infa.odin.models.relational.Table",
+"core.location": "ab2cc915-4b30-396a-9632bd89f02ddf1c://ab2cc915-4b30-396a-9632-bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3~com.infa.odin.models.relational.Table",
+"core.name": "CDGCTABLE3"
+},
+"toProperties": {
+"core.identity": "5ab1fc47-68aa-4182ab8e-80c8dc58e95d",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "ab2cc915-4b30-396a-9632bd89f02ddf1c://ab2cc915-4b30-396a-9632-bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+}
+}
+]
+}
+]
+}
+]
+},
+{
+"type": "com.infa.ccgf.models.governance.BusinessTerm",
+"neighbors": [
+{
+"neighbor": "Customer Records",
+"details": "/data360/search/assets/MLMRSCOE-24?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/CDGCTABLE3/
+CDGCTABL31COL2~com.infa.odin.models.relational.Column ( CDGCTABL31COL2 ) -com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase --> MLMRSCOE-24 ( Customer
+Records ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+
+30
+
+Chapter 2: Search for assets
+
+"curationStatus": "ACCEPTED",
+"from": "CDGCTABL31COL2",
+"to": "Customer Records",
+"fromType": "com.infa.odin.models.relational.Column",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "ab2cc915-4b30-396a-9632bd89f02ddf1c://ab2cc915-4b30-396a-9632-bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2",
+"toLocation": "CDGC://247e6a83-7ddb-4014-bd8beac7018a31e1/7bc6fa52-b563-48a2-9f3a-643b02cc4421",
+"attributes": {
+"core.modifiedOn": 1692954335818,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.inferred": false,
+"core.producer": "CDGC",
+"core.origin": "CDGC",
+"core.createdOn": 1692954335818,
+"core.curationStatus": "ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/
+5ab1fc47-68aa-4182-ab8e-80c8dc58e95d?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/MLMRSCOE-24?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "5ab1fc47-68aa-4182ab8e-80c8dc58e95d",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "ab2cc915-4b30-396a-9632bd89f02ddf1c://ab2cc915-4b30-396a-9632-bd89f02ddf1c/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+},
+"toProperties": {
+"core.identity": "7bc6fa52b563-48a2-9f3a-643b02cc4421",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://247e6a83-7ddb-4014-bd8beac7018a31e1/7bc6fa52-b563-48a2-9f3a-643b02cc4421",
+"core.externalId": "MLMRSCOE-24",
+"core.name": "Customer Records"
+}
+}
+]
+}
+]
+}
+]
+}
+]
+}
+
+Response body
+The GET request returns the details of the asset that you specify in the URL.
+The details that the response body displays for business and technical assets are based on the values that
+you specify in the segments URL parameter while sending the GET request. For more information about the
+details returned in the response body, see segments in “Request parameters” on page 11.
+
+Get details of an asset
+
+31
+
+List details of multiple assets
+Send a POST request to view the details of multiple assets in the catalog. While sending the request, you can
+specify the reference IDs of one or more assets in the body of the request. In the request parameters, specify
+the type of asset details that you would like to view.
+To list the details of multiple assets, submit a request with the following method and endpoint, and specify
+the asset ID:
+Method
+
+Endpoint
+
+POST
+
+<baseApiUrl>/data360/search/v1/assets/details
+
+The <baseApiUrl> differs for each pod. For more information about the base API URL, see “Send
+Requests” on page 7.
+
+32
+
+Chapter 2: Search for assets
+
+Request parameters
+In the request URL parameters, specify the type of asset ID that you want to use to search for assets. To limit
+the API response to specific details of an asset, you can additionally specify the type of asset details that you
+want the request to return.
+
+Request parameters
+Use the following parameters in the request URL:
+Parameter
+
+Description
+
+scheme
+
+Specify the type of asset ID you want to use to query assets. Enter one
+of the following values:
+- internal. Indicates that the asset ID that you specify in the request
+is the internal ID of the asset.
+- external. Indicates that the asset ID that you specify in the request
+is the unique reference ID of the asset.
+
+segments
+
+Specify the type of asset details that you want the API request to
+return. The default value is segments=all.Enter any segment value
+from the following values:
+- all. Returns the internal ID, external ID, summary, system attributes,
+and the API request link to view further details of the asset.
+- summary. Returns the name, description, and location of the asset.
+- systemAttributes. Returns the origin, class type, base types, user
+that created or updated the asset and the date on which the asset
+was created or updated.
+- stakeholdership. Returns the type of user and role that are
+assigned as stakeholder for the asset.
+- customAttributes. Returns the custom attributes specified for the
+asset.
+- selfAttributes. Returns the properties of assets.
+- dataProfile. Returns the profiling statistics of the asset.
+- dataClassification. Returns the data classification associated
+with the asset.
+- glossary. Returns the glossary associated with the asset.
+- dataQuality. Returns the data quality score of the asset.
+- hierarchy. Returns the immediate child assets of the asset.
+- hierarchy:all. Returns all the attributes of the immediate child
+assets in the hierarchy.
+- hierarchy:selfAttributes. Returns the properties of the
+immediate child assets in the hierarchy.
+- hierarchy:systemAttributes. Returns the system attributes of
+the immediate child assets in the hierarchy.
+- hierarchy:customAttributes. Returns the custom attributes of
+the immediate assets in the hierarchy.
+- neighborhood. Returns assets that are in a direct relationship with
+the searched asset.
+- neighborhood:all. Returns assets that are in a direct or indirect
+relationship with the searched asset.
+- neighborhood:<classtype>. Returns assets of the specified
+class type that are in a direct relationship with the searched asset.
+- lineage-level. Returns the lineage level of the asset, that is data
+element or data set level. The default value for lineage-level is
+dataset.
+- lineage-direction. Returns the direction of the asset in the
+lineage, that is inbound or outbound. The default value for lineagedirection is all.
+- lineage-level:dataset. Returns assets that have a direct
+relationship with the searched asset.
+
+List details of multiple assets
+
+33
+
+Parameter
+
+Description
+- lineage-direction:all. Returns assets that are in a direct
+
+inbound and outbound relationship with the searched asset.
+
+- lineage-direction:inbound. Returns assets that are in a direct
+
+inbound relationship with the searched asset.
+
+- lineage-direction:outbound. Returns assets that are in a
+
+direct outbound relationship with the searched asset.
+
+- descendants. Returns the immediate children and related child
+
+assets.
+
+- descendants:all. Returns all the details of the immediate and
+
+related child assets.
+
+- descendants:systemAttributes. Returns the system attributes
+
+of the immediate and related child assets.
+
+- descendants:selfAttributes. Returns the properties of the
+
+immediate and related child assets.
+
+- descendants:customAttributes. Returns the custom attributes
+
+of the immediate and related child assets.
+
+Request body
+Use the request body to specify the external or internal IDs of assets that you want to view. You can specify
+in the scheme request parameter whether you want to search the asset by external ID or internal ID.
+In the body of each API request, specify up to five comma-separated asset IDs. You can specify the asset IDs
+in the following format:
+[
+
+]
+
+"0c5777c2-ec04-4a57-8bf0-fc895c4579a2",
+"982cd858-b5b0-4cea-b120-cad3c325e38e",
+"e907f08f-6327-4214-9401-c794bc0c34db",
+
+If you don't know the ID of a particular asset, you can first send a POST request to view the list of assets in
+the catalog. This request returns the internal ID of each asset in the core.identity parameter and the
+unique reference ID of the asset in the core.externalId parameter. For more information, see “List assets in
+the catalog” on page 10.
+
+Example request
+Search for two assets using internal asset IDs
+The following example shows the POST request to list all the details of a column and an associated business
+term by passing the internal IDs of both the assets in the request body.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/v1/assets/details?
+scheme=internal&segments=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+[
+]
+
+34
+
+"81e8ea5a-c888-4c40-a780-849ac48e66fd",
+"17b1e3ed-f64f-487a-b073-06b78ec30259"
+
+Chapter 2: Search for assets
+
+The following example shows the response for the request. The response returns all the details of the
+business term 'AddressLine2' and the column 'CDGCTABL31COL2' because the segments parameter in the
+request is set to all.
+[
+
+{
+
+"core.identity": "17b1e3ed-f64f-487a-b073-06b78ec30259",
+"core.externalId": "lower-68",
+"summary": {
+"core.location": "CDGC://17b1e3ed-f64f-487a-b073-06b78ec30259",
+"core.name": "AddressLine2"
+},
+"systemAttributes": {
+"core.modifiedOn": 1688816931942,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.classType": "com.infa.ccgf.models.governance.BusinessTerm",
+"core.origin": "CDGC",
+"type": [
+"core.IClassBusiness",
+"core.IClass",
+"com.infa.ccgf.models.governance.GlossaryBase",
+"com.infa.ccgf.models.governance.BusinessTerm"
+],
+"core.createdOn": 1688816931942
+},
+"customAttributes": {
+"com.infa.odin.models.custom.ca_2205258177888237465": "default",
+"com.infa.odin.models.custom.ca_5534006856514172118": "default"
+},
+"selfAttributes": {
+"com.infa.ccgf.models.governance.FormatType": "Text",
+"core.supplement.certified": [
+false
+],
+"core.assetLifecycle": "Published",
+"core.producer": "CDGC",
+"com.infa.ccgf.models.governance.isCDE": false
+},
+"neighborhood": [
+{
+"type": "com.infa.odin.models.file.flat.FlatField",
+"neighbors": [
+{
+"neighbor": "AddressLine2",
+"details": "/data360/search/assets/86aa9780-99d3-4efb-95eab4d691bb97d0?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "lower-68 ( AddressLine2 ) <-com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase -- dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField
+( AddressLine2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+"curationStatus": "AUTO_ACCEPTED",
+"from": "AddressLine2",
+"to": "AddressLine2",
+"fromType":
+"com.infa.odin.models.file.flat.FlatField",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "99068dfb-2c91-34e2bd37-5232fde620b1://99068dfb-2c91-34e2-bd37-5232fde620b1/dqprofiling-dockerpod/courses/
+person1.csv/AddressLine2",
+"toLocation": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"attributes": {
+
+List details of multiple assets
+
+35
+
+bd37-5232fde620b1",
+
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "99068dfb-2c91-34e2-
+
+"core.modifiedOn": 1689076624370,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.confidenceScore": 100.0,
+"core.inferred": true,
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.producer": "discovery-capability",
+"core.createdOn": 1689076624370,
+"core.curationStatus": "AUTO_ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/
+86aa9780-99d3-4efb-95ea-b4d691bb97d0?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "86aa9780-99d3-4efb-95eab4d691bb97d0",
+"core.classType":
+"com.infa.odin.models.file.flat.FlatField",
+"core.location": "99068dfb-2c91-34e2bd37-5232fde620b1://99068dfb-2c91-34e2-bd37-5232fde620b1/dqprofiling-dockerpod/courses/
+person1.csv/AddressLine2",
+"core.externalId": "dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField",
+"core.name": "AddressLine2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+},
+{
+"neighbor": "AddressLine2",
+"details": "/data360/search/assets/00b1dbb0-ee68-43e9a833-675b5c8f0ab2?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "lower-68 ( AddressLine2 ) <-com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase -- dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField
+( AddressLine2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+"curationStatus": "AUTO_ACCEPTED",
+"from": "AddressLine2",
+"to": "AddressLine2",
+"fromType":
+"com.infa.odin.models.file.flat.FlatField",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "27397996ad9a-3f32-8093-2e4b80fcd93c://27397996-ad9a-3f32-8093-2e4b80fcd93c/dqprofiling-dockerpod/
+
+36
+
+Chapter 2: Search for assets
+
+courses/person1.csv/AddressLine2",
+b073-06b78ec30259",
+
+ad9a-3f32-8093-2e4b80fcd93c",
+
+"toLocation": "CDGC://17b1e3ed-f64f-487a"attributes": {
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "27397996-
+
+"core.modifiedOn": 1688819441749,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.confidenceScore": 100.0,
+"core.inferred": true,
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.producer": "discovery-capability",
+"core.createdOn": 1688819441749,
+"core.curationStatus": "AUTO_ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/00b1dbb0ee68-43e9-a833-675b5c8f0ab2?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "00b1dbb0-ee68-43e9a833-675b5c8f0ab2",
+"core.classType":
+"com.infa.odin.models.file.flat.FlatField",
+"core.location": "27397996ad9a-3f32-8093-2e4b80fcd93c://27397996-ad9a-3f32-8093-2e4b80fcd93c/dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2",
+"core.externalId": "dqprofiling-dockerpod/
+courses/person1.csv/AddressLine2~com.infa.odin.models.file.flat.FlatField",
+"core.name": "AddressLine2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+}
+]
+},
+{
+"type": "com.infa.odin.models.relational.Column",
+"neighbors": [
+{
+"neighbor": "CDGCTABL31COL2",
+"details": "/data360/search/assets/81e8ea5a-c888-4c40a780-849ac48e66fd?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "lower-68 ( AddressLine2 ) <-com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase -- CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column
+( CDGCTABL31COL2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+
+List details of multiple assets
+
+37
+
+"curationStatus": "ACCEPTED",
+"from": "CDGCTABL31COL2",
+"to": "AddressLine2",
+"fromType":
+"com.infa.odin.models.relational.Column",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"toLocation": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"attributes": {
+"core.modifiedOn": 1692806775314,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.inferred": false,
+"core.producer": "CDGC",
+"core.origin": "CDGC",
+"core.createdOn": 1692806775314,
+"core.curationStatus": "ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/81e8ea5ac888-4c40-a780-849ac48e66fd?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "81e8ea5a-c888-4c40a780-849ac48e66fd",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+}
+]
+}
+]
+},
+{
+"core.identity": "81e8ea5a-c888-4c40-a780-849ac48e66fd",
+"core.externalId": "d4865a0f-406b-363e-b850-2fc633b3f77b://CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"summary": {
+"core.location": "d4865a0f-406b-363e-b850-2fc633b3f77b://d4865a0f-406b-363eb850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.name": "CDGCTABL31COL2",
+"core.description": ""
+
+38
+
+Chapter 2: Search for assets
+
+},
+"systemAttributes": {
+"core.modifiedOn": 1692806773089,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.classType": "com.infa.odin.models.relational.Column",
+"core.origin": "d4865a0f-406b-363e-b850-2fc633b3f77b",
+"type": [
+"core.IClassTechnical",
+"core.IClass",
+"core.DataElement",
+"com.infa.odin.models.relational.Column"
+],
+"core.createdOn": 1688650669237
+},
+"selfAttributes": {
+"com.infa.odin.models.relational.DatatypeLength": "100",
+"core.reference": false,
+"core.Position": 2,
+"core.rankArray": [],
+"core.patternStatistics": [],
+"com.infa.odin.models.relational.PrimaryKeyColumn": "false",
+"core.mergedObjects": [],
+"core.businessName": "AddressLine2",
+"core.profiled": false,
+"core.resourceType": "Snowflake",
+"core.businessDescription": "",
+"core.lastProfiledState": "Not Profiled",
+"com.infa.odin.models.relational.Datatype": "VARCHAR",
+"core.supplement.certified": [
+false
+],
+"com.infa.odin.models.relational.Nullable": "true",
+"core.assetLifecycle": "Published",
+"core.resourceName": "SnowFlake_CustCheck",
+"core.inferredDataTypeSummaries": []
+},
+"dataProfile": {
+"core.lastProfiledState": "Not Profiled",
+"core.topNValueFrequenciesSample": [],
+"core.rankArray": [],
+"core.patternStatistics": [],
+"core.profiled": false,
+"core.classType": "com.infa.odin.models.relational.Column",
+"core.identity": "81e8ea5a-c888-4c40-a780-849ac48e66fd",
+"core.origin": "d4865a0f-406b-363e-b850-2fc633b3f77b",
+"core.externalId": "d4865a0f-406b-363e-b850-2fc633b3f77b://CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2",
+"core.inferredDataTypeSummaries": [],
+"core.description": ""
+},
+"glossary": [
+{
+"core.identity": "17b1e3ed-f64f-487a-b073-06b78ec30259",
+"details": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2",
+"core.curationStatus": "ACCEPTED"
+}
+],
+"neighborhood": [
+{
+"type": "com.infa.odin.models.relational.Table",
+"neighbors": [
+{
+"neighbor": "CDGCTABLE3",
+"details": "/data360/search/assets/44ef664f-90ef-4ac2-af4da99f7670081b?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+
+List details of multiple assets
+
+39
+
+"paths": [
+{
+"serialized": "CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column ( CDGCTABL31COL2 ) <-com.infa.odin.models.relational.TableToColumn -- CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3~com.infa.odin.models.relational.Table ( CDGCTABLE3 ) ",
+"collection": [
+{
+"association":
+"com.infa.odin.models.relational.TableToColumn",
+"curationStatus": "NONE",
+"from": "CDGCTABLE3",
+"to": "CDGCTABL31COL2",
+"fromType":
+"com.infa.odin.models.relational.Table",
+"toType":
+"com.infa.odin.models.relational.Column",
+"fromLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3",
+"toLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"attributes": {
+"core.modifiedOn": 1688650827020,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind": "core.ParentChild",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "d4865a0f-406b-363eb850-2fc633b3f77b",
+"core.createdOn": 1688650827020
+},
+"details": {
+"fromUri": "/data360/search/assets/
+44ef664f-90ef-4ac2-af4d-a99f7670081b?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/81e8ea5ac888-4c40-a780-849ac48e66fd?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "44ef664f-90ef-4ac2-af4da99f7670081b",
+"core.classType":
+"com.infa.odin.models.relational.Table",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3~com.infa.odin.models.relational.Table",
+"core.name": "CDGCTABLE3"
+},
+"toProperties": {
+"core.identity": "81e8ea5a-c888-4c40a780-849ac48e66fd",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+}
+}
+]
+}
+]
+}
+]
+},
+
+40
+
+Chapter 2: Search for assets
+
+{
+
+"type": "com.infa.odin.models.relational.ViewColumn",
+"neighbors": [
+{
+"neighbor": "CDGCVIEW3COL2",
+"details": "/data360/search/assets/
+a1172b78-75cb-4485-88dd-8b407441187a?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column ( CDGCTABL31COL2 ) -core.DirectionalDataFlow --> CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/CDGCVIEW3/
+CDGCVIEW3COL2~com.infa.odin.models.relational.ViewColumn ( CDGCVIEW3COL2 ) ",
+"collection": [
+{
+"association": "core.DirectionalDataFlow",
+"curationStatus": "NONE",
+"from": "CDGCTABL31COL2",
+"to": "CDGCVIEW3COL2",
+"fromType":
+"com.infa.odin.models.relational.Column",
+"toType":
+"com.infa.odin.models.relational.ViewColumn",
+"fromLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"toLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCVIEW3/CDGCVIEW3COL2",
+"attributes": {
+"core.modifiedOn": 1688650826911,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind": "core.DataFlow",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.origin": "d4865a0f-406b-363eb850-2fc633b3f77b",
+"core.createdOn": 1688650826911
+},
+"details": {
+"fromUri": "/data360/search/assets/81e8ea5ac888-4c40-a780-849ac48e66fd?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/
+a1172b78-75cb-4485-88dd-8b407441187a?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "81e8ea5a-c888-4c40a780-849ac48e66fd",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+},
+"toProperties": {
+"core.identity":
+"a1172b78-75cb-4485-88dd-8b407441187a",
+"core.classType":
+"com.infa.odin.models.relational.ViewColumn",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCVIEW3/CDGCVIEW3COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCVIEW3/CDGCVIEW3COL2~com.infa.odin.models.relational.ViewColumn",
+"core.name": "CDGCVIEW3COL2"
+}
+
+List details of multiple assets
+
+41
+
+},
+{
+
+]
+
+}
+
+]
+
+}
+
+]
+
+}
+
+"type": "com.infa.ccgf.models.governance.BusinessTerm",
+"neighbors": [
+{
+"neighbor": "AddressLine2",
+"details": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"paths": [
+{
+"serialized": "CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/
+CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column ( CDGCTABL31COL2 ) -com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase --> lower-68
+( AddressLine2 ) ",
+"collection": [
+{
+"association":
+"com.infa.ccgf.models.governance.IClassTechnicalGlossaryBase",
+"curationStatus": "ACCEPTED",
+"from": "CDGCTABL31COL2",
+"to": "AddressLine2",
+"fromType":
+"com.infa.odin.models.relational.Column",
+"toType":
+"com.infa.ccgf.models.governance.BusinessTerm",
+"fromLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"toLocation": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"attributes": {
+"core.modifiedOn": 1692806775314,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind":
+"com.infa.ccgf.models.governance.semanticKind",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.inferred": false,
+"core.producer": "CDGC",
+"core.origin": "CDGC",
+"core.createdOn": 1692806775314,
+"core.curationStatus": "ACCEPTED"
+},
+"details": {
+"fromUri": "/data360/search/assets/81e8ea5ac888-4c40-a780-849ac48e66fd?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/assets/lower-68?
+scheme=external&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "81e8ea5a-c888-4c40a780-849ac48e66fd",
+"core.classType":
+"com.infa.odin.models.relational.Column",
+"core.location": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"core.externalId": "CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2~com.infa.odin.models.relational.Column",
+"core.name": "CDGCTABL31COL2"
+},
+"toProperties": {
+"core.identity": "17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.classType":
+
+42
+
+Chapter 2: Search for assets
+
+"com.infa.ccgf.models.governance.BusinessTerm",
+"core.location": "CDGC://17b1e3ed-f64f-487ab073-06b78ec30259",
+"core.externalId": "lower-68",
+"core.name": "AddressLine2"
+}
+}
+]
+}
+]
+}
+]
+}
+],
+"lineage": [
+{
+"direction": "outbound",
+"hops": [
+{
+"distance": 1,
+"items": [
+{
+"from": "CDGCTABL31COL2",
+"to": "CDGCVIEW3COL2",
+"fromType": "com.infa.odin.models.relational.Column",
+"toType": "com.infa.odin.models.relational.ViewColumn",
+"fromLocation": "d4865a0f-406b-363eb850-2fc633b3f77b://d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/
+CDGC_QE_SCHEMA/CDGCTABLE3/CDGCTABL31COL2",
+"toLocation": "d4865a0f-406b-363e-b850-2fc633b3f77b://
+d4865a0f-406b-363e-b850-2fc633b3f77b/CDGC_QE_SNOWFLAKE/CDGC_QE_SCHEMA/CDGCVIEW3/
+CDGCVIEW3COL2",
+"attributes": {
+"core.modifiedOn": 1688650826911,
+"core.createdBy": "5gwD6d18cwPeUaAJAyev2V",
+"core.associationKind": "core.DataFlow",
+"core.modifiedBy": "5gwD6d18cwPeUaAJAyev2V",
+"__meta.association": "core.DirectionalDataFlow",
+"core.origin": "d4865a0f-406b-363eb850-2fc633b3f77b",
+"core.createdOn": 1688650826911
+},
+"details": {
+"fromUri": "/data360/search/v1/assets/812526be-c8e0-48f9a82c-53055cb5d0e3?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes",
+"toUri": "/data360/search/v1/assets/
+7635cb3e-3425-4440-9244-ce516f197ec5?
+scheme=internal&segments=summary,systemAttributes,customAttributes,selfAttributes"
+},
+"fromProperties": {
+"core.identity": "812526be-c8e0-48f9-a82c-53055cb5d0e3",
+"core.classType": "core.DataElement",
+"core.location": "f2c12406-bb40-377eae1d-56574cf056e5://f2c12406-bb40-377e-ae1d-56574cf056e5/f2c12406-bb40-377eae1d-56574cf056e5_S3__infagcstest/S3__infagcstest/rodfolder/bucket",
+"core.externalId": "f2c12406-bb40-377eae1d-56574cf056e5_S3__infagcstest://S3__infagcstest/rodfolder/bucket~core.DataElement",
+"core.name": "bucket"
+},
+"toProperties": {
+"core.identity": "7635cb3e-3425-4440-9244-ce516f197ec5",
+"core.classType":
+"com.infa.odin.models.relational.ExternalColumn",
+"core.location": "f2c12406-bb40-377eae1d-56574cf056e5://f2c12406-bb40-377e-ae1d-56574cf056e5/ATHENA-DB/gcsinstance/
+account_managers/bucket",
+"core.externalId": "f2c12406-bb40-377eae1d-56574cf056e5://ATHENA-DB/gcsinstance/account_managers/
+bucket~com.infa.odin.models.relational.ExternalColumn",
+"core.name": "bucket"
+
+List details of multiple assets
+
+43
+
+]
+
+44
+
+}
+
+]
+
+Chapter 2: Search for assets
+
+}
+
+]
+
+}
+
+]
+
+}
+
+}
+
+Chapter 3
+
+Export assets
+Use this API to search for business or technical assets in the catalog and export the searched assets to a
+Microsoft Excel or a CSV file.
+To export assets using the export API, ensure that your organization administrator has enabled the Export
+privilege for your user role in Administrator.
+Use the export API in one of the following ways:
+•
+
+Search for assets by using queries and export the specified assets
+
+•
+
+Search for assets by asset ID and export the specified assets
+
+The following image shows the overall process of using the export API and the expected response for the
+endpoint:
+
+45
+
+Export assets using search queries
+Send a POST request to search for assets in the catalog using search queries and export the assets to a
+Microsoft Excel or a CSV file. Use the request URL parameters and the request body to enter your search
+queries and specify the details of the assets you want to export.
+To search and export assets using search queries, submit a request with the following method and endpoint:
+Method
+
+Endpoint
+
+POST
+
+<baseApiUrl>/data360/search/export/v1/assets
+
+The base API URL differs for each pod. For more information, see “Send Requests” on page 7.
+
+Request parameters
+To limit the scope of the exported assets, enter search queries using the request URL parameters and filter
+the search results.
+You can use the following request URL parameters to filter and limit your search results before you export the
+assets:
+Parameter
+
+Description
+
+knowledgeQuery
+
+Specify the asset type or name along with any search criteria. For
+information about search query examples, see “Search query
+examples” on page 60.
+For example, you can enter knowledgeQuery=Business Terms and
+knowledgeQuery=data elements related to business term.
+
+segments
+
+Specify the level of asset detail that you want the API request to return.
+Enter any segment value from the following values:
+- all. Returns the summary, system attributes, and the API request
+link to view further details of the asset.
+- summary. Returns the name, description, and location of the asset.
+- systemAttributes. Returns the origin, class type of the asset,
+base types, user that created or updated the asset, and the date on
+which the asset was created or updated.
+- customAttributes. Returns the custom fields specified for the
+asset.
+- selfAttributes. Returns the properties of assets.
+- stakeholdership. Returns the type of user and role that are
+assigned as stakeholder for the asset.
+- dataProfile. Returns the profiling statistics of the asset.
+- dataClassification. Returns the data classification associated
+with the asset.
+- glossary. Returns the glossary associated with the asset.
+- dataQuality. Returns the data quality score of the asset.
+- hierarchy. Returns the hierarchy of the asset.
+The default value is segments=all.
+
+46
+
+Chapter 3: Export assets
+
+Parameter
+
+Description
+
+fileName
+
+Specify the name of the Microsoft Excel output file that you want to
+export. The file name should not contain spaces.
+
+summaryViews
+
+If you set this parameter, the exported Microsoft Excel file includes a
+summary sheet. Specify the type of assets you want to see in the
+summary sheet. You can specify one of the following values:
+- all. The summary sheet in the exported file contains a summary of
+all the assets you have exported.
+- Technical. The summary sheet in the exported file contains a
+summary of only the technical assets you have exported.
+- Business. The summary sheet in the exported file contains a
+summary of only the business assets you have exported.
+
+Request body
+Use the request body to specify the pagination parameters. The API response exports the specified number
+of assets that match the search criteria.
+In the body of the request, specify the pagination parameters in the following format:
+{
+}
+
+"from": 0,
+"size": 10,
+
+The following list describes the pagination parameters that you can use to specify the number of assets that
+you want to export:
+•
+
+from. Specify a numeric value to set an offset for pagination. The default value is zero.
+
+•
+
+size. Specify a numeric value for the number of assets that you want to export. The default value is 10.
+
+Consider the following scenarios when you specify the number of assets to export using this API:
+•
+
+To export more than 10000 assets that match the search criteria, remove the from parameter and specify
+the number of assets to export in the size parameter of the request body. If size is set to more than
+10000 assets, then the exported file is in the ZIP format containing multiple files. Each file is limited to
+10K rows.
+
+•
+
+To export all assets that match the search criteria, remove the from parameter and specify zero as the
+value of the size parameter in the request body.
+
+Example requests
+Export more than 10000 assets
+The following example shows the POST request to export and download 15000 assets that start with the
+name 'Customer'. The summary sheet in the exported file will contain a summary of the assets.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/export/v1/assets?
+knowledgeQuery=Customer*&fileName=Export__all_assetse&summaryViews=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+
+Export assets using search queries
+
+47
+
+}
+
+"size": 15000
+
+Export all assets in the catalog
+The following example shows the POST request to export and download all assets in the catalog. The
+summary sheet in the exported file will contain a summary of the assets.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/export/v1/assets?
+knowledgeQuery=all&fileName=Export__all_assetse&summaryViews=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+}
+
+"size": 0
+
+Export all details of all business assets
+The following example shows the POST request to export all details of business assets in the catalog and
+downloads 500 assets based on the size body parameter. The summary sheet in the exported file will
+contain a summary of the assets.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/export/v1/assets?
+knowledgeQuery=Business
+Assets&segments=all&fileName=Export_32_all_segment_all_view&summaryViews=all
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+}
+
+"from": 0,
+"size": 500
+
+Export the summary and custom attributes of all business assets
+The following example shows the POST request to export the summary and custom attributes of business
+assets in the catalog and downloads 10 business assets based on the size body parameter. The summary
+sheet in the exported file will contain a summary of the business assets.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/export/v1/assets?
+knowledgeQuery=Business
+Assets&segments=summary,customAttributes&fileName=Export_32_all_segment_all_view&summaryV
+iews=Business
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+{
+}
+
+48
+
+"from": 0,
+"size": 10
+
+Chapter 3: Export assets
+
+Export assets using asset IDs
+Send a POST request to search for assets in the catalog using asset IDs and export the assets in a Microsoft
+Excel or a CSV file. Specify the asset IDs in the request body and use the request parameters to specify the
+details of the assets that you want to export.
+To search and export assets using asset IDs, submit a request with the following method and endpoint and
+specify the asset IDs in the request body:
+Method
+
+Endpoint
+
+POST
+
+<baseApiUrl>/data360/search/export/v1/assets/details
+
+The base API URL differs for each pod. For more information, see “Send Requests” on page 7.
+
+Request parameters
+To export specific details of the exported assets, use the request URL parameters and specify the details that
+you want to export.
+You can use the following request URL parameters to specify the details of the assets that you want to
+export:
+Parameter
+
+Description
+
+segments
+
+Specify the level of asset detail that you want the API request to return.
+Enter any segment value from the following values:
+- all. Returns the summary, system attributes, and the API request
+link to view further details of the asset.
+- summary. Returns the name, description, and location of the asset.
+- systemAttributes. Returns the origin, class type of the asset,
+base types, user that created or updated the asset, and the date on
+which the asset was created or updated.
+- customAttributes. Returns the custom fields specified for the
+asset.
+- selfAttributes. Returns the properties of assets.
+- stakeholdership. Returns the type of user and role that are
+assigned as stakeholder for the asset.
+- dataProfile. Returns the profiling statistics of the asset.
+- dataClassification. Returns the data classification associated
+with the asset.
+- glossary. Returns the glossary associated with the asset.
+- dataQuality. Returns the data quality score of the asset.
+- hierarchy. Returns the hierarchy of the asset.
+- neighborhood. Returns assets that are in a direct relationship with
+the searched asset.
+The default value is segments=all.
+
+fileName
+
+Specify the name of the Microsoft Excel output file that you want to
+export. The file name should not contain spaces.Specify the file
+extension. The exported file will either be in the .xlsx or in the .csv
+format.
+
+Export assets using asset IDs
+
+49
+
+Parameter
+
+Description
+
+summaryViews
+
+If you set this parameter, the exported Microsoft Excel file includes a
+summary sheet. Specify the type of assets you want to see in the
+summary sheet. You can specify one of the following values:
+- all. The summary sheet in the exported file contains a summary of
+all the assets you have exported.
+- Technical. The summary sheet in the exported file contains a
+summary of only the technical assets you have exported.
+- Business. The summary sheet in the exported file contains a
+summary of only the business assets you have exported.
+
+scheme
+
+Specify the type of asset ID you want to use to query assets. Enter one
+of the following values:
+- internal. Indicates that the asset ID that you specify in the request
+is the internal ID of the asset.
+- external. Indicates that the asset ID that you specify in the request
+is the unique reference ID of the asset.
+
+Request body
+Use the request body to specify the external or internal IDs of assets you want to export. You can specify in
+the scheme parameter of the request URL whether you want to search the asset by external ID or internal ID.
+In the body of the request, specify comma-separated asset IDs in the following format:
+[
+
+]
+
+"0c5777c2-ec04-4a57-8bf0-fc895c4579a2",
+"982cd858-b5b0-4cea-b120-cad3c325e38e",
+"e907f08f-6327-4214-9401-c794bc0c34db",
+
+If you don't know the ID of a particular asset, you can first send a POST request to view the list of assets in
+the catalog. This request returns the internal ID of each asset in the core.identity parameter and the
+unique reference ID of the asset in the core.externalId parameter. For more information, see “List assets in
+the catalog” on page 10.
+
+Example request
+Export technical assets along with the specified details
+The following example shows the POST request to export the summary, data profile statistics, data
+classifications, and the associated glossary details of seven technical assets in a file named
+Export_technical_assets. The IDs of the technical assets are specified in the body of the request.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/search/export/v1/assets/details?
+segments=summary,dataProfile,dataClassification,glossary&fileName=Export_technical_assets
+&summaryViews=all&scheme=internal
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+Body
+[
+
+50
+
+"0c5777c2-ec04-4a57-8bf0-fc895c4579a2",
+"982cd858-b5b0-4cea-b120-cad3c325e38e",
+"e907f08f-6327-4214-9401-c794bc0c34db",
+"a378e9fa-e4b1-427d-ae9b-978111d431dd",
+"7d01c99f-f57b-44f0-8dd9-ff3721f1eb93",
+"23fd6de2-b0aa-4c79-aa5f-c83205164fc1",
+
+Chapter 3: Export assets
+
+]
+
+"aaace41b-3dff-4a74-82f7-f4e7874dacb8"
+
+Response body
+When you send a POST request to export bulk assets from the catalog, the API triggers a job to export the
+assets.
+The following example shows the response of the POST request to export bulk assets from the catalog:
+{
+
+"jobId": "6a5b273a-f816-4346-a8ae-f2d27f3e3240",
+"trackingURI": "/data360/observable/v1/jobs/6a5b273a-f816-4346-a8ae-f2d27f3e3240?
+expandChildren=OUTPUT-PROPERTIES",
+"outputURI": "/data360/observable/v1/jobs/6a5b273a-f816-4346-a8ae-f2d27f3e3240/
+outputProperties/files/Export_File"
+}
+The following table describes the response body parameters for the export API request:
+Parameter
+
+Description
+
+jobId
+
+Unique ID of the export job that the request triggers.
+
+trackingURI
+
+Job tracking URI that you can use to send a GET request to monitor the status of the export job.
+
+outputURI
+
+Output file URI that you can use to send a GET request to download the exported file.
+
+For more information about using the jobs API to monitor the status of jobs, see Chapter 7, “Monitor jobs” on
+page 58. Once the job completes, you can send a GET request to download the exported file using the
+outputURI. The exported file is a Microsoft Excel file in the .xslx format.
+
+Response body
+
+51
+
+Chapter 4
+
+Import assets
+Use the import API to import bulk assets into the catalog. You can import new business assets into the
+catalog, create, update or delete existing business assets in the catalog, or re-import curated technical
+assets that you previously exported from the catalog.
+Send a POST request after uploading the import file in the body of the request. Send the request with the
+following method and endpoint:
+Method
+
+Endpoint
+
+POST
+
+<baseApiUrl>/data360/content/import/v1/assets
+
+The base API URL differs for each pod. For more information, see “Send Requests” on page 7.
+The following image shows the overall process of using the import API and the expected response for the
+endpoint:
+
+52
+
+Request body
+Use the request body to upload the import file and specify the action that the request should take in case of
+errors or warnings.
+Let us assume that you want to import the MyCurations.xls file containing bulk asset details. In the body of
+the request, specify the parameters in the following format:
+file: MyCurations.xls
+config:
+{
+"validationPolicy": "CONTINUE_ON_ERROR_WARNING"
+}
+The following table describes the parameters that you can specify in the body of the request:
+Parameter
+
+Description
+
+file
+
+Specify the full path to the import file or upload the import file. This should be a Microsoft Excel file in
+the .xlsx, .xlsm, .xlsb, .xls, or .csv format. You can upload only one Microsoft Excel or CSV file in
+each request.
+
+config
+
+Specify one of the following validation policies to specify the action that the API request takes in case
+of errors and warning:
+- STOP_ON_ERROR. If the import file contains a row with errors, the process stops, and no data is
+imported. If there are no errors, the system imports valid data from the file, and warnings are marked
+as skipped.
+- STOP_ON_WARNING. If the import file contains a row of data with warnings, the process stops, and no
+data is imported.
+- CONTINUE_ON_ERROR_WARNING. All valid rows from the file are imported. Rows of data with
+warnings and errors are marked as skipped.
+If you do not specify the validation policy, then the default value is CONTINUE_ON_ERROR_WARNING.
+
+Example request
+Import a bulk asset file in the catalog
+The following example shows a POST request to import a bulk asset Microsoft Excel file named
+MyCurations.xls.The validation policy is set to import all valid rows from the file and skip rows with
+warnings and errors.
+POST https://idmc-api.dm-us.informaticacloud.com/data360/content/import/v1/assets
+Authorization: Bearer <jwt_token>
+X-INFA-ORG-ID:<Org ID>
+Body
+--form 'file=@"/path/to/file"' \
+--form 'config="{
+\"validationPolicy\": \"CONTINUE_ON_ERROR_WARNING\"
+}";type=application/json'
+
+Request body
+
+53
+
+Response body
+When you send a POST request to import bulk assets into the catalog, the API triggers a job to import the
+assets.
+The following example shows the response of the POST request to import bulk assets from the file
+MyCurations.xls:
+{
+}
+
+"jobId": "6a084b71-3696-4a50-b83b-9ef0f2c7f30d",
+"jobUri": "/data360/observable/v1/jobs/6a084b71-3696-4a50-b83b-9ef0f2c7f30d"
+
+The following table describes the response body parameters for the import API request:
+Parameter
+
+Description
+
+jobId
+
+Unique ID of the import job that the request triggers.
+
+jobUri
+
+Job tracking URI that you can use to send a GET request to monitor the status of the import job.
+
+For more information about using the jobs API to monitor the status of jobs, see Chapter 7, “Monitor jobs” on
+page 58.
+
+54
+
+Chapter 4: Import assets
+
+Chapter 5
+
+Upload data quality scores
+Upload one or more data quality scores to Data Governance and Catalog. When you upload a score, specify
+the data quality rule occurrence for which the scores apply. After you upload the scores, you can see the new
+scores in Data Governance and Catalog by opening the asset that is related to the rule occurrence you
+specified.
+To upload one or more data quality scores, send the request with the following method and endpoint:
+Method
+
+Endpoint
+
+PATCH
+
+ccgf-ruleautomation/api/v1/dataQuality/publishScore?refBy=INTERNAL
+
+Note: Depending on the base URL for each pod, prefix the base URL to the endpoint in the following format:
+<baseApiUrl><endpoint>
+For example, https://cdgc-api.dm-em.informaticacloud.com/ccgf-ruleautomation/api/v1/dataQuality/
+publishScore?refBy=INTERNAL
+
+Request Body
+Use the request body to upload one or more data quality scores of an asset.
+In the body of request, specify the asset ID and the data quality scores in the following format:
+{
+
+}
+
+"scores": [
+{
+"assetId": "e8b757ba-63ca-41a6-b79d-00c66fa176a0",
+"dqscore": {
+"facts": {
+"com.infa.ccgf.models.governance.value": 94,
+"com.infa.ccgf.models.governance.totalCount": 20000,
+"com.infa.ccgf.models.governance.exception": 764,
+"com.infa.ccgf.models.governance.scannedTime": "2022-02-09T10:10:12.441Z"
+}
+}
+}
+]
+
+55
+
+The following table describes the parameters that you can specify in the body of the request:
+Parameter
+
+Description
+
+assetId
+
+Required. Internal reference identifier of the data quality rule occurrence for which you want to upload
+the scores.
+You can determine the identifier by looking at the URL in the browser window when you open the rule
+occurrence. The identifier is the value between the asset/ and ? parameters. Consider the following
+example:
+- URL: <domain>/asset/22ea8dd9-5128-496b-a51a-f3f0e6ed2b56?
+type=RuleInstance&name=Rule%20Instance%20July%2009%201214
+- Identifier: 22ea8dd9-5128-496b-a51a-f3f0e6ed2b56
+
+facts
+
+Required. Attribute of the data quality score.
+You must enter the following values:
+- Enter com.infa.ccgf.models.governance.value to specify the data quality score.
+- Enter com.infa.ccgf.models.governance.exception to specify an exception score.
+- Enter com.infa.ccgf.models.governance.scannedTime to specify the timestamp of the last
+rule run.
+- Enter com.infa.ccgf.models.governance.totalCount to specify the total number of run
+counts.
+
+Example request
+The following example shows a PATCH request to upload two data quality scores:
+PATCH https://idmc-api.dm-us.informaticacloud.com/ccgf-ruleautomation/api/v1/dataQuality/
+publishScore?refBy=INTERNAL
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+X-INFA-ORG-ID:<Org ID>
+IDS-SESSION-ID: <sessionId value>
+Body
+{
+"scores": [
+{
+"assetId": "e8b757ba-63ca-41a6-b79d-00c66fa176a0",
+"dqscore": {
+"facts": {
+"com.infa.ccgf.models.governance.value": 94,
+"com.infa.ccgf.models.governance.totalCount": 20000,
+"com.infa.ccgf.models.governance.exception": 764,
+"com.infa.ccgf.models.governance.scannedTime": "2022-02-09T10:10:12.441Z"
+}
+}
+},
+{
+"assetId": "abc82672-63ca-41a6-b79d-00c66fa176a0",
+"dqscore": {
+"facts": {
+"com.infa.ccgf.models.governance.value": 100,
+"com.infa.ccgf.models.governance.totalCount": 100,
+"com.infa.ccgf.models.governance.exception": 0,
+"com.infa.ccgf.models.governance.scannedTime": "2022-02-09T10:10:12.441Z"
+}
+}
+}
+]
+}
+
+56
+
+Chapter 5: Upload data quality scores
+
+Chapter 6
+
+Run a catalog source job
+Use the catalog source management API to run a catalog source job with capabilities that you specify.
+For information about the catalog source management API, see the Informatica Developer Portal.
+The following image shows the overall process of using the catalog source management API and the
+expected response for the request:
+
+57
+
+Chapter 7
+
+Monitor jobs
+Use the jobs API to monitor the status of any job in Data Governance and Catalog and download the job
+output files.
+For information about the jobs API, see the Informatica Developer Portal.
+The following image shows the overall process of using the jobs API and the expected response for each
+endpoint:
+
+58
+
+Chapter 8
+
+API Rate Limits
+Cloud Data Governance and Catalog APIs are throttled by default to provide optimal use of API resources.
+By default, every API provides the following response headers for rate limits based on the number of API calls
+for each API key:
+Response Header
+
+Description
+
+ratelimit-limit
+
+Returns the number of requests allowed for the client in the time window. By default, you can
+make 120 API calls per minute and 10000 calls per day.
+
+ratelimitremaining
+
+Returns the number of remaining requests in the current window.
+
+ratelimit-reset
+
+Returns the time remaining in the current window within which you can make the remaining
+API calls. This time is specified in seconds.
+
+For example, if the value of ratelimit-remaining is 118 calls and ratelimit-reset is 28 seconds, then it
+means that you can make 118 API calls in the next 28 seconds. If the ratelimit-remaining is 0, wait for the
+ratelimit-reset value to reset before attempting the API request again.
+If you send too many requests in a given amount of time and has reached the API rate limit, the response
+header HTTP 429: Too Many Requests is returned.
+
+59
+
+Appendix A
+
+Appendix
+This appendix includes the following topic:
+•
+
+Search query examples, 60
+
+Search query examples
+In the search bar, you can progressively build complex search queries to search for business and technical
+assets. As you type your search query, the search provides intelligent suggestions.
+Business assets search query examples
+The following table lists some sample business asset search query that you can try in the search box:
+
+60
+
+Search query
+
+What it does
+
+all in domain HIPAA*
+
+Shows all assets that are child assets or belong to Domain assets
+that start with the text HIPAA. The search returns results on the
+name, alias name, or business name fields of the asset.
+
+all in 'domain Human
+Resources'
+
+Shows all assets that are children or belong to Domain assets that
+start with the name Human Resources.
+
+business term 'phone number'
+
+Shows all Business Term assets with the text Phone Number. The
+search returns results on the name, alias name, or business name
+fields of the asset.
+
+business term phone*
+
+Shows all Business Term assets that start with text Phone. The
+search returns results on the name, alias name, or business name
+fields of the asset.
+
+business terms which are
+critical data element
+
+Shows all Business Term assets that are marked as Critical Data
+Element.
+
+business terms in domain
+Finance*
+
+Shows all Business Term assets that are children of Domain assets
+that start with the name Finance.
+
+business terms in subdomain
+*Payroll
+
+Shows all Business Term assets that are children of Subdomain
+assets that end with the text Payroll.
+
+Search query
+
+What it does
+
+business terms where format
+type is Text
+
+Shows all Business Term assets with Text in the Format Type field.
+
+business terms without
+description
+
+Shows all Business Term assets with the Description field empty.
+
+business terms related to
+policy "CCPA Policy"
+
+Shows all Business Term assets related to Policy assets with the
+name CCPA Policy.
+
+business terms which are not
+critical data element
+
+Shows all Business Term assets that are not marked as Critical Data
+Element.
+
+business terms 'phone number',
+Metric 'EBITDA'
+
+Shows all Business Term assets that have the name phone number
+and all Metric assets that have the name EBITDA. The search returns
+results on the name, alias name, or business name fields of the
+asset.
+
+dataset Customers*
+
+Shows all business Data Set assets that start with the text
+Customers. The search returns results on the name, alias name, or
+business name fields of the asset.
+
+dataset containing manual data
+element 'Party Data'
+
+Shows all data sets containing manual data elements with the text
+Party Data.
+
+domain 'Party Data'
+
+Shows all Domain assets with the text Party Data. The search
+returns results on the name, alias name, or business name fields of
+the asset.
+
+domains 'Party Data*',
+subdomains 'Party Data*'
+
+Shows all Domain assets that start with the text Party Data and
+Subdomain assets that start with the text Party Data. The search
+returns results on the name, alias name, or business name fields of
+the asset.
+
+domains containing business
+term Email
+
+Shows all Domain assets that have a parent-child relationship to
+Business Term assets with the name Email.
+
+domains containing subdomain
+'Party Data*'
+
+Shows all Domain assets that have a parent-child relationship to
+Subdomain assets that start with Party Data.
+
+domains containing metric
+EBITDA
+
+Shows all Domain assets that have a parent-child relationship to
+Metric assets with the name EBITDA.
+
+manual data element Customers*
+
+Shows all manual data elements starting with the text Customers*.
+
+manual data element matching
+'Product Code'
+
+Shows all manual data elements matching the name 'Product
+Code'.
+
+manual data elements in
+dataset EMPLOYEE.
+
+Shows all manual data elements that are in the data set EMPLOYEE.
+
+metric EBITDA
+
+Shows all Metric assets with the name EBITDA.
+
+metric without description
+
+Shows all Metric assets with the Description field empty.
+
+Search query examples
+
+61
+
+62
+
+Search query
+
+What it does
+
+policy GDPR*
+
+Shows all Policy assets that start with the text GDPR. The search
+returns results on the name, alias name, or business name fields of
+the asset.
+
+policies, processes
+
+Shows all Policy and Process assets.
+
+policies without description
+
+Shows all Policy assets with the Description field empty.
+
+policy P*, process P*
+
+Shows all Policy assets that start with P and Process assets that
+start with P. The search returns results on the name, alias name, or
+business name fields of the asset.
+
+policy *University*, domain
+*University*
+
+Shows all Policy assets that contains the text University and
+Domain assets that contain the text University. The search returns
+results on the name, alias name, or business name fields of the
+assets.
+
+processes without description
+
+Shows all Process assets with the Description field empty.
+
+process KYC
+
+Shows all Process assets that contain the text KYC. The search
+returns results on the name, alias name, or business name fields of
+the asset.
+
+process 'Know Your Client'
+
+Shows all Process assets with the exact text Know Your Client in
+its name, alias name, or business name fields.
+
+subdomain Payroll*
+
+Shows all Subdomain assets that start with the text Payroll. The
+search returns results on the name, alias name, or business name
+fields of the asset. lias name, or business name fields of the asset.
+
+subdomain 'Party Data'
+
+Shows all Subdomain assets with the exact text Party Data in its
+name, alias name, or business name.
+
+subdomain Payroll* and
+containing business term
+Salary*
+
+Shows all Subdomain assets that start with Payroll that have a
+parent-child relationship to Business Term assets that start with
+Salary.
+
+subdomain 'Party Data*' and
+related to policies
+
+Shows all Subdomain assets that start with Party Data and are
+related to Policy assets.
+
+subdomain without description
+
+Shows all Subdomain assets with the Description field empty.
+
+subdomain 'Party Data*',
+subdomains 'Party Data*'
+
+Shows all Subdomain assets that start with Party Data and are
+related to Subdomain assets that start with Party Data.
+
+subdomain containing business
+term Email
+
+Shows all Subdomain assets that have a parent-child relationship to
+Business Term assets with the name Email.
+
+subdomain containing metric
+EBITDA
+
+Shows all Subdomain assets that have a parent-child relationship to
+Metric assets with the name EBITDA.
+
+system DWH*
+
+Shows all System assets that start with the text DWH. The search
+returns results on the name, alias name, or business name fields of
+the asset.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+systems without description
+
+Shows all System assets with the Description field empty.
+
+domain with reference ID
+'<Reference ID value>'
+
+Shows the domain that has the specified value in its reference ID
+field.
+
+<Reference ID value>
+
+Shows all assets with REL_BT_AUT_Parent_CSV_05 in the names,
+aliases, descriptions, and Reference ID.
+
+REL_BT_AUT_Parent_CSV_05
+business term 'phone_number*'
+
+Shows all Business Term assets that start with the text
+phone_number. The search returns results on the name, alias name,
+or business name fields of the asset.
+
+domain 'Party-Data*'
+
+Shows all Domain assets that start with the text Party-Data. The
+search returns results on the name, alias name, or business name
+fields of the asset.
+
+domains containing subdomain
+'Party_Data*'
+
+Shows all Domain assets that have a parent-child relationship to
+Subdomain assets that start with Party Data, Party_Data, and
+Party-Data.
+
+business terms 'phonenumber*', Metric 'EBITDA'
+
+Shows all Business Term assets that start with the text phonenumber, and all Metric assets with the name EBITDA. The search
+returns results on the name, alias name, or business name fields of
+the asset.
+
+Technical asset search query examples
+The following table lists some technical asset search query examples that you can try in the search box:
+Search query
+
+What it does
+
+all in resource <catalog source
+name>
+
+Shows all the assets of the catalog source. The result includes
+the data quality rule occurrences that have their primary data
+element belonging to the catalog source.
+
+all with catalog source name
+Oracle*
+
+Shows all assets that belong to catalog sources starting with the
+name Oracle*.
+
+all with catalog source type
+'Amazon S3'
+
+Shows all assets that belong to the catalog source type
+'Amazon S3'.
+
+columns related to business term
+'Phone Number'
+
+Shows all columns that are related to Business Term assets
+named Phone Number.
+
+columns related to data
+classification 'Social Security
+Number'
+
+Shows all columns that are related to data classifications named
+Social Security Number.
+
+columns related to data
+classification Email
+
+Shows all columns that are related to data classifications with
+the name Email.
+
+columns in (catalog source
+Oracle*) and related to (business
+term 'Phone Number')
+
+Shows all columns that are present in the catalog sources
+starting with the name ORACLE and are related to the Business
+Term asset Phone Number.
+
+Search query examples
+
+63
+
+Search query
+
+What it does
+
+(columns which are profiled and in
+catalog source Oracle*) related to
+data classification Email
+
+Shows all columns that are profiled and in catalog sources that
+start with the name ORACLE and are related to data
+classification Email.
+
+columns not related to business
+term
+
+Shows all columns that are not related to Business Term assets.
+
+data elements related to business
+term Email
+
+Shows all data elements that are related to Business Term
+assets with the name Email.
+
+data elements related to data
+classification 'Social Security
+Number'
+
+Shows all data elements that are related to data classifications
+with the name Social Security Number.
+
+data elements not related to data
+classification
+
+Shows all data elements that are not related to any data
+classification.
+
+data elements related to (data set
+related to system DWH) and related
+to Policy GDPR
+
+- related to Data Set assets that are in turn related to System
+
+Shows all data elements that fulfill both the following criteria:
+assets with the name DWH.
+
+- related to Policy assets with the name GDPR.
+
+64
+
+Data Elements related to data set
+related to System related to
+Policy GDPR
+
+Shows all data elements related to Data Set assets and are
+related to System assets and are related to Policy assets with
+the name GDPR.
+
+Data Elements related to data set
+related to System related to
+Process KYC
+
+Shows all data elements related to Data Set assets and are
+related to System assets and are related to Process assets with
+the name KYC.
+
+Data Elements related to data set
+related to System related to
+(Policy GDPR, Process KYC)
+
+Shows all data elements related to Data Set assets and are
+related to System assets and are related to Policy assets with
+the name GDPR and Process assets with the name KYC.
+
+data elements not related to
+business term
+
+Shows all data elements that are not related to Business Term
+assets.
+
+data elements related to data
+classification
+'Social_Security_Number*'
+
+Shows all data elements that are related to data classifications
+with the name Social Security Number,
+Social_Security_Number, and Social-Security-Number.
+
+glossaries with lifecycle
+Published and related to policy
+GDPR*
+
+Shows all Glossary assets where the Lifecycle field is in the
+Published status and are related to Policy assets that start with
+GDPR.
+
+glossaries with lifecycle
+Published and related to (policy
+GDPR*, policy CCPA*)
+
+Shows all Glossary assets where the Lifecycle field is in the
+Published status and are related to Policy assets that start with
+GDPR and are related to Policy assets that start with CCPA.
+
+glossaries related to all in
+policy GDPR
+
+Shows all Glossary assets related to all Policy assets with the
+name GDPR.
+
+glossaries related to policy GDPR
+
+Shows all Glossary assets related to Policy assets with the name
+GDPR.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+glossaries cust* and related to
+policy GDPR
+
+Shows all Glossary assets that start with cust and are related to
+Policy assets with the name GDPR.
+
+bi reports related to policy GDPR*
+
+Shows all BI reports that are related to Policy assets that start
+with GDPR.
+
+bi reports related to process KYC*
+
+Shows all BI reports that are related to Process assets that start
+with KYC.
+
+tables related to column City
+
+Shows all tables that are related to columns with the name
+City.
+
+data elements related to (business
+term Customer ID, Customer Name)
+
+Shows all data elements related to Business Term assets with
+the names Customer ID and Customer Name.
+
+catalog source ORACLE_HR
+
+Shows catalog source assets with the name ORACLE_HR. The
+search returns results on the name, alias name, or business
+name fields of the asset.
+
+catalog source ORACLE*
+
+Shows catalog source assets that start with the text ORACLE.
+The search returns results on the name, alias name, or business
+name fields of the asset.
+
+catalog sources with resource type
+Oracle
+
+Shows all assets of the catalog source type ORACLE.
+
+catalog sources with resource type
+'Amazon S3'
+
+Shows all assets of the catalog source type Amazon S3.
+
+columns Credit*
+
+Shows all columns that start with the text Credit. The search
+returns results on the name, alias name, or business name fields
+of the asset.
+
+columns which are profiled
+
+Shows all columns that are profiled.
+
+columns which are not profiled
+
+Shows all columns that are not profiled.
+
+columns which are not related to
+data classification
+
+Shows all columns that are not related to data classifications.
+
+columns in catalog source Oracle*
+
+Show all columns in the catalog source types that start with
+ORACLE.
+
+flat field
+
+Shows all the flat field assets contained in flat files.
+
+data elements Credit*
+
+Shows all data elements that start with the text Credit. The
+search returns results on the name, alias name, or business
+name fields of the asset.
+
+data elements 'CREDIT_CARD'
+
+Shows all data elements with the name, alias name, or business
+name as CREDIT_CARD.
+
+data elements which are profiled
+
+Shows all data elements that are profiled.
+
+Search query examples
+
+65
+
+66
+
+Search query
+
+What it does
+
+file Customer*
+
+Shows all files that start with the name Customer. The search
+returns results on the name, alias name, or business name fields
+of the asset.
+
+folder Customer*
+
+Shows all folders that start with the name Customer. The
+search returns results on the name, alias name, or business
+name fields of the asset.
+
+folder containing hierarchical
+file Customer*
+
+Shows all folders that contain files that start with Customer.
+
+folder containing file Customer*
+
+Shows all folders that contain files that start with Customer.
+
+glossaries
+
+Shows all Glossary assets.
+
+glossaries cust*
+
+Shows all Glossary assets that start with the text cust. The
+search returns results on the name, alias name, or business
+name fields of the asset.
+
+glossaries with stakeholder
+@<username>
+
+Shows all Glossary assets with a user name or user group in the
+Stakeholder field.
+
+glossaries without stakeholder
+
+Shows all Glossary assets with the Stakeholder field empty.
+
+bi report 'Quarterly Sales'
+
+Shows all BI reports with the name, alias name, or business
+name as Quarterly Sales.
+
+bi reports with stakeholder
+@<username>
+
+Shows all BI reports with a user name or user group in the
+Stakeholder field.
+
+bi reports without stakeholder
+
+Shows all BI reports with the Stakeholder field empty.
+
+reports modified by @<username>
+
+Shows all reports with a user name or user group in the Modified
+By field.
+
+Tableau Workbook Org*
+
+Shows all Tableau Workbook assets that start with the text Org.
+The search returns results on the name, alias name, or business
+name fields of the asset.
+
+table CUST*
+
+Shows all tables that start with the text CUST. The search
+returns results on the name, alias name, or business name fields
+of the asset.
+
+tables which are profiled
+
+Shows all columns that are profiled.
+
+hierarchical file Employees*
+
+Shows all hierarchical files that start with the text Employees.
+The search returns results on the name, alias name, or business
+name fields of the asset.
+
+bi reports created by @<username>
+
+Shows all BI reports with a user name or user group in the
+Created By field.
+
+tables in catalog source Oracle*
+
+Shows all tables in catalog source types that start with ORACLE.
+
+tables in schema ORACLE_HR*
+
+Shows all tables in schemas that start with ORACLE_HR.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+technical dataset EMPLOYEE*
+
+Shows all technical data set assets that start with the text
+Employee. The search returns results on the name, alias name,
+or business name fields of the asset.
+
+technical datasets which are
+profiled
+
+Shows all technical data set assets that are profiled.
+
+technical datasets in catalog
+source Oracle*
+
+Shows all technical data set assets in catalog source types that
+start with ORACLE.
+
+technical datasets in schema
+ORACLE_HR*
+
+Shows all technical data sets in schema source types that start
+with ORACLE_HR.
+
+Property
+
+Shows all assets that have Property in their names, business
+names, alias names, descriptions, or technical descriptions.
+
+Customer
+
+Shows all assets that have Customer in their names, business
+names, alias names, descriptions, or technical descriptions.
+
+Phone_number
+
+Shows assets with the text Phone number, Phone_number, and
+Phone-number in their names, business names, alias names,
+descriptions, or technical descriptions.
+
+Asset groups search query examples
+The following table lists some asset group search query examples:
+Search query
+
+What it does
+
+((Domain, Sub Domain) with asset group
+@assetgroup:Finance) related to any
+
+Shows domains and subdomains that are
+assigned the Finance asset group and
+are related to any asset.
+
+(technical assets with asset group
+@assetgroup:Finance) in catalog source Oracle
+
+Shows technical assets that are assigned
+the Finance asset group and are in the
+catalog source Oracle.
+
+(technical assets with Asset Group in
+(@assetgroup:Finance,@assetgroup:Legal)) in catalog
+source Oracle
+
+Shows technical assets that are assigned
+the Finance and Legal asset groups
+and belong to the catalog source
+Oracle.
+
+(column with asset group @assetgroup:Finance) in
+schema Oracle_HR*
+
+Shows assets that are assigned the
+Finance asset group and belong to the
+schema source Oracle_HR*.
+
+(technical data set with asset group in
+(@assetgroup:Finance)) related with curation status
+ACCEPTED to data classifications
+
+Shows technical data sets that are
+assigned the Finance asset group and
+are related to data classifications that
+are in the accepted state.
+
+Search query examples
+
+67
+
+Search query
+
+What it does
+
+(technical data set with asset group in
+(@assetgroup:Finance) ) related with curation status
+REJECTED to data classification Sales*
+
+Shows technical data sets that are
+assigned the Finance asset group and
+are related to the Sales* data
+classifications that are in the rejected
+state.
+
+all with asset group *
+
+Shows all assests that are assigned
+asset groups.
+
+all with Asset Group @assetgroup:Finance
+
+Shows assets that are assigned the
+Finance asset group.
+
+all without asset group
+
+Shows all assets that are not assigned
+asset groups.
+
+asset with Asset Group @assetgroup:Finance
+
+Shows assets that are assigned the
+Finance asset group.
+
+assets related to Policy with Asset Group
+@assetgroup:EU
+
+Shows assets related to Policy assets
+that are assigned the EU asset group.
+
+Assets related to sub domain with Asset Group
+@assetgroup:Legal
+
+Shows assets related to subdomains that
+are assigned the Legal asset group.
+
+Asset with asset group @assetgroup:Finance and
+stakeholder @<username>
+
+Shows assets that are assigned the
+Finance asset group and the
+stakeholder <username>.
+
+business terms with asset group @assetgroup:EU
+
+Shows all business terms that are
+assigned the EU asset group.
+
+Relationship search query examples
+The following table lists some relationship search query examples that you can try in the search box:
+
+68
+
+Search query
+
+What it does
+
+all related to business term email
+
+Shows all assets that are related to Business Term assets with
+the name email.
+
+all related to domain HIPAA*, all
+related to process KYC
+
+Shows all assets that are related to Domain assets that start
+with the name HIPAA or all assets that are related to Process
+assets that start with the name KYC.
+
+all related to glossary GDPR*
+
+Shows all assets related to Glossary assets that start with GDPR.
+
+business terms related to data
+elements
+
+Shows all Business Term assets that are related to data
+elements.
+
+data element related to data set
+EMPLOYEE
+
+Shows data elements that are related to the data set EMPLOYEE.
+
+business terms not related to data
+elements
+
+Shows all Business Term assets that are not related to data
+elements.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+dataset related to business term
+'Customer'
+
+Shows all Data Set assets that are related to Business Term
+assets with the name Customer.
+
+datasets not related to business
+term
+
+Shows all Data Set assets that are not related to Business Term
+assets.
+
+datasets related to System related
+to Policy GDPR
+
+Shows all Data Set assets related to System assets that are
+related to Policy assets with the name GDPR.
+
+datasets related to System related
+to Process KYC
+
+Shows all Data Set assets related to System assets that are
+related to Process assets with the name KYC.
+
+datasets related to System related
+to (Policy GDPR, Process KYC)
+
+Shows all Data Set assets related to System assets that are
+related to Policy assets with the name GDPR and Process assets
+with the name KYC.
+
+domains HIPAA* and related to
+subdomains
+
+Shows all Domain assets that start with HIPAA and are related to
+Subdomain assets.
+
+domains 'Party Data*' and related
+to policies
+
+Shows all Domain assets with the name Party Data and are
+related to Policy assets.
+
+domains HIPAA* and related to
+subdomains
+
+Shows all Domain assets that start with HIPAA and are related to
+Subdomain assets.
+
+domains 'Party Data*' and related
+to policies
+
+Shows all Domain assets with the name Party Data and are
+related to Policy assets.
+
+domains related to policy GDPR*
+
+Shows all Domain assets that are related to Policy assets that
+start with GDPR.
+
+domains related to policies in
+policy CCPA*
+
+Shows all Domain assets related to Policy assets that start with
+CCPA.
+
+domain related to any
+
+Shows all Domain assets that are related to any asset.
+
+manual data element related to
+data set EMPLOYEE
+
+Shows all manual data elements that are related to the data set
+EMPLOYEE.
+
+manual data element related to
+data set ADDRESS, data element
+related to data set ADDRESS
+
+Shows all manual data elements and data elements that are
+related to the data set ADDRESS.
+
+manual data element related to
+glossary
+
+Shows all manual data elements that are related to glossary
+assets.
+
+manual data element related to
+Policy GDPR
+
+Shows all manual data elements that are related to Policy assets
+with the name GDPR.
+
+manual data elements related to
+classifications and related to
+policy
+
+Shows all manual data elements that are related to
+classifications and Policy assets.
+
+Search query examples
+
+69
+
+Search query
+
+What it does
+
+manual data elements related to
+classification with name 'Social
+Security Number'
+
+Shows all manual data elements that are related to
+classifications with the name Social Security Number.
+
+Policy related to (System DWH) and
+related to (System CMD)
+
+Shows all Policy assets related to System assets with the name
+DWH and are related to System assets with the name CMD.
+
+processes related to Subdomain
+Payroll*
+
+Shows all Process assets related to Subdomain assets that start
+with Payroll.
+
+subdomain related to policy GDPR*
+
+Shows all Subdomain assets related to Policy assets that start
+with GDPR.
+
+subdomain related to policies in
+policy CCPA*
+
+Shows all Subdomain assets related to Policy assets that start
+with CCPA.
+
+subdomain related to any
+
+Shows all Subdomain assets related to any asset.
+
+systems related to policy GDPR*
+
+Shows all System assets that are related to Policy assets that
+start with GDPR.
+
+systems related to process KYC*
+
+Shows all System assets that are related to Process assets that
+start with KYC.
+
+Stakeholder or user name search query examples
+The following table lists some stakeholder or user name search query examples that you can try in the
+search box:
+
+70
+
+Search query
+
+What it does
+
+business terms with stakeholder
+@CurrentUser
+
+Shows all Business Term assets with your user name in the
+Stakeholder field.
+
+business terms with stakeholder
+@<username>
+
+Shows all Business Term assets with a user name in the
+Stakeholder field.
+
+business terms without
+stakeholder
+
+Shows all Business Term assets with the Stakeholder field empty.
+
+business term created by
+@CurrentUser
+
+Shows all Business Term assets created by you.
+
+business term created by
+@<username>
+
+Shows all Business Term assets created by the user.
+
+business term modified by
+@CurrentUser
+
+Shows all Business Term assets modified by you.
+
+business term modified by
+@<username>
+
+Shows all Business Term assets modified by the user.
+
+datasets with stakeholder
+@CurrentUser
+
+Shows all Data Set assets with your user name in the Stakeholder
+field.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+datasets with stakeholder
+@<username>
+
+Shows all Data Set assets with a user name in the Stakeholder field.
+
+datasets created by
+@CurrentUser
+
+Shows all Data Set assets created by you.
+
+datasets created by @<username>
+
+Shows all Data Set assets created by the user.
+
+datasets modified by
+@CurrentUser
+
+Shows all Data Set assets modified by you.
+
+datasets modified by
+@<username>
+
+Shows all Data Set assets modified by the user.
+
+domains with stakeholder
+@CurrentUser
+
+Shows all Domain assets with your user name in the Stakeholder
+field.
+
+domains with stakeholder
+@<username>
+
+Shows all Domain assets with a user name in the Stakeholder field.
+
+domains without stakeholder
+
+Shows all Domain assets with the Stakeholder field empty.
+
+domains created by @CurrentUser
+
+Shows all Domain assets created by you.
+
+domains created by @<username>
+
+Shows all Domain assets created by the user.
+
+domains modified by
+@CurrentUser
+
+Shows all Domain assets modified by you.
+
+domains modified by @<username>
+
+Shows all Domain assets modified by the user.
+
+metric with stakeholder
+@CurrentUser
+
+Shows all Metric assets with your user name in the Stakeholder
+field.
+
+metric with stakeholder
+@<username>
+
+Shows all Metric assets with a user name in the Stakeholder field.
+
+metric without stakeholder
+
+Shows all Metric assets with the Stakeholder field empty.
+
+metric created by @CurrentUser
+
+Shows all Metric assets created by you.
+
+metric created by @<username>
+
+Shows all Metric assets created by the user.
+
+metric modified by @CurrentUser
+
+Shows all Metric assets modified by you.
+
+metric modified by @<username>
+
+Shows all Metric assets modified by the user.
+
+policies with stakeholder
+@CurrentUser
+
+Shows all Policy assets with your user name in the Stakeholder
+field.
+
+policies with stakeholder
+@<username>
+
+Shows all Policy assets with a user name in the Stakeholder field.
+
+policies without stakeholder
+
+Shows all Policy assets with the Stakeholder field empty.
+
+Search query examples
+
+71
+
+72
+
+Search query
+
+What it does
+
+policies created by
+@CurrentUser
+
+Shows all Policy assets created by you.
+
+policies created by @<username>
+
+Shows all Policy assets created by the user.
+
+policies modified by
+@CurrentUser
+
+Shows all Policy assets modified by you.
+
+policies modified by
+@<username>
+
+Shows all Policy assets modified by the user.
+
+processes with stakeholder
+@CurrentUser
+
+Shows all Process assets with your user name in the Stakeholder
+field.
+
+processes with stakeholder
+@<username>
+
+Shows all Process assets with a user name in the Stakeholder field.
+
+processes without stakeholder
+
+Shows all Process assets with the Stakeholder field empty.
+
+processes created by
+@CurrentUser
+
+Shows all Process assets created by you.
+
+processes created by
+@<username>
+
+Shows all Process assets created by the user.
+
+processes modified by
+@CurrentUser
+
+Shows all Process assets modified by you.
+
+processes modified by
+@<username>
+
+Shows all Process assets modified by the user.
+
+subdomain with stakeholder
+@CurrentUser
+
+Shows all Subdomain assets with your user name in the Stakeholder
+field.
+
+subdomain with stakeholder
+@<username>
+
+Shows all Subdomain assets with a user name in the Stakeholder
+field.
+
+subdomain without stakeholder
+
+Shows all Subdomain assets with the Stakeholder field empty.
+
+subdomain created by
+@CurrentUser
+
+Shows all Subdomain assets created by you.
+
+subdomain created by
+@<username>
+
+Shows all Subdomain assets created by the user.
+
+subdomain modified by
+@CurrentUser
+
+Shows all Subdomain assets modified by you.
+
+subdomain modified by
+@<username>
+
+Shows all Subdomain assets modified by the user.
+
+systems with stakeholder
+@CurrentUser
+
+Shows all System assets with your user name in the Stakeholder
+field.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+systems with stakeholder
+@<username>
+
+Shows all System assets with a user name in the Stakeholder field.
+
+systems without stakeholder
+
+Shows all System assets with the Stakeholder field empty.
+
+systems created by @CurrentUser
+
+Shows all System assets created by you.
+
+systems created by @<username>
+
+Shows all System assets created by the user.
+
+systems modified by
+@CurrentUser
+
+Shows all System assets modified by you.
+
+systems modified by @<username>
+
+Shows all System assets modified by the user.
+
+Lifecycle search query examples
+The following table lists some lifecycle search query examples that you can try in the search box:
+Search query
+
+What it does
+
+all where lifecycle is not
+Published
+
+Shows all assets where the Lifecycle field is not in the Published status.
+
+all with lifecycle Draft
+
+Shows all assets where the Lifecycle field is in the Draft status.
+
+business terms with
+lifecycle Draft
+
+Shows all Business Term assets where the Lifecycle field is in the Draft
+status.
+
+domains with lifecycle Draft
+
+Shows all Domain assets where the Lifecycle field is in Draft status.
+
+metric with lifecycle draft
+
+Shows all Metric assets where the Lifecycle field is in the Draft status.
+
+policies with lifecycle
+Draft
+
+Shows all Policy assets where the Lifecycle field is in the Draft status.
+
+subdomain with lifecycle
+Draft
+
+Shows all Subdomain assets where the Lifecycle field is in the Draft
+status.
+
+systems with lifecycle Draft
+
+Shows all System assets where the Lifecycle field is in the Draft status.
+
+Assets with Lifecycle
+(Draft, 'In Review')
+
+Shows all assets where the Lifecycle field is in Draft or In Review status.
+
+all with lifecycle
+'Obsolete'
+
+Shows all assets where the Lifecycle field is in Obsolete status.
+
+business terms with
+lifecycle 'Obsolete'
+
+Shows all Business Term assets where the Lifecycle field is in Obsolete
+status.
+
+Search query examples
+
+73
+
+Collaboration search query examples
+The following table lists some collaboration search query examples that you can try in the search box:
+
+74
+
+Search query
+
+What it does
+
+all with rating between 1 and 5
+
+Shows all assets with rating between 1 and 5 stars.
+
+all rated by @<username>
+
+Shows all assets with a user name or user group in the Updated
+By field.
+
+all rated within last 3 days
+
+Shows all assets rated within last 3 days.
+
+all commented by @username
+
+Shows all assets with comments with a user name or user group
+in the Updated By field.
+
+all commented within last 2 days
+
+Shows all assets with comments within last 2 days.
+
+all certified by @username
+
+Shows all certified assets with a user name or user group in the
+Updated By field.
+
+all certified within last 10 days
+
+Shows all certified assets within the last 10 days.
+
+technical datasets which are not
+certified
+
+Shows all technical Data Set assets that are not certified.
+
+all having ratings
+
+Shows all assets with ratings.
+
+all having comments
+
+Shows all assets with comments.
+
+all not having ratings
+
+Shows all assets without ratings.
+
+all not having comments
+
+Shows all assets without comments.
+
+all which are certified
+
+Shows all technical Data Set assets that are certified.
+
+tables which are certified
+
+Shows all tables that are certified.
+
+files which are certified
+
+Shows all files that are certified.
+
+business assets with rating
+between 1 and 5
+
+Shows all assets with rating between 1 and 5 stars.
+
+Business terms with rating less
+than 3
+
+Shows all Business Term assets with rating less than 3 stars.
+
+manual data elements having
+comments and commented by
+@<username>
+
+Shows all manual data elements with comments and commented
+by a specific user.
+
+Policies with rating equals 5
+
+Shows all Policy assets with 5 star rating.
+
+Processes with rating greater
+than 3
+
+Shows all Process assets with 3 stars and above rating.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+Business terms commented within
+last 2 days and with stakeholder
+@username
+
+Shows all Business Term assets with comments within last 2 days
+and with a user name or user group in the Updated By field.
+
+Business terms with rating less
+than 3 and with stakeholder
+@username
+
+Shows all Business Term assets with rating less than 3 stars and
+with a user name or user group in the Updated By field.
+
+Classifications search query examples
+The following table lists some search query examples that you can use for searching classifications:
+Search query
+
+What it does
+
+classification with sensitivity
+in (High, Medium)
+
+Shows all data classifications that are marked with High and
+Medium sensitivity.
+
+data elements related with
+curation status ACCEPTED to
+classification with sensitivity
+Medium
+
+Shows all data elements for which the associated data
+classifications are in the accepted state and are marked with High
+sensitivity.
+
+data elements related to
+classifications and related to
+policy
+
+Shows all data elements that have associated classifications that
+are related to a policy.
+
+generated classifications
+
+Shows all automatically generated classifications in your
+organization.
+
+generated classifications which
+are not promoted
+
+Shows all automatically generated classifications that have not
+been promoted to data element classifications.
+
+generated classifications which
+are promoted
+
+Shows all automatically generated classifications that have been
+promoted to data element classifications.
+
+classifications with sensitivity
+high
+
+Shows all data classifications that are marked with High
+sensitivity.
+
+classifications with sensitivity
+medium
+
+Shows all data classifications that are marked with Medium
+sensitivity.
+
+classifications with sensitivity
+low
+
+Shows all data classifications that are marked with '-' for Low
+sensitivity.
+
+assets related to classifications
+with sensitivity high
+
+Shows all assets that are associated with classifications that are
+marked with High sensitivity.
+
+Search query examples
+
+75
+
+Custom attributes search query examples
+The following table lists some search query examples that you can use for searching custom attributes:
+Search query
+
+What it does
+
+all with 'Geo location' USA
+
+Shows all assets for which the custom attributes 'Geo location' value is
+USA.
+
+assets with <text custom
+attribute> 'Hyderabad'
+
+Shows all assets that have a text data type custom attributes and the
+value of the custom attributes is Hyderabad.
+
+assets with <numeric custom
+attribute> greater than 80
+
+Shows all assets that have a numeric data type custom attributes and
+the value of the custom attributes is greater than 80.
+
+assets with <numeric custom
+attribute> less than 20
+
+Shows all assets that have a numeric data type custom attributes and
+the value of the custom attributes is less than 20.
+
+assets with <numeric custom
+attribute> equals 30
+
+Shows all assets that have a numeric data type custom attributes and
+the value of the custom attributes is 30.
+
+assets with <numeric custom
+attribute> between 50 and 60
+
+Shows all assets that have a numeric data type custom attributes and
+the value of the custom attributes is in the range of 50 to 60.
+
+assets <date type custom
+attribute> within last 7
+hours
+
+Shows all assets that have a date type custom attributes and the value
+of the custom attributes is within the last seven hours.
+
+assets <date type custom time
+attribute> within last 4 days
+
+Shows all assets that have a date type custom attributes and the value
+of the custom attributes is within the last four days.
+
+assets which are <boolean
+type custom attribute>
+
+Shows all assets that have a check box type custom attributes.
+
+assets which are not <boolean
+type custom attribute>
+
+Shows all assets that do not have a check box type custom attributes.
+
+Data quality rule occurrences search query examples
+The following table lists some data quality rule occurrences search query examples:
+
+76
+
+Search query
+
+What it does
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and related to data
+element related to dataset '<DATASET_NAME>'
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+related to the data elements in the specified
+data set.
+
+dq rule with threshold result 'Good' and related
+to data element related to dataset
+'<DATASET_NAME>'
+
+Shows all data quality rule occurrences with
+the data quality score status as Good and
+are related to data elements belonging to
+the specified data set.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and related to data
+element related to dataset related to system with
+name <DQ_ORCL_SYSTEM>
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+related to the data set belonging to a
+system with a specified system name.
+
+dq rule with threshold result 'Good' and related
+to data element related to dataset related to
+system '<SYSTEM_NAME>'
+
+Shows all data quality rule occurrences with
+the data quality score status as Good and
+are related to the data set belonging to a
+system with a specified system name.
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and with stakeholder
+'test_data_owner'
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and with
+the assigned stakeholder that is specified.
+
+dq rule with threshold result 'Good' and with
+stakeholder @{{DO}} role @role:test_data_owner
+
+Shows all data quality rule occurrences with
+the data quality score as Good and with the
+specified stakeholder belonging to the
+specified role.
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and without
+stakeholder
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+without any assigned stakeholder.
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and with stakeholder
+'test_data_owner' and related to data element
+related to dataset with name <DATASET_NAME>
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and with
+the assigned stakeholder that is specified.
+These data quality rule occurrences are
+related to data elements belonging to the
+specified data set.
+
+dq rule related to data element related to
+technical dataset employees
+
+Shows all data quality rule occurrences that
+are related to a specified technical data set.
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and related to data
+element related to business term which are cde
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+related to data elements belonging to
+specific business terms associated with
+critical data element attributes.
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and related to data
+element related to datasets related to System
+related to Policy '<POLICY_NAME>'
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+related to the data set belonging to a
+system with a specified policy name.
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and related to data
+element related to datasets related to System
+related to Policy
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+related to the data set belonging to a
+system with any policy name.
+
+Search query examples
+
+77
+
+Search query
+
+What it does
+
+dq rule with threshold result in (good,
+acceptable, 'not acceptable') and related to data
+element related to datasets related to System
+related to Process
+
+Shows all data quality rule occurrences with
+the data quality score status as Good,
+Acceptable, and Not Acceptable and are
+related to the data set belonging to a
+system with a process.
+
+dq rule related to data element related to
+datasets related to System related to Process
+'DQ_PAM_AZRSQL_PROP_PROCESS_001_10'
+
+Shows all data quality rule occurrences with
+or without data quality score status and are
+related to the data set belonging to a
+system with a specified process.
+
+dq rule related to data element related to
+datasets related to System related to Process
+('<PROCESS_NAME>' , '<PROCESS_NAME_01>')
+
+Shows all data quality rule occurrences with
+or without data quality score status and are
+related to the data set belonging to a
+system with two specified processes.
+
+dq rule related to data element related to dataset
+related to system with stakeholder
+'test_data_owner'
+
+Shows all data quality rule occurrences with
+or without data quality score status and are
+related to a data set belonging to a system
+with the assigned stakeholder that is
+specified.
+
+Glossary assets associations with data classifications search query examples
+The following table lists some search query examples for the associations of the glossary assets with
+the data element and data entity classifications:
+
+78
+
+Search query
+
+What it does
+
+data classifications related to
+glossary
+
+Shows all the data classifications that are related to the glossary
+assets.
+
+data classifications related to
+glossary 'Country'
+
+Shows all data classifications that are related to the glossary
+asset named Country.
+
+data elements related to glossary
+'Sales' and data element
+classification 'Email Address'
+
+Shows all the data elements that are related to the glossary assets
+with the name Sales and the data element classifications with the
+name Email Address.
+
+technical datasets related to
+glossary 'Sales' and data entity
+classification 'PCI'
+
+Shows the technical data sets that are related to the glossary
+assets with the name Sales and data entity classifications with
+the name PCI.
+
+data elements related to glossary
+'Customer email' and data element
+classification 'Email Address'
+
+Shows all the data elements that are related to the glossary assets
+with the name Customer email and data element classifications
+with the name Email Address.
+
+glossary related to data elements
+
+Shows all the glossary assets that are related to the data
+elements.
+
+glossary related to data
+classification
+
+Shows all the glossary assets that are related to the data
+classifications.
+
+Appendix A: Appendix
+
+Search query
+
+What it does
+
+glossary related to data
+classifications ‘Email Address’
+
+Shows all the glossary assets that are related to the data
+classification named Email Address.
+
+glossary not related to any data
+classifications
+
+Shows all the glossary assets that are not related to any data
+classifications.
+
+Search query examples
+
+79
+
+
