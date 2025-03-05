@@ -1,13 +1,12 @@
 import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 /**
  * API route for checking OAuth authentication status
  *
- * @param request The incoming request
  * @returns Authentication status information
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
+export async function GET(): Promise<NextResponse> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('informatica_access_token');
 

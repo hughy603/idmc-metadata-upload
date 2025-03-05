@@ -2,28 +2,12 @@ import { NextResponse, NextRequest } from 'next/server';
 
 import { authenticateWithInformatica } from '@/lib/services/informatica-mapping-service';
 
-import { InformaticaAuthCredentials } from '@/lib/types';
-
 interface InformaticaAuthCredentials {
   username: string;
   password: string;
+  baseUrl: string;
+  apiUrl: string;
 }
-
-// Define regions
-const _INFORMATICA_REGIONS = {
-  US: {
-    baseUrl: 'https://dm-us.informaticacloud.com',
-    apiUrl: 'https://idmc-api.dm-us.informaticacloud.com',
-  },
-  EMEA: {
-    baseUrl: 'https://dm-em.informaticacloud.com',
-    apiUrl: 'https://idmc-api.dm-em.informaticacloud.com',
-  },
-  APJ: {
-    baseUrl: 'https://dm-ap.informaticacloud.com',
-    apiUrl: 'https://idmc-api.dm-ap.informaticacloud.com',
-  },
-};
 
 /**
  * API route for authenticating with Informatica Cloud

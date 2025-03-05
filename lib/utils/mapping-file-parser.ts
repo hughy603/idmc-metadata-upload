@@ -100,7 +100,7 @@ export async function parseMappingFile(
         }
       };
 
-      reader.onerror = error => {
+      reader.onerror = () => {
         reject(new Error('No data found in file'));
       };
 

@@ -1,4 +1,4 @@
-import { InformaticaAuthCredentials } from '@/lib/utils/auth';
+import type { InformaticaAuthCredentials } from '@/lib/utils/auth';
 /**
  * Client-side service for managing authentication tokens
  */

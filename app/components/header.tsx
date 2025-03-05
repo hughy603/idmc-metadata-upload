@@ -1,5 +1,6 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-('use client');
 
 export default function Header(): JSX.Element {
   const [isDarkMode, setIsDarkMode] = useState(false);

@@ -1,10 +1,11 @@
+'use client';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { cn } from '@/lib/utils';
-('use client');
 
 export const fileUploaderSchema = z.object({
   file: z.instanceof(File).optional(),

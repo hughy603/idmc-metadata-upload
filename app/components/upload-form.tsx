@@ -77,7 +77,7 @@ export default function UploadForm(): JSX.Element {
     uploadFile,
     uploadMappingRow,
     uploadMappingBatch,
-    reset: resetFileUpload,
+    reset: _resetFileUpload,
   } = useFileUpload();
 
   const { jobState, startTracking, stopTracking } = useJobTracking();
@@ -160,14 +160,6 @@ export default function UploadForm(): JSX.Element {
     }
   };
 
-  /**
-   * Reset all form state
-   */
-  const _handleReset = (): void => {
-    resetFileUpload();
-    stopTracking();
-    setShowFileData(false);
-  };
 
   /**
    * Handle login form submission

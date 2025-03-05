@@ -63,6 +63,15 @@ repos:
         exclude: node_modules/
         args: [--cache, --cache-location, .eslintcache]
 
+      # Build check to prevent commits when build fails
+      - id: build-check
+        name: build-check
+        entry: bash -c 'npm run build'
+        language: system
+        pass_filenames: false
+        stages: [commit]
+        verbose: true
+
       # Move these hooks to push stage only to avoid blocking commits
       - id: typescript-check
         name: typescript-check

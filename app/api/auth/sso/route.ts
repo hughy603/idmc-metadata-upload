@@ -3,7 +3,7 @@ import { randomBytes } from 'crypto';
 import { cookies } from 'next/headers';
 import { NextResponse, NextRequest } from 'next/server';
 
-import { INFORMATICA_REGIONS } from '@/lib/services/auth-service';
+import { INFORMATICA_REGIONS } from '@/lib/utils/auth';
 
 /**
  * API route for initiating OAuth authentication with Informatica Cloud

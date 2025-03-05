@@ -18,7 +18,7 @@ export default function JobStatus({
   onReset,
 }: JobStatusProps): JSX.Element {
   if (!jobId) {
-    return null;
+    return <></>;
   }
 
   const getStatusBadge = () => {

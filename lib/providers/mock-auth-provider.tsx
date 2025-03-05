@@ -1,6 +1,7 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import { createContext, useContext, useState } from 'react';
-('use client');
 
 type MockAuthContextType = {
   isMockAuthEnabled: boolean;

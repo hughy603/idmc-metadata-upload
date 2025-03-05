@@ -447,7 +447,7 @@ export class MappingService {
 
       return {
         success: response.success,
-        error: response.error,
+        ...(response.error ? { error: response.error } : {})
       };
     } catch (error) {
       const errorMessage =

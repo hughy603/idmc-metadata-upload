@@ -1,17 +1,16 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
-import { clearAuth } from '@/lib/services/auth-service';
+import { logout } from '@/lib/services/auth-service';
 
 /**
  * API route for logging out and clearing authentication
  *
- * @param request The incoming request
  * @returns A response indicating successful logout
  */
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export async function POST(): Promise<NextResponse> {
   try {
     // Clear server-side authentication state
-    clearAuth();
+    logout();
 
     // Return success
     return NextResponse.json({
