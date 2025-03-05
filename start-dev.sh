@@ -19,4 +19,4 @@ fi
 
 # Start the development server
 echo "Starting Next.js development server on port $port..."
-npm run dev -- -p $port 
+npm run dev -- -p $port

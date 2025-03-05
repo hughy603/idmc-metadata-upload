@@ -6,14 +6,16 @@ export default function Home() {
     <div className="container mx-auto px-4 py-8">
       <Header />
       <main className="mt-10">
-        <div className="bg-white dark:bg-gray-900 shadow-md rounded-lg p-6">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">Metadata Upload Tool</h2>
+        <div className="rounded-lg bg-white p-6 shadow-md dark:bg-gray-900">
+          <h2 className="mb-6 text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            Metadata Upload Tool
+          </h2>
           <UploadForm />
         </div>
       </main>
-      <footer className="mt-10 text-center text-gray-500 dark:text-gray-400 text-sm">
+      <footer className="mt-10 text-center text-sm text-gray-500 dark:text-gray-400">
         &copy; {new Date().getFullYear()} IDMC Metadata Upload Tool
       </footer>
     </div>
   )
-} 
+}

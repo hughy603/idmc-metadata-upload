@@ -23,4 +23,4 @@ if git diff --cached --name-only | grep -q '\.env$\|\.env\.[^.]*$' | grep -v '\.
 fi
 
 # Successfully passed all checks
-echo "✅ Pre-commit hooks passed successfully!" 
+echo "✅ Pre-commit hooks passed successfully!"

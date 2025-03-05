@@ -1,5 +1,9 @@
+import { screen, _fireEvent } from '@testing-library/react';
+import { screen, fireEvent } from '@testing-library/react';
+import { render } from '@testing-library/react';
+import { screen, _fireEvent } from '@testing-library/react';
+import { render, _RenderOptions } from '@testing-library/react'
 import React, { ReactElement } from 'react'
-import { render, RenderOptions } from '@testing-library/react'
 
 // Define interface for wrapper provider props
 interface AllTheProvidersProps {
@@ -14,21 +18,17 @@ const AllTheProviders = ({ children }: AllTheProvidersProps) => {
   // - Redux Provider
   // - Context Providers
   // - Next.js Providers
-  return (
-    <>
-      {children}
-    </>
-  )
+  return <>{_children}</>
 }
 
 // Custom render function that includes providers
 const customRender = (
   ui: ReactElement,
   options?: Omit<RenderOptions, 'wrapper'>
-) => render(ui, { wrapper: AllTheProviders, ...options })
+) => render(_ui, { wrapper: AllTheProviders, ...options })
 
 // Re-export everything from testing-library
 export * from '@testing-library/react'
 
 // Override render method
-export { customRender as render } 
+export { customRender as render }

@@ -1,4 +1,4 @@
-module.exports = {
+const config = {
   presets: [
     [
       'next/babel',
@@ -19,4 +19,7 @@ module.exports = {
       ],
     },
   },
-}; 
+}
+
+// Use CommonJS export for Jest compatibility
+module.exports = config

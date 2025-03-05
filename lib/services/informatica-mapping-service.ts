@@ -41,7 +41,7 @@ export interface MappingImportResult {
 
 /**
  * Authenticates with Informatica Cloud and returns session and token information
- * 
+ *
  * @param credentials Authentication credentials
  * @returns Session information and auth token
  */
@@ -79,8 +79,8 @@ export async function authenticateWithInformatica(
       {
         method: 'POST',
         headers: {
-          'cookie': `USER_SESSION=${sessionId}`,
-          'IDS-SESSION-ID': sessionId
+          cookie: `USER_SESSION=${sessionId}`,
+          'IDS-SESSION-ID': sessionId,
         },
       }
     )
@@ -98,7 +98,7 @@ export async function authenticateWithInformatica(
 
     return {
       session: { sessionId, orgId, apiUrl: credentials.apiUrl },
-      token: { token, expiresAt }
+      token: { token, expiresAt },
     }
   } catch (error) {
     console.error('Authentication error:', error)
@@ -108,7 +108,7 @@ export async function authenticateWithInformatica(
 
 /**
  * Imports mapping documentation to Informatica Cloud Data Catalog
- * 
+ *
  * @param auth Authentication information
  * @param mappingData Array of mapping documentation data
  * @returns Result of the import operation
@@ -128,35 +128,41 @@ export async function importMappingDocumentation(
     const assets = mappingData.map(mapping => {
       return {
         // Asset metadata
-        "core.name": `${mapping.sourceColumn} to ${mapping.targetColumn}`,
-        "core.description": mapping.description || `Mapping from ${mapping.sourceSystem}.${mapping.sourceTable}.${mapping.sourceColumn} to ${mapping.targetSystem}.${mapping.targetTable}.${mapping.targetColumn}`,
-        "core.classType": "com.infa.ldm.mapping.MappingSpecification",
-        
+        'core.name': `${mapping.sourceColumn} to ${mapping.targetColumn}`,
+        'core.description':
+          mapping.description ||
+          `Mapping from ${mapping.sourceSystem}.${mapping.sourceTable}.${mapping.sourceColumn} to ${mapping.targetSystem}.${mapping.targetTable}.${mapping.targetColumn}`,
+        'core.classType': 'com.infa.ldm.mapping.MappingSpecification',
+
         // Source and target information
-        "mapping.sourceAttribute": {
-          "core.name": mapping.sourceColumn,
-          "core.classType": "com.infa.ldm.relational.Column",
-          "core.resourceName": mapping.sourceSystem,
-          "core.resourceType": "JDBC",
-          "core.containerName": mapping.sourceTable
+        'mapping.sourceAttribute': {
+          'core.name': mapping.sourceColumn,
+          'core.classType': 'com.infa.ldm.relational.Column',
+          'core.resourceName': mapping.sourceSystem,
+          'core.resourceType': 'JDBC',
+          'core.containerName': mapping.sourceTable,
         },
-        "mapping.targetAttribute": {
-          "core.name": mapping.targetColumn,
-          "core.classType": "com.infa.ldm.relational.Column",
-          "core.resourceName": mapping.targetSystem,
-          "core.resourceType": "JDBC",
-          "core.containerName": mapping.targetTable
+        'mapping.targetAttribute': {
+          'core.name': mapping.targetColumn,
+          'core.classType': 'com.infa.ldm.relational.Column',
+          'core.resourceName': mapping.targetSystem,
+          'core.resourceType': 'JDBC',
+          'core.containerName': mapping.targetTable,
         },
-        
+
         // Add transformation logic if provided
-        ...(mapping.transformationLogic ? {
-          "mapping.transformationLogic": mapping.transformationLogic
-        } : {}),
-        
+        ...(mapping.transformationLogic
+          ? {
+              'mapping.transformationLogic': mapping.transformationLogic,
+            }
+          : {}),
+
         // Add business term reference if provided
-        ...(mapping.businessTerm ? {
-          "mapping.businessTerm": mapping.businessTerm
-        } : {})
+        ...(mapping.businessTerm
+          ? {
+              'mapping.businessTerm': mapping.businessTerm,
+            }
+          : {}),
       }
     })
 
@@ -167,10 +173,10 @@ export async function importMappingDocumentation(
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${auth.token.token}`,
-          'X-INFA-ORG-ID': auth.session.orgId
+          Authorization: `Bearer ${auth.token.token}`,
+          'X-INFA-ORG-ID': auth.session.orgId,
         },
-        body: JSON.stringify({ assets })
+        body: JSON.stringify({ assets }),
       }
     )
 
@@ -182,20 +188,20 @@ export async function importMappingDocumentation(
     const result = await response.json()
     return {
       success: true,
-      jobId: result.jobId || 'unknown'
+      jobId: result.jobId || 'unknown',
     }
   } catch (error) {
     console.error('Error importing mapping documentation:', error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
     }
   }
 }
 
 /**
  * Checks the status of an import job
- * 
+ *
  * @param auth Authentication information
  * @param jobId ID of the import job
  * @returns Status of the job
@@ -215,9 +221,9 @@ export async function checkImportJobStatus(
       {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${auth.token.token}`,
-          'X-INFA-ORG-ID': auth.session.orgId
-        }
+          Authorization: `Bearer ${auth.token.token}`,
+          'X-INFA-ORG-ID': auth.session.orgId,
+        },
       }
     )
 
@@ -229,7 +235,7 @@ export async function checkImportJobStatus(
     const result = await response.json()
     return {
       status: result.status,
-      details: result
+      details: result,
     }
   } catch (error) {
     console.error('Error checking job status:', error)
@@ -239,7 +245,7 @@ export async function checkImportJobStatus(
 
 /**
  * Uploads an Excel or CSV file containing mapping documentation
- * 
+ *
  * @param auth Authentication information
  * @param file The file to upload
  * @param description Optional description for the uploaded mappings
@@ -259,7 +265,7 @@ export async function uploadMappingFile(
     // Create a FormData object to send the file
     const formData = new FormData()
     formData.append('file', file)
-    
+
     if (description) {
       formData.append('description', description)
     }
@@ -273,10 +279,10 @@ export async function uploadMappingFile(
       {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${auth.token.token}`,
-          'X-INFA-ORG-ID': auth.session.orgId
+          Authorization: `Bearer ${auth.token.token}`,
+          'X-INFA-ORG-ID': auth.session.orgId,
         },
-        body: formData
+        body: formData,
       }
     )
 
@@ -288,13 +294,13 @@ export async function uploadMappingFile(
     const result = await response.json()
     return {
       success: true,
-      jobId: result.jobId || 'unknown'
+      jobId: result.jobId || 'unknown',
     }
   } catch (error) {
     console.error('Error uploading mapping file:', error)
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: error instanceof Error ? error.message : 'Unknown error occurred',
     }
   }
-} 
+}

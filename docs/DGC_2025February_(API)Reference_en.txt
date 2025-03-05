@@ -3980,7 +3980,7 @@ state.
 
 all with asset group *
 
-Shows all assests that are assigned
+Shows all assets that are assigned
 asset groups.
 
 all with Asset Group @assetgroup:Finance
@@ -5100,5 +5100,3 @@ classifications.
 Search query examples
 
 79
-
-

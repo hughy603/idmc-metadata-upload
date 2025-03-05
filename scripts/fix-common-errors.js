@@ -11,8 +11,8 @@ const { execSync } = require('child_process')
 
 // Create the scripts directory if it doesn't exist
 const scriptsDir = path.join(__dirname)
-if (!fs.existsSync(scriptsDir)) {
-  fs.mkdirSync(scriptsDir, { recursive: true })
+if (!fs.existsSync(_scriptsDir)) {
+  fs.mkdirSync(_scriptsDir, { recursive: true })
 }
 
 console.log('🔍 Scanning for common linting errors...')
@@ -20,37 +20,41 @@ console.log('🔍 Scanning for common linting errors...')
 // Find all API route files that use cookies()
 const findApiRoutesWithCookies = () => {
   try {
-    const result = execSync('grep -r "const cookieStore = cookies()" --include="*.ts" app/api').toString()
+    const result = execSync(
+      'grep -r "const cookieStore = cookies()" --include="*.ts" app/api'
+    ).toString()
     const files = result
       .split('\n')
-      .filter(line => line.trim() !== '')
-      .map(line => {
+      .filter(_line => line.trim() !== '')
+      .map(_line => {
         const [filePath] = line.split(':')
         return filePath
       })
 
-    return [...new Set(files)] // Remove duplicates
+    return [...new Set(_files)] // Remove duplicates
   } catch (error) {
-    console.log('No files found with cookie store issues or error in grep command')
+    console.log(
+      'No files found with cookie store issues or error in grep command'
+    )
     return []
   }
 }
 
 // Fix the cookies() usage in API routes
-const fixCookieIssues = (files) => {
+const fixCookieIssues = files => {
   if (files.length === 0) {
     console.log('No cookie usage issues found in API routes')
     return
   }
 
   console.log(`Found ${files.length} files with potential cookie usage issues:`)
-  files.forEach(file => console.log(`  - ${file}`))
+  files.forEach(_file => console.log(`  - ${_file}`))
 
   let fixedFiles = 0
 
-  files.forEach(file => {
+  files.forEach(_file => {
     try {
-      let content = fs.readFileSync(file, 'utf8')
+      let content = fs.readFileSync(_file, 'utf8')
 
       // Fix cookieStore.get/set issues
       const fixed = content
@@ -61,21 +65,23 @@ const fixCookieIssues = (files) => {
         )
         // Fix the cookieStore declaration
         .replace(
-          "const cookieStore = cookies()",
-          "const cookieStore = cookies() as unknown as ReadonlyRequestCookies"
+          'const cookieStore = cookies()',
+          'const cookieStore = cookies() as unknown as ReadonlyRequestCookies'
         )
 
       if (content !== fixed) {
-        fs.writeFileSync(file, fixed, 'utf8')
-        console.log(`✅ Fixed cookie issues in ${file}`)
+        fs.writeFileSync(_file, _fixed, 'utf8')
+        console.log(`✅ Fixed cookie issues in ${_file}`)
         fixedFiles++
       }
     } catch (error) {
-      console.error(`❌ Error fixing ${file}:`, error.message)
+      console.error(`❌ Error fixing ${_file}:`, error.message)
     }
   })
 
-  console.log(`Fixed ${fixedFiles} out of ${files.length} files with cookie issues`)
+  console.log(
+    `Fixed ${_fixedFiles} out of ${files.length} files with cookie issues`
+  )
 }
 
 // Find files that might need the FileDataRow interface fixes
@@ -98,22 +104,28 @@ const shouldFixCookies = args.includes('--fix-cookies') || shouldFixAll
 const shouldFixUploadForm = args.includes('--fix-upload-form') || shouldFixAll
 
 // Fix the identified issues
-if (shouldFixCookies) {
+if (_shouldFixCookies) {
   console.log('\n🔧 Fixing cookie handling issues in API routes...')
   const cookieFiles = findApiRoutesWithCookies()
-  fixCookieIssues(cookieFiles)
+  fixCookieIssues(_cookieFiles)
 }
 
-if (shouldFixUploadForm) {
+if (_shouldFixUploadForm) {
   console.log('\n🔧 Checking for upload form issues...')
   const uploadFormFiles = findUploadFormIssues()
   if (uploadFormFiles.length > 0) {
-    console.log(`Found upload-form.tsx. You should manually review this file to fix type errors.`)
+    console.log(
+      `Found upload-form.tsx. You should manually review this file to fix type errors.`
+    )
     console.log('Common issues include:')
     console.log(' - Return types of processFile() and validateFile() functions')
     console.log(' - Parameter types of uploadMappingData() function')
-    console.log(' - Parameter counts for startTracking() and checkStatus() functions')
-    console.log('\nThese typically require changes to the underlying service implementations and cannot be automatically fixed.')
+    console.log(
+      ' - Parameter counts for startTracking() and checkStatus() functions'
+    )
+    console.log(
+      '\nThese typically require changes to the underlying service implementations and cannot be automatically fixed.'
+    )
   } else {
     console.log('No upload form issues found.')
   }

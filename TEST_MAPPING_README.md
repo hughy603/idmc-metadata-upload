@@ -22,17 +22,17 @@ These files contain mapping data with the following characteristics:
 
 Each mapping row contains the following fields:
 
-| Field | Description | Required |
-|-------|-------------|----------|
-| SourceSystem | Source system name | Yes |
-| SourceTable | Source table/entity name | Yes |
-| SourceColumn | Source column/field name | Yes |
-| TargetSystem | Target system name | Yes |
-| TargetTable | Target table/entity name | Yes |
-| TargetColumn | Target column/field name | Yes |
-| TransformationLogic | SQL or expression for the transformation | No |
-| BusinessTerm | Business glossary term | No |
-| Description | Additional description or notes | No |
+| Field               | Description                              | Required |
+| ------------------- | ---------------------------------------- | -------- |
+| SourceSystem        | Source system name                       | Yes      |
+| SourceTable         | Source table/entity name                 | Yes      |
+| SourceColumn        | Source column/field name                 | Yes      |
+| TargetSystem        | Target system name                       | Yes      |
+| TargetTable         | Target table/entity name                 | Yes      |
+| TargetColumn        | Target column/field name                 | Yes      |
+| TransformationLogic | SQL or expression for the transformation | No       |
+| BusinessTerm        | Business glossary term                   | No       |
+| Description         | Additional description or notes          | No       |
 
 ## How to Use
 
@@ -49,4 +49,4 @@ You can generate new test files using the provided scripts:
 - `node create-test-mapping.js` - Generates Excel file from JSON
 - `node create-test-mapping-csv.js` - Generates CSV file from JSON
 
-To modify the test data, edit the `test_mapping_example.json` file and then run the scripts to regenerate the Excel and CSV versions. 
+To modify the test data, edit the `test_mapping_example.json` file and then run the scripts to regenerate the Excel and CSV versions.

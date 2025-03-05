@@ -1,5 +1,5 @@
 // Import jest-dom for custom matchers
-require('@testing-library/jest-dom');
+require('@testing-library/jest-dom')
 
 // Mock window.matchMedia
 Object.defineProperty(window, 'matchMedia', {
@@ -14,29 +14,29 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
-});
+})
 
 // Mock animation properties/methods needed for DOM testing
-window.AnimationEvent = window.AnimationEvent || function() {};
-window.TransitionEvent = window.TransitionEvent || function() {};
-window.WebkitAnimation = {};
+window.AnimationEvent = window.AnimationEvent || function () {}
+window.TransitionEvent = window.TransitionEvent || function () {}
+window.WebkitAnimation = {}
 
 // Mock fetch API
-global.fetch = jest.fn();
+global.fetch = jest.fn()
 
 // Reset mocks between tests
 beforeEach(() => {
-  jest.clearAllMocks();
-});
+  jest.clearAllMocks()
+})
 
 // Suppress specific console errors from React that are expected
-const originalError = console.error;
+const originalError = console.error
 console.error = (...args) => {
   if (
     /Warning.*not wrapped in act/.test(args[0]) ||
     /Warning.*ReactDOM.render is no longer supported/.test(args[0])
   ) {
-    return;
+    return
   }
-  originalError.call(console, ...args);
-}; 
+  originalError.call(console, ...args)
+}

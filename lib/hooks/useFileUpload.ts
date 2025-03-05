@@ -1,35 +1,57 @@
-import { useState } from 'react'
-import { FileDataRow } from '@/app/components/file-data-table'
-import { 
-  MappingDocumentationData, 
-  SessionInfo, 
-  AuthTokenInfo,
+import { useState, useEffect } from 'react';
+
+import { FileDataRow } from '@/app/components/file-data-table';
+import {
+  MappingDocumentationData,
   uploadMappingFile,
-  importMappingDocumentation
-} from '../services/informatica-mapping-service'
-import { parseMappingFile, validateMappingFile } from '../utils/mapping-file-parser'
+  importMappingDocumentation,
+  SessionInfo,
+  AuthTokenInfo
+} from '@/lib/services/informatica-mapping-service';
+import {
+  parseMappingFile,
+  validateMappingFile
+} from '@/lib/utils/mapping-file-parser';
 
 export interface FileUploadState {
-  isValidating: boolean
-  isUploading: boolean
-  validationResults: { isValid: boolean; errors?: string[] }
-  fileName: string
-  fileData: FileDataRow[]
-  mappingData: MappingDocumentationData[]
-  uploadStatus: 'idle' | 'validating' | 'validated' | 'authenticating' | 'uploading' | 'success' | 'error'
-  error: string | null
-  jobId: string | null
+  isValidating: boolean;
+  isUploading: boolean;
+  validationResults: { isValid: boolean; errors?: string[] };
+  fileName: string;
+  fileData: FileDataRow[];
+  mappingData: MappingDocumentationData[];
+  uploadStatus:
+    | 'idle'
+    | 'validating'
+    | 'validated'
+    | 'authenticating'
+    | 'uploading'
+    | 'success'
+    | 'error';
+  error: string | null;
+  jobId: string | null;
 }
 
 export interface UseFileUploadReturn {
-  fileState: FileUploadState
-  validateFile: (file: File) => Promise<boolean>
-  processFile: (file: File) => Promise<void>
-  uploadFile: (auth: { session: SessionInfo; token: AuthTokenInfo }, file: File, description?: string) => Promise<boolean>
-  uploadMappingData: (auth: { session: SessionInfo; token: AuthTokenInfo }) => Promise<boolean>
-  updateRowStatus: (rowId: string, newStatus: FileDataRow['status'], error?: string) => void
-  updateRowStatuses: (newStatus: FileDataRow['status'], error?: string) => void
-  reset: () => void
+  fileState: FileUploadState;
+  validateFile: (file: File) => Promise<boolean>;
+  processFile: (file: File) => Promise<void>;
+  uploadFile: (
+    auth: { session: SessionInfo; token: AuthTokenInfo },
+    file: File,
+    description?: string
+  ) => Promise<boolean>;
+  uploadMappingData: (auth: {
+    session: SessionInfo;
+    token: AuthTokenInfo;
+  }) => Promise<boolean>;
+  updateRowStatus: (
+    rowId: string,
+    newStatus: FileDataRow['status'],
+    error?: string
+  ) => void;
+  updateRowStatuses: (newStatus: FileDataRow['status'], error?: string) => void;
+  reset: () => void;
 }
 
 export function useFileUpload(): UseFileUploadReturn {
@@ -42,49 +64,54 @@ export function useFileUpload(): UseFileUploadReturn {
     mappingData: [],
     uploadStatus: 'idle',
     error: null,
-    jobId: null
-  })
+    jobId: null,
+  });
 
   const validateFile = async (file: File): Promise<boolean> => {
-    setFileState(prev => ({ 
-      ...prev, 
-      isValidating: true, 
+    setFileState(prev => ({
+      ...prev,
+      isValidating: true,
       uploadStatus: 'validating',
-      fileName: file.name
-    }))
+      fileName: file.name,
+    }));
 
     try {
-      const result = await validateMappingFile(file)
-      
-      setFileState(prev => ({ 
-        ...prev, 
+      const result = await validateMappingFile(file);
+
+      setFileState(prev => ({
+        ...prev,
         isValidating: false,
         validationResults: result,
         uploadStatus: result.isValid ? 'validated' : 'error',
-        error: result.isValid ? null : (result.errors?.join(', ') || 'Unknown validation error')
-      }))
-      
-      return result.isValid
+        error: result.isValid
+          ? null
+          : result.errors?.join(', ') || 'Unknown validation error',
+      }));
+
+      return result.isValid;
     } catch (error) {
-      setFileState(prev => ({ 
-        ...prev, 
+      setFileState(prev => ({
+        ...prev,
         isValidating: false,
-        validationResults: { 
-          isValid: false, 
-          errors: [error instanceof Error ? error.message : 'Unknown validation error'] 
+        validationResults: {
+          isValid: false,
+          errors: [
+            error instanceof Error ? error.message : 'Unknown validation error',
+          ],
         },
         uploadStatus: 'error',
-        error: error instanceof Error ? error.message : 'Unknown validation error'
-      }))
-      
-      return false
+        error:
+          error instanceof Error ? error.message : 'Unknown validation error',
+      }));
+
+      return false;
     }
-  }
+  };
 
   const processFile = async (file: File): Promise<void> => {
     try {
-      const mappingData = await parseMappingFile(file)
-      
+      const mappingData = await parseMappingFile(file);
+
       // Convert mapping data to table rows
       const tableData: FileDataRow[] = mappingData.map((item, index) => ({
         id: `row-${index}`,
@@ -97,115 +124,124 @@ export function useFileUpload(): UseFileUploadReturn {
           targetColumn: item.targetColumn,
           transformationLogic: item.transformationLogic || '',
           businessTerm: item.businessTerm || '',
-          description: item.description || ''
+          description: item.description || '',
         },
-        status: 'pending'
-      }))
-      
+        status: 'pending',
+      }));
+
       setFileState(prev => ({
         ...prev,
         fileData: tableData,
-        mappingData
-      }))
+        mappingData,
+      }));
     } catch (error) {
       setFileState(prev => ({
         ...prev,
-        error: error instanceof Error ? error.message : 'Error processing file'
-      }))
+        error: error instanceof Error ? error.message : 'Error processing file',
+      }));
     }
-  }
+  };
 
   const uploadFile = async (
-    auth: { session: SessionInfo; token: AuthTokenInfo }, 
-    file: File, 
+    auth: { session: SessionInfo; token: AuthTokenInfo },
+    file: File,
     description?: string
   ): Promise<boolean> => {
-    setFileState(prev => ({ 
-      ...prev, 
-      isUploading: true, 
+    setFileState(prev => ({
+      ...prev,
+      isUploading: true,
       uploadStatus: 'uploading',
-      error: null
-    }))
-    
+      error: null,
+    }));
+
     try {
-      const result = await uploadMappingFile(auth, file, description)
-      
-      setFileState(prev => ({ 
-        ...prev, 
+      const result = await uploadMappingFile(auth, file, description);
+
+      setFileState(prev => ({
+        ...prev,
         isUploading: false,
         uploadStatus: result.success ? 'success' : 'error',
-        error: result.success ? null : (result.error || 'Upload failed'),
-        jobId: result.jobId || null
-      }))
-      
-      return result.success
+        error: result.success ? null : result.error || 'Upload failed',
+        jobId: result.jobId || null,
+      }));
+
+      return result.success;
     } catch (error) {
-      setFileState(prev => ({ 
-        ...prev, 
+      setFileState(prev => ({
+        ...prev,
         isUploading: false,
         uploadStatus: 'error',
-        error: error instanceof Error ? error.message : 'Upload failed'
-      }))
-      
-      return false
-    }
-  }
+        error: error instanceof Error ? error.message : 'Upload failed',
+      }));
 
-  const uploadMappingData = async (
-    auth: { session: SessionInfo; token: AuthTokenInfo }
-  ): Promise<boolean> => {
-    setFileState(prev => ({ 
-      ...prev, 
-      isUploading: true, 
+      return false;
+    }
+  };
+
+  const uploadMappingData = async (auth: {
+    session: SessionInfo;
+    token: AuthTokenInfo;
+  }): Promise<boolean> => {
+    setFileState(prev => ({
+      ...prev,
+      isUploading: true,
       uploadStatus: 'uploading',
-      error: null
-    }))
-    
+      error: null,
+    }));
+
     try {
-      const result = await importMappingDocumentation(auth, fileState.mappingData)
-      
-      setFileState(prev => ({ 
-        ...prev, 
+      const result = await importMappingDocumentation(
+        auth,
+        fileState.mappingData
+      );
+
+      setFileState(prev => ({
+        ...prev,
         isUploading: false,
         uploadStatus: result.success ? 'success' : 'error',
-        error: result.success ? null : (result.error || 'Upload failed'),
-        jobId: result.jobId || null
-      }))
-      
-      return result.success
+        error: result.success ? null : result.error || 'Upload failed',
+        jobId: result.jobId || null,
+      }));
+
+      return result.success;
     } catch (error) {
-      setFileState(prev => ({ 
-        ...prev, 
+      setFileState(prev => ({
+        ...prev,
         isUploading: false,
         uploadStatus: 'error',
-        error: error instanceof Error ? error.message : 'Upload failed'
-      }))
-      
-      return false
-    }
-  }
+        error: error instanceof Error ? error.message : 'Upload failed',
+      }));
 
-  const updateRowStatuses = (newStatus: FileDataRow['status'], error?: string) => {
+      return false;
+    }
+  };
+
+  const updateRowStatuses = (
+    newStatus: FileDataRow['status'],
+    error?: string
+  ) => {
     setFileState(prev => ({
       ...prev,
       fileData: prev.fileData.map(row => ({
         ...row,
         status: newStatus,
-        error: error
-      }))
-    }))
-  }
+        error: error,
+      })),
+    }));
+  };
 
-  const updateRowStatus = (rowId: string, newStatus: FileDataRow['status'], error?: string) => {
+  const updateRowStatus = (
+    rowId: string,
+    newStatus: FileDataRow['status'],
+    error?: string
+  ) => {
     setFileState(prev => ({
       ...prev,
-      fileData: prev.fileData.map(row => 
-        row.id === rowId 
-          ? { ...row, status: newStatus, error: error }
-          : row
-      )
-    }))
-  }
+      fileData: prev.fileData.map(row =>
+        row.id === rowId ? { ...row, status: newStatus, error } : row
+      ),
+    }));
+  };
 
   const reset = () => {
     setFileState({
@@ -217,9 +253,9 @@ export function useFileUpload(): UseFileUploadReturn {
       mappingData: [],
       uploadStatus: 'idle',
       error: null,
-      jobId: null
-    })
-  }
+      jobId: null,
+    });
+  };
 
   return {
     fileState,
@@ -229,6 +265,6 @@ export function useFileUpload(): UseFileUploadReturn {
     uploadMappingData,
     updateRowStatus,
     updateRowStatuses,
-    reset
-  }
-} 
+    reset,
+  };
+}

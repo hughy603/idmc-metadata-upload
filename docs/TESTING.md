@@ -33,12 +33,14 @@ Our test coverage target is 80% across the codebase. The coverage is measured fo
 ### Key Areas Under Test
 
 1. **API Services (`lib/services/`)**
+
    - Authentication with Informatica Cloud
    - Mapping documentation import
    - File upload
    - Job status monitoring
 
 2. **Utilities (`lib/utils/`)**
+
    - File parsing (Excel/CSV)
    - Validation
    - Template generation
@@ -99,9 +101,9 @@ jest.mock('@/lib/services/informatica-mapping-service', () => ({
   authenticateWithInformatica: jest.fn().mockResolvedValue({
     token: 'mock-token',
     baseUrl: 'https://mock-base-url.com',
-    apiUrl: 'https://mock-api-url.com/api'
-  })
-}));
+    apiUrl: 'https://mock-api-url.com/api',
+  }),
+}))
 ```
 
 ### File Mocks
@@ -119,7 +121,7 @@ jest.mock('xlsx', () => ({
     book_append_sheet: jest.fn(),
   },
   write: jest.fn().mockReturnValue(new Uint8Array([1, 2, 3])),
-}));
+}))
 ```
 
 ### Component Mocks
@@ -147,20 +149,20 @@ describe('authenticateWithInformatica', () => {
   it('should authenticate successfully', async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ token: 'mock-token' })
-    });
+      json: async () => ({ token: 'mock-token' }),
+    })
 
     const result = await authenticateWithInformatica({
       username: 'testuser',
       password: 'testpass',
       baseUrl: 'https://test-url.com',
-      apiUrl: 'https://test-api-url.com'
-    });
+      apiUrl: 'https://test-api-url.com',
+    })
 
-    expect(mockFetch).toHaveBeenCalledTimes(1);
-    expect(result.token).toBe('mock-token');
-  });
-});
+    expect(mockFetch).toHaveBeenCalledTimes(1)
+    expect(result.token).toBe('mock-token')
+  })
+})
 ```
 
 ### Testing Components
@@ -174,14 +176,14 @@ describe('UploadForm', () => {
     });
 
     render(<UploadForm />);
-    
+
     const fileInput = screen.getByLabelText(/Choose a file/i);
     const file = new File(['test'], 'test.xlsx', { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    
+
     await act(async () => {
       userEvent.upload(fileInput, file);
     });
-    
+
     await waitFor(() => {
       expect(screen.getByText(/File validated successfully/i)).toBeInTheDocument();
     });
@@ -205,4 +207,4 @@ Tests are automatically run in our CI pipeline on each pull request and push to 
 4. **Arrange, Act, Assert**: Structure tests in three distinct phases
 5. **Isolate tests**: Tests should not depend on each other
 6. **Mock external dependencies**: External services and APIs should be mocked
-7. **Test edge cases**: Include tests for error conditions and boundary cases 
+7. **Test edge cases**: Include tests for error conditions and boundary cases

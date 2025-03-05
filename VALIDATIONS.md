@@ -33,6 +33,7 @@ The commit-msg hook enforces the [Conventional Commits](https://www.conventional
 ```
 
 Valid types:
+
 - `feat`: A new feature
 - `fix`: A bug fix
 - `docs`: Documentation only changes
@@ -70,6 +71,7 @@ After merging changes, this hook checks if there were changes to the package dep
 ## VS Code Integration
 
 We've included VS Code settings that automatically:
+
 - Format code on save
 - Fix ESLint issues on save
 - Set the correct tab size and line endings
@@ -90,6 +92,7 @@ git commit -m "commit message" --no-verify
 If you encounter issues with the pre-commit hooks:
 
 1. Try running the individual scripts manually:
+
    ```bash
    npm run lint
    npm run format
@@ -97,6 +100,7 @@ If you encounter issues with the pre-commit hooks:
    ```
 
 2. Check if husky is properly installed:
+
    ```bash
    ls -la .git/hooks
    ```

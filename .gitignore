@@ -30,4 +30,18 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts 
+next-env.d.ts
+
+# ESLint cache
+.eslintcache
+
+# Stylelint cache
+.stylelintcache
+
+# Prettier cache
+.prettiercache
+
+# Ensure linter config files are not ignored
+!.eslintrc.js
+!.prettierrc
+!.stylelintrc.json

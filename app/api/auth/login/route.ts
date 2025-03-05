@@ -1,10 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { authenticate } from '@/lib/services/auth-service'
-import { InformaticaAuthCredentials, INFORMATICA_REGIONS } from '@/lib/utils/auth'
+
+import { authenticateWithInformatica, InformaticaAuthCredentials } from '@/lib/services/informatica-mapping-service'
+
+// Define regions
+const INFORMATICA_REGIONS = {
+  US: {
+    baseUrl: 'https://dm-us.informaticacloud.com',
+    apiUrl: 'https://idmc-api.dm-us.informaticacloud.com',
+  },
+  EMEA: {
+    baseUrl: 'https://dm-em.informaticacloud.com',
+    apiUrl: 'https://idmc-api.dm-em.informaticacloud.com',
+  },
+  APJ: {
+    baseUrl: 'https://dm-ap.informaticacloud.com',
+    apiUrl: 'https://idmc-api.dm-ap.informaticacloud.com',
+  },
+}
 
 /**
  * API route for authenticating with Informatica Cloud
- * 
+ *
  * @param request The incoming request
  * @returns A response with the authentication token
  */
@@ -12,7 +28,7 @@ export async function POST(request: NextRequest) {
   try {
     // Get credentials from request body
     const body = await request.json()
-    
+
     // Validate required fields
     if (!body.username || !body.password) {
       return NextResponse.json(
@@ -20,31 +36,30 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       )
     }
-    
+
     const credentials: InformaticaAuthCredentials = {
       username: body.username,
-      password: body.password
+      password: body.password,
+      baseUrl: body.baseUrl || 'https://dm-us.informaticacloud.com',
+      apiUrl: body.apiUrl || 'https://idmc-api.dm-us.informaticacloud.com',
     }
-    
-    // Get the region from request or use default
-    const region = body.region && INFORMATICA_REGIONS[body.region as keyof typeof INFORMATICA_REGIONS]
-      ? (body.region as keyof typeof INFORMATICA_REGIONS)
-      : 'US'
-    
+
     // Authenticate with Informatica Cloud
-    const token = await authenticate(credentials, region)
-    
-    // Return token and expiration
+    const authResult = await authenticateWithInformatica(credentials)
+
+    // Return token and session info
     return NextResponse.json({
-      accessToken: token.accessToken,
-      expiresAt: token.expiresAt
+      token: authResult.token,
+      session: authResult.session
     })
   } catch (error) {
     console.error('Authentication error:', error)
-    
+
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Authentication failed' },
+      {
+        error: error instanceof Error ? error.message : 'Authentication failed',
+      },
       { status: 401 }
     )
   }
-} 
+}

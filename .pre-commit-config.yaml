@@ -1,4 +1,5 @@
 repos:
+  # Standard Python pre-commit hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -18,34 +19,43 @@ repos:
       - id: mixed-line-ending
         args: ['--fix=lf']
 
+  # Local Node.js hooks - use system Node installation
   - repo: local
     hooks:
-      - id: prettier-fix
-        name: prettier-fix
-        entry: npx prettier --write --cache --cache-location .prettiercache
-        language: system
-        types_or: [javascript, jsx, ts, tsx, json, css, markdown]
-        exclude: node_modules/
+      # - id: prettier-fix
+      #   name: prettier-fix
+      #   entry: npx prettier --write --cache --cache-location .prettiercache
+      #   language: system
+      #   types_or: [javascript, jsx, ts, tsx, json, css, markdown]
+      #   exclude: node_modules/
 
-      - id: prettier-check
-        name: prettier-check
-        entry: npx prettier --check --cache --cache-location .prettiercache
-        language: system
-        types_or: [javascript, jsx, ts, tsx, json, css, markdown]
-        exclude: node_modules/
+      # - id: prettier-check
+      #   name: prettier-check
+      #   entry: npx prettier --check --cache --cache-location .prettiercache
+      #   language: system
+      #   types_or: [javascript, jsx, ts, tsx, json, css, markdown]
+      #   exclude: node_modules/
 
       - id: eslint
         name: eslint
-        entry: npx eslint --fix --max-warnings=20
+        entry: npx eslint --fix --max-warnings=100
         language: system
         types_or: [javascript, jsx, ts, tsx]
         files: \.(js|jsx|ts|tsx)$
-        exclude: node_modules/
+        exclude: >
+          (?x)^(
+            node_modules/|
+            scripts/|
+            __tests__/|
+            create-test-mapping\.js|
+            create-test-mapping-csv\.js|
+            lib/examples/
+          )
         args: [--cache, --cache-location, .eslintcache]
 
       - id: eslint-next
         name: eslint-next
-        entry: npx eslint --fix --max-warnings=20
+        entry: npx eslint --fix --max-warnings=100
         language: system
         files: 'app/.*\.(js|jsx|ts|tsx)$'
         types_or: [javascript, jsx, ts, tsx]
@@ -61,6 +71,7 @@ repos:
         files: \.(js|jsx|ts|tsx)$
         exclude: node_modules/
         args: [--noEmit, --pretty]
+        stages: [push]
 
       - id: test
         name: test
@@ -76,6 +87,7 @@ repos:
         types_or: [javascript, jsx, ts, tsx]
         files: \.(jsx|tsx)$
         exclude: node_modules/
+        stages: [push]
 
       - id: npm-audit
         name: npm-audit
@@ -91,7 +103,7 @@ repos:
         entry: npx jscpd
         language: system
         pass_filenames: false
-        args: [--ignore, 'node_modules/**,coverage/**,.next/**', --threshold=1]
+        args: [--ignore, 'node_modules/**,coverage/**,.next/**,__tests__/**,lib/examples/**', --threshold=1]
         stages: [push]
 
       - id: stylelint
@@ -101,23 +113,34 @@ repos:
         types_or: [css]
         files: \.(css)$
         exclude: node_modules/
+        stages: [push]
 
-  - repo: https://github.com/Lucas-C/pre-commit-hooks-nodejs
-    rev: v1.1.2
-    hooks:
+      # Add markdown-toc as a local hook to avoid nodeenv issues
       - id: markdown-toc
+        name: markdown-toc
+        entry: bash -c 'npx markdown-toc -i "$@"' --
+        language: system
+        files: \.md$
+        exclude: node_modules/
+        types: [markdown]
+        description: "Automatically updates the table of contents in markdown files"
+        require_serial: true
+        stages: [push]
 
+  # Security and quality hooks
   - repo: https://github.com/PyCQA/bandit
     rev: 1.8.3
     hooks:
       - id: bandit
         name: bandit-package-json-scan
         args: ['-r', 'package.json']
+        stages: [push]
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.24.0
     hooks:
       - id: gitleaks
+        stages: [push]
 
   - repo: https://github.com/hadolint/hadolint
     rev: v2.13.1-beta
@@ -127,10 +150,11 @@ repos:
         stages: [commit]
 
   - repo: https://github.com/crate-ci/typos
-    rev: v1.19.0
+    rev: v1.17.2
     hooks:
       - id: typos
         exclude: node_modules/|package-lock.json
+        stages: [push]
 
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.4.1

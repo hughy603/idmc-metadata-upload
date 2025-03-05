@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import clsx from 'clsx';
 
 export default function Header() {
   const [isDarkMode, setIsDarkMode] = useState(false)
 
   // Check for user's preferred color scheme on initial load
   useEffect(() => {
-    const isDark = document.documentElement.classList.contains('dark') || 
-                  window.matchMedia('(prefers-color-scheme: dark)').matches
+    const isDark =
+      document.documentElement.classList.contains('dark') ||
+      window.matchMedia('(prefers-color-scheme: dark)').matches
     setIsDarkMode(isDark)
     if (isDark) {
       document.documentElement.classList.add('dark')
@@ -25,18 +27,31 @@ export default function Header() {
   }
 
   return (
-    <header className="flex justify-between items-center py-4">
+    <header className="flex items-center justify-between py-4">
       <div className="flex items-center">
-        <h1 className="text-3xl font-bold text-primary dark:text-gray-100">IDMC Metadata Upload</h1>
+        <h1 className="text-3xl font-bold text-primary dark:text-gray-100">
+          IDMC Metadata Upload
+        </h1>
       </div>
       <div className="flex items-center space-x-4">
         <button
           onClick={toggleDarkMode}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-300"
-          aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="rounded-full p-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800"
+          aria-label={
+            isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'
+          }
         >
           {isDarkMode ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
               <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -48,7 +63,16 @@ export default function Header() {
               <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
             </svg>
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
           )}
@@ -56,4 +80,4 @@ export default function Header() {
       </div>
     </header>
   )
-} 
+}

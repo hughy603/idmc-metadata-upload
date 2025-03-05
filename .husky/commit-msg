@@ -31,4 +31,4 @@ if [ ${#subject} -gt 72 ]; then
   # This is just a warning, not an error
 fi
 
-echo "✅ Commit message format is valid!" 
+echo "✅ Commit message format is valid!"

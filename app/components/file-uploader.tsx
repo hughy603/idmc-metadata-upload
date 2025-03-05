@@ -1,17 +1,17 @@
 'use client'
 
 import { useRef } from 'react'
-import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 const fileUploaderSchema = z.object({
-  file: z.any()
-    .refine(
-      (files) => files instanceof FileList && files.length > 0, 
-      { message: 'Please select a file' }
-    ),
-  description: z.string().optional()
+  file: z
+    .any()
+    .refine((files) => files instanceof FileList && files.length > 0, {
+      message: 'Please select a file',
+    }),
+  description: z.string().optional(),
 })
 
 export type FileUploaderValues = z.infer<typeof fileUploaderSchema>
@@ -33,20 +33,19 @@ export default function FileUploader({
   validationError,
   isFileValid,
   onFileChange,
-  onSubmit
+  onSubmit,
 }: FileUploaderProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-    watch
   } = useForm<FileUploaderValues>({
     resolver: zodResolver(fileUploaderSchema),
     defaultValues: {
-      description: ''
-    }
+      description: '',
+    },
   })
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,11 +60,11 @@ export default function FileUploader({
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <h3 className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
           Upload Mapping File
-        </label>
-        
-        <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+        </h3>
+
+        <div className="mt-1 flex justify-center rounded-md border-2 border-dashed border-gray-300 px-6 pb-6 pt-5">
           <div className="space-y-1 text-center">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
@@ -84,7 +83,7 @@ export default function FileUploader({
             <div className="flex text-sm text-gray-600">
               <label
                 htmlFor="file-upload"
-                className="relative cursor-pointer bg-white dark:bg-gray-800 rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
+                className="relative cursor-pointer rounded-md bg-white font-medium text-blue-600 focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2 hover:text-blue-500 dark:bg-gray-800"
               >
                 <span>Upload a file</span>
                 <input
@@ -93,7 +92,7 @@ export default function FileUploader({
                   className="sr-only"
                   disabled={isValidating || isUploading}
                   {...fileRegisterRest}
-                  ref={(element) => {
+                  ref={element => {
                     ref(element)
                     if (element) {
                       fileInputRef.current = element
@@ -117,31 +116,36 @@ export default function FileUploader({
         </div>
 
         {errors.file && (
-          <p className="mt-1 text-sm text-red-600">{errors.file.message?.toString()}</p>
+          <p className="mt-1 text-sm text-red-600">
+            {errors.file.message?.toString()}
+          </p>
         )}
 
         {validationError && (
-          <div className="p-3 mt-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800">
+          <div className="mt-3 rounded-lg bg-red-100 p-3 text-sm text-red-700 dark:bg-red-200 dark:text-red-800">
             {validationError}
           </div>
         )}
 
         {isFileValid && (
-          <div className="p-3 mt-3 text-sm text-green-700 bg-green-100 rounded-lg dark:bg-green-200 dark:text-green-800">
+          <div className="mt-3 rounded-lg bg-green-100 p-3 text-sm text-green-700 dark:bg-green-200 dark:text-green-800">
             File validated successfully
           </div>
         )}
       </div>
 
       <div className="mb-4">
-        <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          htmlFor="description"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Description (optional)
         </label>
         <textarea
           id="description"
           {...register('description')}
           disabled={isValidating || isUploading || !isFileValid}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-800 dark:border-gray-700 dark:text-white"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
           rows={3}
         />
       </div>
@@ -149,10 +153,10 @@ export default function FileUploader({
       <button
         type="submit"
         disabled={isValidating || isUploading || !isFileValid}
-        className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isUploading ? 'Uploading...' : 'Upload to Informatica'}
       </button>
     </form>
   )
-} 
+}

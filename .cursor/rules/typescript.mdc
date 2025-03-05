@@ -1,6 +1,6 @@
 ---
 description: This comprehensive guide outlines best practices, conventions, and standards for development with modern web technologies including ReactJS, NextJS, Redux, TypeScript, JavaScript, HTML, CSS, and UI frameworks
-globs: *.tsx, *.ts, *.js, *.json
+globs: **/*.tsx, **/*.ts, **/*.js, **/*.json, **/*.cjs
 alwaysApply: false
 ---
 # Development Philosophy
@@ -189,7 +189,8 @@ alwaysApply: false
 - Mock external dependencies and API calls to isolate unit tests.
 - Aim for 80% code coverage
 
-Integration Testing
+## Integration Testing
+
 - Focus on user workflows to ensure app functionality.
 - Set up and tear down test environments properly to maintain test independence.
 - Use snapshot testing selectively to catch unintended UI changes without over-relying on it.
@@ -218,7 +219,7 @@ Internationalization (i18n)
 - Implement proper RTL support
 - Use proper currency formatting
 
-# TypeSript Documentation
+# TypeScript Documentation
 - Use JSDoc for documentation
 - Document all public functions, classes, methods, and interfaces
 - Add examples when appropriate
@@ -234,4 +235,3 @@ Internationalization (i18n)
 
 - API Documentation contained in the docs/ folder [DGC_2025February_(API)Reference_en.txt](mdc:docs/DGC_2025February_(API)Reference_en.txt)
 - Official Documentation hosted on https://docs.informatica.com/
-

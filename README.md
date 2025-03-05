@@ -1,6 +1,26 @@
 # IDMC Metadata Upload
 
-User Interface for validating & submitting data mapping documentation containing source to target lineage & business terms to Informatica Cloud's Data Catalog.
+<!-- toc -->
+
+## Introduction
+This project handles metadata uploads for IDMC.
+
+## Features
+- Feature 1
+- Feature 2
+
+## Installation
+```bash
+npm install
+```
+
+## Usage
+```bash
+npm run dev
+```
+
+## Contributing
+Please read the [contributing guide](CONTRIBUTING.md).
 
 ## Overview
 
@@ -11,21 +31,12 @@ The IDMC Metadata Upload tool is a web application that allows users to:
 3. Submit the validated mappings to Informatica Cloud's Data Catalog API
 4. Track the status of submitted mapping information
 
-## Features
-
-- Modern, responsive UI built with Next.js and Tailwind CSS
-- File upload with validation
-- Authentication with Informatica Cloud
-- Region selection for different Informatica Cloud instances
-- Real-time feedback during validation and upload processes
-- Display of mapping documentation before submission
-- Tracking of job status after submission
-
 ## Mapping File Format
 
 The tool expects Excel (.xlsx) or CSV (.csv) files with the following columns:
 
 ### Required Columns:
+
 - **SourceSystem**: The name of the source system
 - **SourceTable**: The name of the source table/object
 - **SourceColumn**: The name of the source column/field
@@ -34,6 +45,7 @@ The tool expects Excel (.xlsx) or CSV (.csv) files with the following columns:
 - **TargetColumn**: The name of the target column/field
 
 ### Optional Columns:
+
 - **TransformationLogic**: The transformation logic applied to the source data
 - **BusinessTerm**: Associated business term(s)
 - **Description**: Additional description or notes
@@ -59,12 +71,14 @@ The tool expects Excel (.xlsx) or CSV (.csv) files with the following columns:
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/your-organization/idmc-metadata-upload.git
    cd idmc-metadata-upload
    ```
 
 2. Install the dependencies:
+
    ```bash
    npm install
    # or
@@ -72,6 +86,7 @@ The tool expects Excel (.xlsx) or CSV (.csv) files with the following columns:
    ```
 
 3. Start the development server:
+
    ```bash
    npm run dev
    # or
@@ -129,6 +144,14 @@ npm run test:coverage
 
 See [Testing Documentation](docs/TESTING.md) for more details on our testing approach.
 
+## Testing Pre-commit Hooks
+
+This is a test to see if the Prettier hook works correctly.
+
+const testFunction = ( ) => {
+return "This should be formatted"
+}
+
 ## Project Structure
 
 ```
@@ -167,6 +190,28 @@ When contributing to this project, please follow these guidelines:
 4. Use meaningful commit messages
 5. Create pull requests with appropriate descriptions
 6. Ensure tests pass and maintain code coverage above 80%
+
+### Variable Naming Conventions
+
+This project follows these variable naming conventions:
+
+1. Use descriptive camelCase for all variables and function names
+2. Only use underscore prefix (`_variableName`) for variables that are intentionally unused
+3. Use PascalCase for class names, interfaces, and type aliases
+4. Use UPPER_CASE for constants and enum values
+
+To maintain consistent naming across the codebase, we provide a script that can automatically fix common naming issues:
+
+```bash
+# Fix variable naming issues
+npm run fix:naming
+```
+
+This script:
+- Removes unnecessary underscore prefixes from variables that are actually used
+- Updates test files to use consistent naming
+- Runs ESLint to apply naming convention rules
+- Verifies that tests still pass after the changes
 
 ## Troubleshooting
 
